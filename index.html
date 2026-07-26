@@ -252,10 +252,28 @@ tr:hover{background:#f8fafc;}
           <label>Full Name *</label>
           <input type="text" id="signup-name" placeholder="Your full name">
         </div>
-        <div class="form-group">
-          <label>Department *</label>
-          <input type="text" id="signup-dept" placeholder="e.g., Front Office">
-        </div>
+       <div class="form-group">
+  <label>Department *</label>
+  <select id="signup-dept" required>
+    <option value="">Select Department</option>
+    <option value="Engineering">Engineering</option>
+    <option value="Executive Office">Executive Office</option>
+    <option value="F&B Service">F&B Service</option>
+    <option value="Finance">Finance</option>
+    <option value="Front Office">Front Office</option>
+    <option value="Gallery - Retail Store">Gallery - Retail Store</option>
+    <option value="Housekeeping">Housekeeping</option>
+    <option value="Human Resources">Human Resources</option>
+    <option value="IT">IT</option>
+    <option value="Kitchen">Kitchen</option>
+    <option value="Purchasing">Purchasing</option>
+    <option value="Reservations">Reservations</option>
+    <option value="Sales and Marketing">Sales and Marketing</option>
+    <option value="Security">Security</option>
+    <option value="Spa">Spa</option>
+    <option value="Stewarding">Stewarding</option>
+  </select>
+</div>
         <div class="form-group">
           <label>Create Password *</label>
           <input type="password" id="signup-password" placeholder="Min 6 characters">
@@ -696,9 +714,27 @@ tr:hover{background:#f8fafc;}
       <input type="text" id="edit-emp-name">
     </div>
     <div class="form-group">
-      <label>Department *</label>
-      <input type="text" id="edit-emp-dept">
-    </div>
+  <label>Department *</label>
+  <select id="edit-emp-dept" required>
+    <option value="">Select Department</option>
+    <option value="Engineering">Engineering</option>
+    <option value="Executive Office">Executive Office</option>
+    <option value="F&B Service">F&B Service</option>
+    <option value="Finance">Finance</option>
+    <option value="Front Office">Front Office</option>
+    <option value="Gallery - Retail Store">Gallery - Retail Store</option>
+    <option value="Housekeeping">Housekeeping</option>
+    <option value="Human Resources">Human Resources</option>
+    <option value="IT">IT</option>
+    <option value="Kitchen">Kitchen</option>
+    <option value="Purchasing">Purchasing</option>
+    <option value="Reservations">Reservations</option>
+    <option value="Sales and Marketing">Sales and Marketing</option>
+    <option value="Security">Security</option>
+    <option value="Spa">Spa</option>
+    <option value="Stewarding">Stewarding</option>
+  </select>
+</div>
     <div class="form-group">
       <label>Points Balance</label>
       <input type="number" id="edit-emp-points">
