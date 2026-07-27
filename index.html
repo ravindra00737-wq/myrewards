@@ -1003,13 +1003,28 @@ function employeeLogin() {
 
   db.ref('loyalty/employees').orderByChild('employeeId').equalTo(empId).once('value', snap => {
     let found = null;
+    let employeeKey = null;
+    
     snap.forEach(child => {
       const data = child.val();
-      if(data.password === btoa(password)) found = {id: child.key, ...data};
+      if(data.password === btoa(password)) {
+        found = {id: child.key, ...data};
+        employeeKey = child.key;
+      }
     });
+    
     if(found) {
       currentUser = found;
       isAdmin = false;
+      
+      // THIS IS THE CRITICAL PART: Update status in database
+      db.ref('loyalty/employees/' + employeeKey).update({
+        accountStatus: 'account created',
+        lastLogin: Date.now()
+      }).then(() => {
+          console.log("Status updated to account created");
+      });
+      
       onLoginSuccess();
     } else {
       showAlert('Invalid Employee ID or Password', 'error');
@@ -1944,7 +1959,6 @@ function renderEmployees() {
     (e.department || '').toLowerCase().includes(searchTerm)
   );
   
-  // Sorting logic
   switch(sortValue) {
     case 'name-asc': filtered.sort((a,b) => a.name.localeCompare(b.name)); break;
     case 'name-desc': filtered.sort((a,b) => b.name.localeCompare(a.name)); break;
@@ -1957,7 +1971,7 @@ function renderEmployees() {
   document.getElementById('employees-list').innerHTML = filtered.length === 0
     ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No employees found</p>'
     : filtered.map(e => {
-      // LOGIC: Check if accountStatus is 'Account Created', otherwise default to 'Pending'
+      // Check status exactly as written in database
       const status = e.accountStatus === 'Account Created' ? 'Account Created' : 'Pending';
       const badgeClass = status === 'Account Created' ? 'status-account-created' : 'status-pending';
       const icon = status === 'Account Created' ? '✅' : '⏳';
@@ -1975,7 +1989,7 @@ function renderEmployees() {
         <div class="item-points">${e.points || 0} pts</div>
         <div class="item-actions">
           <button class="btn btn-outline btn-sm" onclick="editEmployee('${e.id}')">✏️ Edit</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${e.id}')">🗑️ Delete</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${e.id}')">️ Delete</button>
         </div>
       </div>
     `}).join('');
