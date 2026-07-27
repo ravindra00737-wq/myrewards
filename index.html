@@ -70,6 +70,7 @@ textarea{resize:vertical;min-height:80px;}
 .alert-success{background:#d1fae5;color:#065f46;border:1px solid #6ee7b7;}
 .alert-error{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;}
 .alert-info{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd;}
+.alert-warning{background:#fef3c7;color:#92400e;border:1px solid #fde68a;}
 
 .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:25px;}
 .stat-card{background:linear-gradient(135deg,var(--brand),var(--brand-light));color:#fff;padding:25px;border-radius:12px;text-align:center;box-shadow:0 6px 15px rgba(15,118,110,0.3);transition:transform 0.3s;}
@@ -79,8 +80,7 @@ textarea{resize:vertical;min-height:80px;}
 
 table{width:100%;border-collapse:collapse;margin-top:15px;background:#fff;border-radius:8px;overflow:hidden;}
 th,td{padding:12px;text-align:left;border-bottom:1px solid var(--border);}
-th{background:var(--brand);color:#fff;font-weight:600;cursor:pointer;}
-th:hover{background:var(--brand-dark);}
+th{background:var(--brand);color:#fff;font-weight:600;}
 tr:hover{background:#f8fafc;}
 
 .item-list{display:grid;gap:12px;}
@@ -98,7 +98,7 @@ tr:hover{background:#f8fafc;}
 
 .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(5px);}
 .modal.active{display:flex;}
-.modal-content{background:#fff;padding:30px;border-radius:15px;max-width:600px;width:90%;max-height:90vh;overflow-y:auto;animation:modalSlide 0.3s;}
+.modal-content{background:#fff;padding:30px;border-radius:15px;max-width:700px;width:90%;max-height:90vh;overflow-y:auto;animation:modalSlide 0.3s;}
 @keyframes modalSlide{from{opacity:0;transform:scale(0.9);}to{opacity:1;transform:scale(1);}}
 
 .wallet{background:linear-gradient(135deg,var(--gold),var(--gold-light));color:#fff;padding:35px;border-radius:15px;text-align:center;box-shadow:0 8px 25px rgba(245,158,11,0.3);margin-bottom:25px;position:relative;overflow:hidden;}
@@ -170,6 +170,28 @@ tr:hover{background:#f8fafc;}
 .status-used{background:#e5e7eb;color:#374151;}
 .status-cancelled{background:#f3f4f6;color:#6b7280;}
 
+.activity-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 4px 15px rgba(0,0,0,0.08);transition:all 0.3s;border-left:4px solid var(--brand);}
+.activity-card:hover{transform:translateY(-3px);box-shadow:0 8px 25px rgba(0,0,0,0.12);}
+.activity-card .activity-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.activity-card .activity-name{font-size:1.2rem;font-weight:bold;color:var(--brand);}
+.activity-card .activity-points{font-size:1.5rem;font-weight:bold;color:var(--gold);}
+.activity-card .activity-category{display:inline-block;padding:4px 10px;background:#e0f2fe;color:#0369a1;border-radius:12px;font-size:0.8rem;margin-bottom:10px;}
+.activity-card .activity-desc{color:#64748b;font-size:0.9rem;line-height:1.5;}
+
+.autocomplete-container{position:relative;}
+.autocomplete-list{position:absolute;top:100%;left:0;right:0;background:#fff;border:2px solid var(--brand-light);border-radius:8px;max-height:200px;overflow-y:auto;z-index:1000;box-shadow:0 4px 15px rgba(0,0,0,0.1);display:none;}
+.autocomplete-list.active{display:block;}
+.autocomplete-item{padding:10px 15px;cursor:pointer;transition:background 0.2s;}
+.autocomplete-item:hover{background:#f0fdfa;}
+.autocomplete-item strong{color:var(--brand);}
+.autocomplete-item small{color:#64748b;display:block;font-size:0.85rem;}
+
+.filter-row{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:20px;align-items:end;}
+.filter-row .form-group{margin-bottom:0;flex:1;min-width:150px;}
+
+.error-row{background:#fee2e2 !important;border-left-color:var(--danger) !important;}
+.success-row{background:#d1fae5 !important;border-left-color:var(--success) !important;}
+
 @media(max-width:768px){
   .header-content{flex-direction:column;text-align:center;}
   .nav-content{flex-direction:column;}
@@ -180,6 +202,7 @@ tr:hover{background:#f8fafc;}
   .voucher-details{grid-template-columns:1fr;}
   .stats-grid{grid-template-columns:1fr 1fr;}
   .item-row{flex-direction:column;align-items:flex-start;gap:10px;}
+  .filter-row{flex-direction:column;}
 }
 </style>
 </head>
@@ -197,15 +220,18 @@ tr:hover{background:#f8fafc;}
 
 <div class="navbar">
   <div class="nav-content">
-    <button class="nav-btn hidden" id="nav-points" onclick="switchTab('points',this)">💰 My Points</button>
+    <button class="nav-btn hidden" id="nav-points" onclick="switchTab('points',this)"> My Points</button>
     <button class="nav-btn hidden" id="nav-history" onclick="switchTab('history',this)">📜 Activity History</button>
-    <button class="nav-btn hidden" id="nav-services" onclick="switchTab('services',this)">🎁 All Services</button>
+    <button class="nav-btn hidden" id="nav-activities" onclick="switchTab('activities',this)">🎯 Activities</button>
+    <button class="nav-btn hidden" id="nav-services" onclick="switchTab('services',this)"> All Services</button>
     <button class="nav-btn hidden" id="nav-available" onclick="switchTab('available',this)">✅ Available to Me</button>
     <button class="nav-btn hidden" id="nav-my-requests" onclick="switchTab('my-requests',this)">📋 My Requests</button>
+    <button class="nav-btn hidden" id="nav-transactions" onclick="switchTab('transactions',this)">📊 Transaction History</button>
     
     <button class="nav-btn hidden" id="nav-dashboard" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
     <button class="nav-btn hidden" id="nav-branding" onclick="switchTab('branding',this)"> Branding</button>
-    <button class="nav-btn hidden" id="nav-activities" onclick="switchTab('activities',this)">🎯 Activities</button>
+    <button class="nav-btn hidden" id="nav-employee-points" onclick="switchTab('employee-points',this)">⭐ Employee Activity Points</button>
+    <button class="nav-btn hidden" id="nav-admin-activities" onclick="switchTab('admin-activities',this)">🎯 Activities</button>
     <button class="nav-btn hidden" id="nav-admin-services" onclick="switchTab('admin-services',this)">🎁 Services</button>
     <button class="nav-btn hidden" id="nav-employees" onclick="switchTab('employees',this)">👥 Employees</button>
     <button class="nav-btn hidden" id="nav-vouchers" onclick="switchTab('vouchers',this)">🎟️ Vouchers</button>
@@ -225,6 +251,7 @@ tr:hover{background:#f8fafc;}
   <div id="alert-success" class="alert alert-success"></div>
   <div id="alert-error" class="alert alert-error"></div>
   <div id="alert-info" class="alert alert-info"></div>
+  <div id="alert-warning" class="alert alert-warning"></div>
 
   <!-- LOGIN TAB -->
   <div id="tab-login" class="tab-content active">
@@ -254,26 +281,11 @@ tr:hover{background:#f8fafc;}
       <div class="card">
         <h2>📝 Employee Sign Up</h2>
         <p style="color:#64748b;margin-bottom:20px;">Create your loyalty account</p>
-        <div class="form-group">
-          <label>Employee ID *</label>
-          <input type="text" id="signup-empid" placeholder="e.g., E001">
-        </div>
-        <div class="form-group">
-          <label>Full Name *</label>
-          <input type="text" id="signup-name" placeholder="Your full name">
-        </div>
-        <div class="form-group">
-          <label>Department *</label>
-          <input type="text" id="signup-dept" placeholder="e.g., Front Office">
-        </div>
-        <div class="form-group">
-          <label>Create Password *</label>
-          <input type="password" id="signup-password" placeholder="Min 6 characters">
-        </div>
-        <div class="form-group">
-          <label>Confirm Password *</label>
-          <input type="password" id="signup-confirm" placeholder="Re-enter password">
-        </div>
+        <div class="form-group"><label>Employee ID *</label><input type="text" id="signup-empid" placeholder="e.g., E001"></div>
+        <div class="form-group"><label>Full Name *</label><input type="text" id="signup-name" placeholder="Your full name"></div>
+        <div class="form-group"><label>Department *</label><input type="text" id="signup-dept" placeholder="e.g., Front Office"></div>
+        <div class="form-group"><label>Create Password *</label><input type="password" id="signup-password" placeholder="Min 6 characters"></div>
+        <div class="form-group"><label>Confirm Password *</label><input type="password" id="signup-confirm" placeholder="Re-enter password"></div>
         <button class="btn btn-primary btn-full" onclick="employeeSignup()">Create Account</button>
         <button class="btn btn-outline btn-full" onclick="showLogin()" style="margin-top:10px;">← Back to Login</button>
       </div>
@@ -285,19 +297,9 @@ tr:hover{background:#f8fafc;}
     <div class="login-box">
       <div class="card">
         <h2>🔑 Reset Password</h2>
-        <p style="color:#64748b;margin-bottom:20px;">Enter your Employee ID to reset your password</p>
-        <div class="form-group">
-          <label>Employee ID</label>
-          <input type="text" id="forgot-empid" placeholder="Enter your Employee ID">
-        </div>
-        <div class="form-group">
-          <label>New Password</label>
-          <input type="password" id="forgot-password" placeholder="New password (min 6 chars)">
-        </div>
-        <div class="form-group">
-          <label>Confirm New Password</label>
-          <input type="password" id="forgot-confirm" placeholder="Re-enter new password">
-        </div>
+        <div class="form-group"><label>Employee ID</label><input type="text" id="forgot-empid"></div>
+        <div class="form-group"><label>New Password</label><input type="password" id="forgot-password"></div>
+        <div class="form-group"><label>Confirm New Password</label><input type="password" id="forgot-confirm"></div>
         <button class="btn btn-primary btn-full" onclick="resetPassword()">Reset Password</button>
         <button class="btn btn-outline btn-full" onclick="showLogin()" style="margin-top:10px;">← Back to Login</button>
       </div>
@@ -313,13 +315,11 @@ tr:hover{background:#f8fafc;}
         <small>All points redeemable until 30th December 2026. From 1st January 2027, all points will lapse.</small>
       </div>
     </div>
-    
     <div class="wallet">
       <div class="employee-name" id="wallet-employee-name">Employee Name</div>
       <div class="balance" id="wallet-balance">0</div>
       <div class="label">Available Reward Points</div>
     </div>
-    
     <div class="stats-grid">
       <div class="stat-card" style="background:linear-gradient(135deg,var(--success),#34d399);">
         <div class="number" id="stat-total-earned">0</div>
@@ -336,8 +336,47 @@ tr:hover{background:#f8fafc;}
   <div id="tab-history" class="tab-content">
     <div class="card">
       <h2>📜 Activity History</h2>
+      <div class="filter-row">
+        <div class="form-group">
+          <label>Filter by Month</label>
+          <select id="history-month-filter" onchange="renderEmployeeActivityHistory()">
+            <option value="">All Months</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter by Year</label>
+          <select id="history-year-filter" onchange="renderEmployeeActivityHistory()">
+            <option value="">All Years</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
+      </div>
       <div id="activity-history-stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:25px;"></div>
       <div class="transaction-list" id="activity-history-list"></div>
+    </div>
+  </div>
+
+  <!-- EMPLOYEE: ACTIVITIES TAB -->
+  <div id="tab-activities" class="tab-content">
+    <div class="card">
+      <h2>🎯 Available Activities</h2>
+      <p style="color:#64748b;margin-bottom:20px;">Participate in these activities to earn reward points.</p>
+      <div class="item-list" id="employee-activities-list"></div>
     </div>
   </div>
 
@@ -366,35 +405,61 @@ tr:hover{background:#f8fafc;}
     </div>
   </div>
 
+  <!-- EMPLOYEE: TRANSACTIONS TAB -->
+  <div id="tab-transactions" class="tab-content">
+    <div class="card">
+      <h2>📊 Transaction History</h2>
+      <p style="color:#64748b;margin-bottom:20px;">Complete audit trail of all your points transactions</p>
+      <div class="filter-row">
+        <div class="form-group">
+          <label>Filter by Month</label>
+          <select id="trans-month-filter" onchange="renderEmployeeTransactions()">
+            <option value="">All Months</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter by Year</label>
+          <select id="trans-year-filter" onchange="renderEmployeeTransactions()">
+            <option value="">All Years</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Date</th><th>Type</th><th>Description</th><th>Points</th><th>Running Balance</th></tr>
+        </thead>
+        <tbody id="employee-transactions-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- ADMIN: DASHBOARD TAB -->
   <div id="tab-dashboard" class="tab-content">
     <div class="card">
-      <h2> Dashboard Overview</h2>
+      <h2>📊 Dashboard Overview</h2>
       <div class="stats-grid">
-        <div class="stat-card">
-          <div class="number" id="stat-employees">0</div>
-          <div class="label">Total Employees</div>
-        </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,var(--warning),var(--gold-light));">
-          <div class="number" id="stat-activities">0</div>
-          <div class="label">Total Activities</div>
-        </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,var(--info),#60a5fa);">
-          <div class="number" id="stat-services">0</div>
-          <div class="label">Total Services</div>
-        </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,var(--danger),#f87171);">
-          <div class="number" id="stat-vouchers-admin">0</div>
-          <div class="label">Active Vouchers</div>
-        </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,var(--success),#34d399);">
-          <div class="number" id="stat-points-distributed">0</div>
-          <div class="label">Points Distributed</div>
-        </div>
-        <div class="stat-card" style="background:linear-gradient(135deg,var(--brand),var(--brand-light));">
-          <div class="number" id="stat-points-redeemed">0</div>
-          <div class="label">Points Redeemed</div>
-        </div>
+        <div class="stat-card"><div class="number" id="stat-employees">0</div><div class="label">Total Employees</div></div>
+        <div class="stat-card" style="background:linear-gradient(135deg,var(--warning),var(--gold-light));"><div class="number" id="stat-activities">0</div><div class="label">Total Activities</div></div>
+        <div class="stat-card" style="background:linear-gradient(135deg,var(--info),#60a5fa);"><div class="number" id="stat-services">0</div><div class="label">Total Services</div></div>
+        <div class="stat-card" style="background:linear-gradient(135deg,var(--danger),#f87171);"><div class="number" id="stat-vouchers-admin">0</div><div class="label">Active Vouchers</div></div>
+        <div class="stat-card" style="background:linear-gradient(135deg,var(--success),#34d399);"><div class="number" id="stat-points-distributed">0</div><div class="label">Points Distributed</div></div>
+        <div class="stat-card" style="background:linear-gradient(135deg,var(--brand),var(--brand-light));"><div class="number" id="stat-points-redeemed">0</div><div class="label">Points Redeemed</div></div>
       </div>
     </div>
   </div>
@@ -402,52 +467,128 @@ tr:hover{background:#f8fafc;}
   <!-- ADMIN: BRANDING TAB -->
   <div id="tab-branding" class="tab-content">
     <div class="card">
-      <h2>🎨 Customize Appearance</h2>
-      <div class="form-group">
-        <label>Hotel/Company Name</label>
-        <input type="text" id="brand-hotel-name" placeholder="e.g., Six Senses Dunes">
-      </div>
-      <div class="form-group">
-        <label>Tagline</label>
-        <input type="text" id="brand-tagline" placeholder="e.g., Umluj Shopping Trip">
-      </div>
+      <h2> Customize Appearance</h2>
+      <div class="form-group"><label>Hotel/Company Name</label><input type="text" id="brand-hotel-name"></div>
+      <div class="form-group"><label>Tagline</label><input type="text" id="brand-tagline"></div>
       <div class="form-group">
         <label>Hotel Logo</label>
-        <div class="file-upload" id="logo-upload">
-          <p style="font-size:2rem;">🏨</p>
-          <p><strong>Click to upload logo</strong></p>
-          <input type="file" id="brand-logo-file" accept="image/*">
-        </div>
+        <div class="file-upload" id="logo-upload"><p style="font-size:2rem;">🏨</p><p><strong>Click to upload logo</strong></p><input type="file" id="brand-logo-file" accept="image/*"></div>
         <img id="brand-logo-preview" style="max-width:150px;margin-top:10px;border-radius:10px;display:none;">
       </div>
       <div class="form-group">
         <label>Background Image</label>
-        <div class="file-upload" id="bg-upload">
-          <p style="font-size:2rem;">🌄</p>
-          <p><strong>Click to upload background</strong></p>
-          <input type="file" id="brand-bg-file" accept="image/*">
-        </div>
+        <div class="file-upload" id="bg-upload"><p style="font-size:2rem;">🌄</p><p><strong>Click to upload background</strong></p><input type="file" id="brand-bg-file" accept="image/*"></div>
         <img id="brand-bg-preview" style="max-width:100%;margin-top:10px;border-radius:10px;display:none;">
       </div>
-      <div class="form-group">
-        <label>Primary Color</label>
-        <input type="color" id="brand-color" value="#0f766e" style="width:100px;height:40px;">
-      </div>
+      <div class="form-group"><label>Primary Color</label><input type="color" id="brand-color" value="#0f766e" style="width:100px;height:40px;"></div>
       <button class="btn btn-primary btn-full" onclick="saveBranding()">💾 Save Branding</button>
     </div>
   </div>
 
+  <!-- ADMIN: EMPLOYEE ACTIVITY POINTS TAB (NEW) -->
+  <div id="tab-employee-points" class="tab-content">
+    <div class="card">
+      <h2>⭐ Employee Activity Points Management</h2>
+      
+      <!-- Manual Entry Section -->
+      <div style="background:#f8fafc;padding:20px;border-radius:10px;margin-bottom:25px;">
+        <h3 style="margin-bottom:15px;">➕ Manual Entry - Award Points</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
+          <div class="form-group">
+            <label>Activity Date *</label>
+            <input type="date" id="manual-activity-date">
+          </div>
+          <div class="form-group">
+            <label>Points Earned *</label>
+            <input type="number" id="manual-points" placeholder="Auto-populated from activity" min="0">
+          </div>
+        </div>
+        <div class="form-group autocomplete-container">
+          <label>Employee Name *</label>
+          <input type="text" id="manual-emp-name" placeholder="Start typing employee name..." oninput="showEmployeeNameSuggestions(this.value)">
+          <div class="autocomplete-list" id="emp-name-suggestions"></div>
+        </div>
+        <div class="form-group autocomplete-container">
+          <label>Employee ID *</label>
+          <input type="text" id="manual-emp-id" placeholder="Start typing employee ID..." oninput="showEmployeeIdSuggestions(this.value)">
+          <div class="autocomplete-list" id="emp-id-suggestions"></div>
+        </div>
+        <div class="form-group autocomplete-container">
+          <label>Activity Name *</label>
+          <input type="text" id="manual-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestions(this.value)">
+          <div class="autocomplete-list" id="activity-suggestions"></div>
+        </div>
+        <div class="form-group">
+          <label>Remarks (Optional)</label>
+          <textarea id="manual-remarks" placeholder="Any additional notes..."></textarea>
+        </div>
+        <button class="btn btn-success" onclick="addManualActivity()">➕ Add Activity & Award Points</button>
+      </div>
+
+      <!-- Bulk Upload Section -->
+      <div style="background:#f8fafc;padding:20px;border-radius:10px;margin-bottom:25px;">
+        <h3 style="margin-bottom:15px;">📤 Bulk Upload via Excel</h3>
+        <p style="color:#64748b;margin-bottom:15px;">Upload Excel file with columns: Activity Date, Employee ID, Employee Name, Activity Name, Points Earned</p>
+        <div class="file-upload" id="bulk-activity-upload">
+          <p style="font-size:2rem;">📊</p>
+          <p><strong>Click to upload Excel file</strong></p>
+          <input type="file" id="bulk-activity-file" accept=".xlsx,.xls">
+        </div>
+        <button class="btn btn-outline" onclick="downloadActivityUploadTemplate()" style="margin-top:10px;">📥 Download Template</button>
+        <div id="bulk-upload-results" style="margin-top:15px;"></div>
+      </div>
+
+      <!-- Activity Records List -->
+      <h3 style="margin-bottom:15px;">📋 Activity Records</h3>
+      <div class="filter-row">
+        <div class="form-group">
+          <label>Filter by Month</label>
+          <select id="admin-activity-month" onchange="renderAdminActivityRecords()">
+            <option value="">All Months</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter by Year</label>
+          <select id="admin-activity-year" onchange="renderAdminActivityRecords()">
+            <option value="">All Years</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr><th>Date</th><th>Employee</th><th>Activity</th><th>Points</th><th>Month/Year</th><th>Remarks</th><th>Actions</th></tr>
+          </thead>
+          <tbody id="admin-activity-records-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- ADMIN: ACTIVITIES TAB -->
-  <div id="tab-activities" class="tab-content">
+  <div id="tab-admin-activities" class="tab-content">
     <div class="card">
       <h2>🎯 Manage Activities</h2>
       <div style="margin-bottom:20px;">
         <button class="btn btn-primary" onclick="showAddActivityModal()">➕ Add Activity</button>
         <button class="btn btn-outline" onclick="downloadActivityTemplate()" style="margin-left:10px;">📥 Download Template</button>
-        <label class="btn btn-success" style="margin-left:10px;cursor:pointer;">
-          📤 Bulk Upload
-          <input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadActivities(this)">
-        </label>
+        <label class="btn btn-success" style="margin-left:10px;cursor:pointer;"> Bulk Upload<input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadActivities(this)"></label>
       </div>
       <div class="item-list" id="activities-list"></div>
     </div>
@@ -460,10 +601,7 @@ tr:hover{background:#f8fafc;}
       <div style="margin-bottom:20px;">
         <button class="btn btn-primary" onclick="showAddServiceModal()">➕ Add Service</button>
         <button class="btn btn-outline" onclick="downloadServiceTemplate()" style="margin-left:10px;">📥 Download Template</button>
-        <label class="btn btn-success" style="margin-left:10px;cursor:pointer;">
-          📤 Bulk Upload
-          <input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadServices(this)">
-        </label>
+        <label class="btn btn-success" style="margin-left:10px;cursor:pointer;">📤 Bulk Upload<input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadServices(this)"></label>
       </div>
       <div class="item-list" id="services-list"></div>
     </div>
@@ -476,10 +614,7 @@ tr:hover{background:#f8fafc;}
       <div style="margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;">
         <button class="btn btn-primary" onclick="showAddEmployeeModal()">➕ Add Employee Manually</button>
         <button class="btn btn-outline" onclick="downloadEmployeeTemplate()">📥 Download Template</button>
-        <label class="btn btn-success" style="cursor:pointer;">
-          📤 Bulk Import
-          <input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadEmployees(this)">
-        </label>
+        <label class="btn btn-success" style="cursor:pointer;">📤 Bulk Import<input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadEmployees(this)"></label>
       </div>
       <div class="sort-controls">
         <select id="employee-sort" onchange="renderEmployees()">
@@ -500,19 +635,12 @@ tr:hover{background:#f8fafc;}
   <div id="tab-vouchers" class="tab-content">
     <div class="card">
       <h2>🎟️ Voucher Management</h2>
-      <div class="month-tabs" id="voucher-month-tabs"></div>
+      <div style="margin-bottom:15px;">
+        <button class="btn btn-primary" onclick="showApplyBehalfModal()">➕ Apply on Behalf of Employee</button>
+      </div>
       <table>
         <thead>
-          <tr>
-            <th>Serial No</th>
-            <th>Employee</th>
-            <th>Service</th>
-            <th>Points</th>
-            <th>Issue Date</th>
-            <th>Expiry</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
+          <tr><th>Serial No</th><th>Employee</th><th>Service</th><th>Points</th><th>Issue Date</th><th>Expiry</th><th>Actions</th></tr>
         </thead>
         <tbody id="vouchers-tbody"></tbody>
       </table>
@@ -532,26 +660,15 @@ tr:hover{background:#f8fafc;}
     <div class="card">
       <h2>📊 Reports</h2>
       <div class="month-tabs" id="report-month-tabs"></div>
-      
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
-        <div>
-          <h3>Activities This Month</h3>
-          <div id="report-activities"></div>
-        </div>
-        <div>
-          <h3>Services Redeemed</h3>
-          <div id="report-services"></div>
-        </div>
+        <div><h3>Activities This Month</h3><div id="report-activities"></div></div>
+        <div><h3>Services Redeemed</h3><div id="report-services"></div></div>
       </div>
-      
       <h3>Employee Summary</h3>
       <table>
-        <thead>
-          <tr><th>Employee</th><th>Department</th><th>Points Earned</th><th>Points Spent</th><th>Current Balance</th></tr>
-        </thead>
+        <thead><tr><th>Employee</th><th>Department</th><th>Points Earned</th><th>Points Spent</th><th>Current Balance</th></tr></thead>
         <tbody id="report-employees-tbody"></tbody>
       </table>
-      
       <button class="btn btn-primary" onclick="downloadReport()" style="margin-top:20px;">📥 Download Report</button>
     </div>
   </div>
@@ -562,26 +679,11 @@ tr:hover{background:#f8fafc;}
   <div class="modal-content">
     <h2 style="color:var(--brand);margin-bottom:20px;" id="activity-modal-title">Add Activity</h2>
     <input type="hidden" id="activity-edit-id">
-    <div class="form-group">
-      <label>Activity Name *</label>
-      <input type="text" id="activity-name" placeholder="e.g., Team Building Event">
-    </div>
-    <div class="form-group">
-      <label>Category</label>
-      <input type="text" id="activity-category" placeholder="e.g., Team Building">
-    </div>
-    <div class="form-group">
-      <label>Points *</label>
-      <input type="number" id="activity-points" placeholder="e.g., 100" min="0">
-    </div>
-    <div class="form-group">
-      <label>Description</label>
-      <textarea id="activity-desc" placeholder="Activity description"></textarea>
-    </div>
-    <div class="form-group">
-      <label>Image URL</label>
-      <input type="text" id="activity-image" placeholder="https://example.com/image.jpg">
-    </div>
+    <div class="form-group"><label>Activity Name *</label><input type="text" id="activity-name"></div>
+    <div class="form-group"><label>Category</label><input type="text" id="activity-category"></div>
+    <div class="form-group"><label>Points *</label><input type="number" id="activity-points" min="0"></div>
+    <div class="form-group"><label>Description</label><textarea id="activity-desc"></textarea></div>
+    <div class="form-group"><label>Image URL</label><input type="text" id="activity-image"></div>
     <button class="btn btn-success btn-full" onclick="saveActivity()">💾 Save Activity</button>
     <button class="btn btn-outline btn-full" onclick="closeModal('activity-modal')" style="margin-top:10px;">Cancel</button>
   </div>
@@ -592,52 +694,25 @@ tr:hover{background:#f8fafc;}
   <div class="modal-content">
     <h2 style="color:var(--brand);margin-bottom:20px;" id="service-modal-title">Add Service</h2>
     <input type="hidden" id="service-edit-id">
-    <div class="form-group">
-      <label>Service Name *</label>
-      <input type="text" id="service-name" placeholder="e.g., Spa Treatment">
-    </div>
-    <div class="form-group">
-      <label>Category</label>
-      <input type="text" id="service-category" placeholder="e.g., Wellness">
-    </div>
-    <div class="form-group">
-      <label>Points Required *</label>
-      <input type="number" id="service-points" placeholder="e.g., 500" min="0">
-    </div>
-    <div class="form-group">
-      <label>Description</label>
-      <textarea id="service-desc" placeholder="Service description"></textarea>
-    </div>
-    <div class="form-group">
-      <label>Image URL</label>
-      <input type="text" id="service-image" placeholder="https://example.com/image.jpg">
-    </div>
+    <div class="form-group"><label>Service Name *</label><input type="text" id="service-name"></div>
+    <div class="form-group"><label>Category</label><input type="text" id="service-category"></div>
+    <div class="form-group"><label>Points Required *</label><input type="number" id="service-points" min="0"></div>
+    <div class="form-group"><label>Description</label><textarea id="service-desc"></textarea></div>
+    <div class="form-group"><label>Image URL</label><input type="text" id="service-image"></div>
     <button class="btn btn-success btn-full" onclick="saveService()">💾 Save Service</button>
     <button class="btn btn-outline btn-full" onclick="closeModal('service-modal')" style="margin-top:10px;">Cancel</button>
   </div>
 </div>
 
-<!-- Modal: Add/Edit Employee (PASSWORD REMOVED) -->
+<!-- Modal: Add/Edit Employee -->
 <div id="employee-modal" class="modal">
   <div class="modal-content">
     <h2 style="color:var(--brand);margin-bottom:20px;" id="employee-modal-title">Add Employee</h2>
     <input type="hidden" id="employee-edit-id">
-    <div class="form-group">
-      <label>Employee ID *</label>
-      <input type="text" id="employee-empid" placeholder="e.g., E001">
-    </div>
-    <div class="form-group">
-      <label>Full Name *</label>
-      <input type="text" id="employee-name" placeholder="Full Name">
-    </div>
-    <div class="form-group">
-      <label>Department *</label>
-      <input type="text" id="employee-dept" placeholder="e.g., Front Office">
-    </div>
-    <div class="form-group">
-      <label>Available Reward Points *</label>
-      <input type="number" id="employee-points" placeholder="0" min="0" value="0">
-    </div>
+    <div class="form-group"><label>Employee ID *</label><input type="text" id="employee-empid"></div>
+    <div class="form-group"><label>Full Name *</label><input type="text" id="employee-name"></div>
+    <div class="form-group"><label>Department *</label><input type="text" id="employee-dept"></div>
+    <div class="form-group"><label>Available Reward Points *</label><input type="number" id="employee-points" min="0" value="0"></div>
     <button class="btn btn-success btn-full" onclick="saveEmployee()">💾 Save Employee</button>
     <button class="btn btn-outline btn-full" onclick="closeModal('employee-modal')" style="margin-top:10px;">Cancel</button>
   </div>
@@ -667,16 +742,10 @@ tr:hover{background:#f8fafc;}
 <div id="apply-behalf-modal" class="modal">
   <div class="modal-content">
     <h2 style="color:var(--brand);margin-bottom:20px;">🎁 Apply on Behalf of Employee</h2>
-    <div class="form-group">
-      <label>Select Employee *</label>
-      <select id="behalf-employee-select"></select>
-    </div>
-    <div class="form-group">
-      <label>Select Service *</label>
-      <select id="behalf-service-select"></select>
-    </div>
+    <div class="form-group"><label>Select Employee *</label><select id="behalf-employee-select"></select></div>
+    <div class="form-group"><label>Select Service *</label><select id="behalf-service-select"></select></div>
     <div id="behalf-service-details" style="background:#f8fafc;padding:15px;border-radius:8px;margin-bottom:15px;display:none;"></div>
-    <button class="btn btn-warning btn-full" onclick="confirmApplyBehalf()">🎟️ Submit Request</button>
+    <button class="btn btn-warning btn-full" onclick="confirmApplyBehalf()">🎟️ Generate Voucher</button>
     <button class="btn btn-outline btn-full" onclick="closeModal('apply-behalf-modal')" style="margin-top:10px;">Cancel</button>
   </div>
 </div>
@@ -684,7 +753,7 @@ tr:hover{background:#f8fafc;}
 <script>
 // ============ FIREBASE CONFIG ============
 const firebaseConfig = {
-   apiKey: "AIzaSyDsq9c2468sYFl-RkhZQIF9hnFKONUJL1w",
+  apiKey: "AIzaSyDsq9c2468sYFl-RkhZQIF9hnFKONUJL1w",
   authDomain: "hostloyaltyprogram.firebaseapp.com",
   databaseURL: "https://hostloyaltyprogram-default-rtdb.firebaseio.com",
   projectId: "hostloyaltyprogram",
@@ -705,6 +774,7 @@ let services = [];
 let vouchers = [];
 let transactions = [];
 let rewardRequests = [];
+let employeeActivities = [];
 let branding = {};
 let pendingRedeem = null;
 let currentVoucher = null;
@@ -714,6 +784,7 @@ let currentMonth = new Date();
 document.addEventListener('DOMContentLoaded', () => {
   loadData();
   setupFileUploads();
+  setupBulkUpload();
 });
 
 function setupFileUploads() {
@@ -726,15 +797,22 @@ function setupFileUploads() {
     logoUpload.onclick = () => logoFile.click();
     logoFile.onchange = handleLogoUpload;
   }
-  
   if(bgUpload && bgFile) {
     bgUpload.onclick = () => bgFile.click();
     bgFile.onchange = handleBgUpload;
   }
 }
 
+function setupBulkUpload() {
+  const bulkUpload = document.getElementById('bulk-activity-upload');
+  const bulkFile = document.getElementById('bulk-activity-file');
+  if(bulkUpload && bulkFile) {
+    bulkUpload.onclick = () => bulkFile.click();
+    bulkFile.onchange = handleBulkActivityUpload;
+  }
+}
+
 function loadData() {
-  // FIXED: Properly map Firebase keys to id property
   db.ref('loyalty/employees').on('value', snap => {
     const data = snap.val();
     employees = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
@@ -746,7 +824,10 @@ function loadData() {
     const data = snap.val();
     activities = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
     if(isAdmin) renderActivities();
-    if(currentUser) renderActivityHistory();
+    if(currentUser) {
+      renderEmployeeActivities();
+      renderEmployeeActivityHistory();
+    }
   });
   
   db.ref('loyalty/services').on('value', snap => {
@@ -770,7 +851,8 @@ function loadData() {
     const data = snap.val();
     transactions = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
     if(currentUser) {
-      renderActivityHistory();
+      renderEmployeeActivityHistory();
+      renderEmployeeTransactions();
       updateWalletDisplays();
     }
   });
@@ -780,6 +862,13 @@ function loadData() {
     rewardRequests = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
     if(isAdmin) renderApprovals();
     if(currentUser) renderMyRequests();
+  });
+  
+  db.ref('loyalty/employeeActivities').on('value', snap => {
+    const data = snap.val();
+    employeeActivities = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
+    if(isAdmin) renderAdminActivityRecords();
+    if(currentUser) renderEmployeeActivityHistory();
   });
   
   db.ref('loyalty/branding').on('value', snap => {
@@ -829,12 +918,15 @@ function switchTab(tab, btn) {
   if(btn) btn.classList.add('active');
   
   if(tab === 'points' && currentUser) updateWalletDisplays();
-  if(tab === 'history' && currentUser) renderActivityHistory();
+  if(tab === 'history' && currentUser) renderEmployeeActivityHistory();
+  if(tab === 'activities' && currentUser) renderEmployeeActivities();
   if(tab === 'services' && currentUser) renderAllServices();
   if(tab === 'available' && currentUser) renderAvailableServices();
   if(tab === 'my-requests' && currentUser) renderMyRequests();
+  if(tab === 'transactions' && currentUser) renderEmployeeTransactions();
   if(tab === 'dashboard') updateStats();
-  if(tab === 'activities' && isAdmin) renderActivities();
+  if(tab === 'employee-points' && isAdmin) renderAdminActivityRecords();
+  if(tab === 'admin-activities' && isAdmin) renderActivities();
   if(tab === 'admin-services' && isAdmin) renderServices();
   if(tab === 'employees' && isAdmin) renderEmployees();
   if(tab === 'vouchers' && isAdmin) renderVouchers();
@@ -863,18 +955,18 @@ function updateNavVisibility() {
   const isLoggedIn = currentUser !== null;
   const isAdminMode = isAdmin;
   
-  ['nav-points','nav-history','nav-services','nav-available','nav-my-requests','nav-dashboard','nav-branding','nav-activities','nav-admin-services','nav-employees','nav-vouchers','nav-approvals','nav-reports','nav-login','user-info'].forEach(id => {
+  ['nav-points','nav-history','nav-activities','nav-services','nav-available','nav-my-requests','nav-transactions','nav-dashboard','nav-branding','nav-employee-points','nav-admin-activities','nav-admin-services','nav-employees','nav-vouchers','nav-approvals','nav-reports','nav-login','user-info'].forEach(id => {
     document.getElementById(id).classList.add('hidden');
   });
   
   if(isAdminMode) {
-    ['nav-dashboard','nav-branding','nav-activities','nav-admin-services','nav-employees','nav-vouchers','nav-approvals','nav-reports'].forEach(id => {
+    ['nav-dashboard','nav-branding','nav-employee-points','nav-admin-activities','nav-admin-services','nav-employees','nav-vouchers','nav-approvals','nav-reports'].forEach(id => {
       document.getElementById(id).classList.remove('hidden');
     });
     document.getElementById('nav-login').classList.remove('hidden');
     document.getElementById('nav-login').innerText = '👤 Employee Login';
   } else if(isLoggedIn) {
-    ['nav-points','nav-history','nav-services','nav-available','nav-my-requests'].forEach(id => {
+    ['nav-points','nav-history','nav-activities','nav-services','nav-available','nav-my-requests','nav-transactions'].forEach(id => {
       document.getElementById(id).classList.remove('hidden');
     });
     document.getElementById('user-info').classList.remove('hidden');
@@ -895,9 +987,7 @@ function employeeLogin() {
     let found = null;
     snap.forEach(child => {
       const data = child.val();
-      if(data.password === btoa(password)) {
-        found = {id: child.key, ...data};
-      }
+      if(data.password === btoa(password)) found = {id: child.key, ...data};
     });
     if(found) {
       currentUser = found;
@@ -966,9 +1056,7 @@ function resetPassword() {
 
 function onLoginSuccess() {
   updateNavVisibility();
-  if(!isAdmin) {
-    switchTab('points', document.getElementById('nav-points'));
-  }
+  if(!isAdmin) switchTab('points', document.getElementById('nav-points'));
 }
 
 function logout() {
@@ -1007,16 +1095,11 @@ function saveBranding() {
     tagline: document.getElementById('brand-tagline').value.trim(),
     color: document.getElementById('brand-color').value
   };
-  
   const logoPreview = document.getElementById('brand-logo-preview');
   const bgPreview = document.getElementById('brand-bg-preview');
-  
   if(logoPreview.src && logoPreview.style.display !== 'none') updates.logo = logoPreview.src;
   if(bgPreview.src && bgPreview.style.display !== 'none') updates.background = bgPreview.src;
-  
-  db.ref('loyalty/branding').set(updates).then(() => {
-    showAlert('Branding saved successfully!', 'success');
-  });
+  db.ref('loyalty/branding').set(updates).then(() => showAlert('Branding saved successfully!', 'success'));
 }
 
 // ============ EMPLOYEE: WALLET & STATS ============
@@ -1024,55 +1107,419 @@ function updateWalletDisplays() {
   if(!currentUser) return;
   const emp = employees.find(e => e.id === currentUser.id);
   if(!emp) return;
-  
   document.getElementById('wallet-employee-name').innerText = emp.name;
   document.getElementById('wallet-balance').innerText = emp.points || 0;
   document.getElementById('stat-total-earned').innerText = emp.totalEarned || 0;
   document.getElementById('stat-total-spent').innerText = emp.totalSpent || 0;
-  
   currentUser.points = emp.points || 0;
   currentUser.totalEarned = emp.totalEarned || 0;
   currentUser.totalSpent = emp.totalSpent || 0;
 }
 
+// ============ AUTO-SUGGESTIONS ============
+function showEmployeeNameSuggestions(query) {
+  const container = document.getElementById('emp-name-suggestions');
+  if(!query || query.length < 2) {
+    container.classList.remove('active');
+    return;
+  }
+  const matches = employees.filter(e => e.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
+  if(matches.length === 0) {
+    container.classList.remove('active');
+    return;
+  }
+  container.innerHTML = matches.map(e => `
+    <div class="autocomplete-item" onclick="selectEmployeeByName('${e.id}')">
+      <strong>${e.name}</strong>
+      <small>ID: ${e.employeeId} • ${e.department || 'N/A'}</small>
+    </div>
+  `).join('');
+  container.classList.add('active');
+}
+
+function showEmployeeIdSuggestions(query) {
+  const container = document.getElementById('emp-id-suggestions');
+  if(!query || query.length < 2) {
+    container.classList.remove('active');
+    return;
+  }
+  const matches = employees.filter(e => e.employeeId.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
+  if(matches.length === 0) {
+    container.classList.remove('active');
+    return;
+  }
+  container.innerHTML = matches.map(e => `
+    <div class="autocomplete-item" onclick="selectEmployeeById('${e.id}')">
+      <strong>${e.employeeId}</strong>
+      <small>${e.name} • ${e.department || 'N/A'}</small>
+    </div>
+  `).join('');
+  container.classList.add('active');
+}
+
+function showActivitySuggestions(query) {
+  const container = document.getElementById('activity-suggestions');
+  if(!query || query.length < 2) {
+    container.classList.remove('active');
+    return;
+  }
+  const matches = activities.filter(a => a.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
+  if(matches.length === 0) {
+    container.classList.remove('active');
+    return;
+  }
+  container.innerHTML = matches.map(a => `
+    <div class="autocomplete-item" onclick="selectActivity('${a.id}')">
+      <strong>${a.name}</strong>
+      <small>${a.points} points • ${a.category || 'General'}</small>
+    </div>
+  `).join('');
+  container.classList.add('active');
+}
+
+function selectEmployeeByName(empId) {
+  const emp = employees.find(e => e.id === empId);
+  if(!emp) return;
+  document.getElementById('manual-emp-name').value = emp.name;
+  document.getElementById('manual-emp-id').value = emp.employeeId;
+  document.getElementById('emp-name-suggestions').classList.remove('active');
+}
+
+function selectEmployeeById(empId) {
+  const emp = employees.find(e => e.id === empId);
+  if(!emp) return;
+  document.getElementById('manual-emp-id').value = emp.employeeId;
+  document.getElementById('manual-emp-name').value = emp.name;
+  document.getElementById('emp-id-suggestions').classList.remove('active');
+}
+
+function selectActivity(activityId) {
+  const activity = activities.find(a => a.id === activityId);
+  if(!activity) return;
+  document.getElementById('manual-activity-name').value = activity.name;
+  document.getElementById('manual-points').value = activity.points;
+  document.getElementById('activity-suggestions').classList.remove('active');
+}
+
+// Close autocomplete when clicking outside
+document.addEventListener('click', function(e) {
+  if(!e.target.closest('.autocomplete-container')) {
+    document.querySelectorAll('.autocomplete-list').forEach(l => l.classList.remove('active'));
+  }
+});
+
+// ============ MANUAL ACTIVITY ENTRY ============
+function addManualActivity() {
+  const activityDate = document.getElementById('manual-activity-date').value;
+  const empName = document.getElementById('manual-emp-name').value.trim();
+  const empId = document.getElementById('manual-emp-id').value.trim();
+  const activityName = document.getElementById('manual-activity-name').value.trim();
+  const points = parseInt(document.getElementById('manual-points').value);
+  const remarks = document.getElementById('manual-remarks').value.trim();
+
+  if(!activityDate || !empName || !empId || !activityName || !points) {
+    return showAlert('Please fill all required fields', 'error');
+  }
+
+  const emp = employees.find(e => e.employeeId === empId && e.name === empName);
+  if(!emp) {
+    return showAlert('Employee not found. Please select from suggestions.', 'error');
+  }
+
+  const dateObj = new Date(activityDate);
+  const month = dateObj.getMonth() + 1;
+  const year = dateObj.getFullYear();
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+  const activityRecord = {
+    employeeId: empId,
+    employeeName: empName,
+    employeeDept: emp.department || '',
+    activityName: activityName,
+    points: points,
+    activityDate: activityDate,
+    month: month,
+    monthName: monthNames[month - 1],
+    year: year,
+    remarks: remarks,
+    addedBy: 'admin',
+    createdAt: Date.now()
+  };
+
+  db.ref('loyalty/employeeActivities').push(activityRecord).then(() => {
+    const newPoints = (emp.points || 0) + points;
+    const newTotalEarned = (emp.totalEarned || 0) + points;
+    db.ref('loyalty/employees/' + emp.id).update({
+      points: newPoints,
+      totalEarned: newTotalEarned
+    });
+
+    db.ref('loyalty/transactions').push({
+      employeeId: empId,
+      employeeName: empName,
+      type: 'earn',
+      activityName: activityName,
+      points: points,
+      runningBalance: newPoints,
+      addedBy: 'admin',
+      timestamp: Date.now()
+    });
+
+    showAlert(`Successfully awarded ${points} points to ${empName}!`, 'success');
+    document.getElementById('manual-activity-date').value = '';
+    document.getElementById('manual-emp-name').value = '';
+    document.getElementById('manual-emp-id').value = '';
+    document.getElementById('manual-activity-name').value = '';
+    document.getElementById('manual-points').value = '';
+    document.getElementById('manual-remarks').value = '';
+  }).catch(err => showAlert('Error: ' + err.message, 'error'));
+}
+
+// ============ BULK UPLOAD ============
+function handleBulkActivityUpload(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const data = new Uint8Array(ev.target.result);
+      const workbook = XLSX.read(data, {type: 'array'});
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet);
+
+      const results = [];
+      let successCount = 0;
+      let errorCount = 0;
+
+      rows.forEach((row, index) => {
+        const activityDate = row['Activity Date'] || row['activityDate'] || row['Date'];
+        const empId = row['Employee ID'] || row['employeeId'] || row['EmpID'];
+        const empName = row['Employee Name'] || row['employeeName'] || row['Name'];
+        const activityName = row['Activity Name'] || row['activityName'] || row['Activity'];
+        const points = parseInt(row['Points Earned'] || row['points'] || row['Points']);
+        const remarks = row['Remarks'] || row['remarks'] || '';
+
+        const errors = [];
+        if(!activityDate) errors.push('Missing Activity Date');
+        if(!empId) errors.push('Missing Employee ID');
+        if(!empName) errors.push('Missing Employee Name');
+        if(!activityName) errors.push('Missing Activity Name');
+        if(!points) errors.push('Missing Points');
+
+        const emp = employees.find(e => e.employeeId === String(empId));
+        if(!emp) errors.push('Employee ID not found');
+
+        const activity = activities.find(a => a.name.toLowerCase() === String(activityName).toLowerCase());
+        if(!activity) errors.push('Activity Name not found in database');
+
+        if(errors.length > 0) {
+          results.push({row: index + 2, status: 'error', errors: errors, data: row});
+          errorCount++;
+        } else {
+          const dateObj = new Date(activityDate);
+          const month = dateObj.getMonth() + 1;
+          const year = dateObj.getFullYear();
+          const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+          const activityRecord = {
+            employeeId: String(empId),
+            employeeName: String(empName),
+            employeeDept: emp.department || '',
+            activityName: String(activityName),
+            points: points,
+            activityDate: String(activityDate),
+            month: month,
+            monthName: monthNames[month - 1],
+            year: year,
+            remarks: String(remarks),
+            addedBy: 'admin-bulk',
+            createdAt: Date.now()
+          };
+
+          db.ref('loyalty/employeeActivities').push(activityRecord);
+
+          const newPoints = (emp.points || 0) + points;
+          const newTotalEarned = (emp.totalEarned || 0) + points;
+          db.ref('loyalty/employees/' + emp.id).update({
+            points: newPoints,
+            totalEarned: newTotalEarned
+          });
+
+          db.ref('loyalty/transactions').push({
+            employeeId: String(empId),
+            employeeName: String(empName),
+            type: 'earn',
+            activityName: String(activityName),
+            points: points,
+            runningBalance: newPoints,
+            addedBy: 'admin-bulk',
+            timestamp: Date.now()
+          });
+
+          results.push({row: index + 2, status: 'success', data: row});
+          successCount++;
+        }
+      });
+
+      const resultsHtml = `
+        <div style="padding:15px;background:#f8fafc;border-radius:8px;margin-top:15px;">
+          <h4 style="margin-bottom:10px;">Upload Results:</h4>
+          <p style="color:var(--success);">✅ Successfully processed: ${successCount} records</p>
+          <p style="color:var(--danger);">❌ Errors: ${errorCount} records</p>
+          ${errorCount > 0 ? '<p style="color:var(--warning);margin-top:10px;">Please correct the errors and re-upload.</p>' : ''}
+        </div>
+      `;
+      document.getElementById('bulk-upload-results').innerHTML = resultsHtml;
+      showAlert(`Bulk upload complete! ${successCount} successful, ${errorCount} errors.`, errorCount > 0 ? 'warning' : 'success');
+    } catch(err) {
+      showAlert('Error reading file: ' + err.message, 'error');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+  e.target.value = '';
+}
+
+function downloadActivityUploadTemplate() {
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['Activity Date', 'Employee ID', 'Employee Name', 'Activity Name', 'Points Earned', 'Remarks'],
+    ['2026-07-26', '317', 'OM Prakash', 'Team Building', '100', 'Optional remarks']
+  ]);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'Activity Points');
+  XLSX.writeFile(wb, 'employee-activity-points-template.xlsx');
+}
+
+// ============ ADMIN: ACTIVITY RECORDS ============
+function renderAdminActivityRecords() {
+  const tbody = document.getElementById('admin-activity-records-tbody');
+  if(!tbody) return;
+
+  const monthFilter = document.getElementById('admin-activity-month').value;
+  const yearFilter = document.getElementById('admin-activity-year').value;
+
+  let filtered = employeeActivities;
+  if(monthFilter) filtered = filtered.filter(r => r.month === parseInt(monthFilter));
+  if(yearFilter) filtered = filtered.filter(r => r.year === parseInt(yearFilter));
+
+  filtered.sort((a,b) => b.createdAt - a.createdAt);
+
+  tbody.innerHTML = filtered.length === 0
+    ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No activity records found</td></tr>'
+    : filtered.map(r => `
+    <tr>
+      <td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td>
+      <td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td>
+      <td>${r.activityName}</td>
+      <td style="color:var(--success);font-weight:bold;">+${r.points}</td>
+      <td>${r.monthName || ''} ${r.year || ''}</td>
+      <td>${r.remarks || '-'}</td>
+      <td><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td>
+    </tr>
+  `).join('');
+}
+
+function deleteActivityRecord(recordId) {
+  if(!confirm('Delete this activity record? Note: Points already awarded will NOT be reversed.')) return;
+  db.ref('loyalty/employeeActivities/' + recordId).remove().then(() => {
+    showAlert('Activity record deleted', 'success');
+  });
+}
+
 // ============ EMPLOYEE: ACTIVITY HISTORY ============
-function renderActivityHistory() {
+function renderEmployeeActivityHistory() {
   if(!currentUser) return;
-  const myEarnTrans = transactions.filter(t => t.employeeId === currentUser.employeeId && t.type === 'earn').sort((a,b) => b.timestamp - a.timestamp);
-  
+  const monthFilter = document.getElementById('history-month-filter').value;
+  const yearFilter = document.getElementById('history-year-filter').value;
+
+  let myActivities = employeeActivities.filter(a => a.employeeId === currentUser.employeeId);
+  if(monthFilter) myActivities = myActivities.filter(a => a.month === parseInt(monthFilter));
+  if(yearFilter) myActivities = myActivities.filter(a => a.year === parseInt(yearFilter));
+  myActivities.sort((a,b) => b.createdAt - a.createdAt);
+
   const monthStats = {};
-  myEarnTrans.forEach(t => {
-    const d = new Date(t.timestamp);
-    const key = d.toLocaleString('default',{month:'long',year:'numeric'});
+  myActivities.forEach(a => {
+    const key = `${a.monthName || ''} ${a.year || ''}`;
     if(!monthStats[key]) monthStats[key] = {count:0, points:0};
     monthStats[key].count++;
-    monthStats[key].points += t.points;
+    monthStats[key].points += a.points;
   });
-  
+
   document.getElementById('activity-history-stats').innerHTML = Object.entries(monthStats).map(([month,stats]) => `
     <div style="background:linear-gradient(135deg,var(--brand),var(--brand-light));color:#fff;padding:15px;border-radius:10px;text-align:center;">
-      <div style="font-size:1.5rem;font-weight:bold;">${stats.points}</div>
+      <div style="font-size:1.5rem;font-weight:bold;">${stats.points} pts</div>
       <div style="font-size:0.9rem;opacity:0.9;">${month}</div>
       <div style="font-size:0.8rem;opacity:0.8;">${stats.count} activities</div>
     </div>
   `).join('') || '<p style="color:#94a3b8;">No activity history yet</p>';
-  
-  document.getElementById('activity-history-list').innerHTML = myEarnTrans.length === 0
-    ? '<p style="text-align:center;padding:30px;color:#94a3b8;">No activities attended yet. Join activities to earn points!</p>'
-    : myEarnTrans.map(t => {
-      const d = new Date(t.timestamp);
-      const dateStr = d.toLocaleDateString();
-      const monthStr = d.toLocaleString('default',{month:'long',year:'numeric'});
+
+  document.getElementById('activity-history-list').innerHTML = myActivities.length === 0
+    ? '<p style="text-align:center;padding:30px;color:#94a3b8;">No activities attended yet.</p>'
+    : myActivities.map(a => `
+    <div class="transaction-item earn">
+      <div class="transaction-info">
+        <strong> ${a.activityName}</strong>
+        <small>📅 ${a.activityDate ? new Date(a.activityDate).toLocaleDateString() : 'N/A'} • 📆 ${a.monthName || ''} ${a.year || ''}</small>
+        ${a.remarks ? `<small>📝 ${a.remarks}</small>` : ''}
+      </div>
+      <div class="transaction-points earn">+${a.points} pts</div>
+    </div>
+  `).join('');
+}
+
+// ============ EMPLOYEE: TRANSACTIONS ============
+function renderEmployeeTransactions() {
+  if(!currentUser) return;
+  const monthFilter = document.getElementById('trans-month-filter').value;
+  const yearFilter = document.getElementById('trans-year-filter').value;
+
+  let myTrans = transactions.filter(t => t.employeeId === currentUser.employeeId);
+  if(monthFilter) myTrans = myTrans.filter(t => {
+    const d = new Date(t.timestamp);
+    return (d.getMonth() + 1) === parseInt(monthFilter);
+  });
+  if(yearFilter) myTrans = myTrans.filter(t => {
+    const d = new Date(t.timestamp);
+    return d.getFullYear() === parseInt(yearFilter);
+  });
+  myTrans.sort((a,b) => b.timestamp - a.timestamp);
+
+  const tbody = document.getElementById('employee-transactions-tbody');
+  tbody.innerHTML = myTrans.length === 0
+    ? '<tr><td colspan="5" style="text-align:center;color:#94a3b8;">No transactions yet</td></tr>'
+    : myTrans.map(t => {
+      const typeIcon = t.type === 'earn' ? '📈' : t.type === 'spend' ? '📉' : '↩️';
+      const typeClass = t.type === 'earn' ? 'earn' : t.type === 'spend' ? 'spend' : 'cancel';
+      const pointsDisplay = t.type === 'earn' ? `+${t.points}` : t.type === 'spend' ? `-${t.points}` : `+${t.points} (refunded)`;
       return `
-      <div class="transaction-item earn">
-        <div class="transaction-info">
-          <strong>🎯 ${t.activityName}</strong>
-          <small>📅 ${dateStr} • 📆 ${monthStr}</small>
-          ${t.category ? `<small>🏷️ ${t.category}</small>` : ''}
-        </div>
-        <div class="transaction-points earn">+${t.points} pts</div>
-      </div>`;
-    }).join('');
+      <tr>
+        <td>${new Date(t.timestamp).toLocaleDateString()}</td>
+        <td><span class="transaction-points ${typeClass}">${typeIcon} ${t.type.toUpperCase()}</span></td>
+        <td><strong>${t.activityName || t.serviceName || 'N/A'}</strong><br><small>${t.addedBy ? 'By: ' + t.addedBy : ''}</small></td>
+        <td class="transaction-points ${typeClass}">${pointsDisplay}</td>
+        <td><strong>${t.runningBalance || 0}</strong></td>
+      </tr>
+    `}).join('');
+}
+
+// ============ EMPLOYEE: ACTIVITIES ============
+function renderEmployeeActivities() {
+  const container = document.getElementById('employee-activities-list');
+  if(!container) return;
+  if(activities.length === 0) {
+    container.innerHTML = '<p style="text-align:center;padding:30px;color:#94a3b8;">No activities available yet.</p>';
+    return;
+  }
+  container.innerHTML = activities.map(a => `
+    <div class="activity-card">
+      <div class="activity-header">
+        <div class="activity-name">${a.name}</div>
+        <div class="activity-points">+${a.points} pts</div>
+      </div>
+      ${a.category ? `<div class="activity-category">${a.category}</div>` : ''}
+      ${a.description ? `<div class="activity-desc">${a.description}</div>` : ''}
+    </div>
+  `).join('');
 }
 
 // ============ EMPLOYEE: SERVICES ============
@@ -1102,7 +1549,7 @@ function renderAvailableServices() {
   const balance = currentUser.points || 0;
   const available = services.filter(s => balance >= s.points);
   document.getElementById('available-services-list').innerHTML = available.length === 0
-    ? '<p style="text-align:center;padding:40px;color:#94a3b8;grid-column:1/-1;">You don\'t have enough points for any service yet. Keep earning!</p>'
+    ? '<p style="text-align:center;padding:40px;color:#94a3b8;grid-column:1/-1;">You don\'t have enough points for any service yet.</p>'
     : available.map(s => `
       <div class="service-card affordable" onclick="openRedeem('${s.id}')">
         <div class="service-img">${s.image ? `<img src="${s.image}">` : '🎁'}</div>
@@ -1121,11 +1568,9 @@ function openRedeem(serviceId) {
   const service = services.find(s => s.id === serviceId);
   if(!service) return;
   if((currentUser.points || 0) < service.points) return showAlert('Not enough points', 'error');
-  
   pendingRedeem = service;
   const expiryDate = new Date();
   expiryDate.setMonth(expiryDate.getMonth() + 1);
-  
   document.getElementById('redeem-details').innerHTML = `
     <div style="padding:20px;background:#f8fafc;border-radius:10px;">
       <h3 style="color:var(--brand);margin-bottom:10px;">${service.name}</h3>
@@ -1139,10 +1584,6 @@ function openRedeem(serviceId) {
       <div style="display:flex;justify-content:space-between;padding:10px;background:#fff;border-radius:8px;">
         <span>Voucher Valid Until:</span><strong>${expiryDate.toLocaleDateString()}</strong>
       </div>
-      <div style="background:#fef3c7;padding:10px;border-radius:8px;margin-top:10px;">
-        <strong style="color:#92400e;">⚠️ Note:</strong>
-        <p style="color:#78350f;font-size:0.9rem;margin-top:5px;">This request will be sent to admin for approval. Voucher will be generated after approval.</p>
-      </div>
     </div>
   `;
   document.getElementById('redeem-modal').classList.add('active');
@@ -1150,7 +1591,6 @@ function openRedeem(serviceId) {
 
 function confirmRedeem() {
   if(!pendingRedeem || !currentUser) return;
-  
   const request = {
     employeeId: currentUser.employeeId,
     employeeName: currentUser.name,
@@ -1162,7 +1602,6 @@ function confirmRedeem() {
     status: 'pending',
     requestedAt: Date.now()
   };
-  
   db.ref('loyalty/rewardRequests').push(request).then(() => {
     showAlert('Request submitted for approval!', 'success');
     closeRedeemModal();
@@ -1179,28 +1618,21 @@ function closeRedeemModal() {
 function renderMyRequests() {
   if(!currentUser) return;
   const myRequests = rewardRequests.filter(r => r.employeeId === currentUser.employeeId).sort((a,b) => b.requestedAt - a.requestedAt);
-  
   const container = document.getElementById('my-requests-list');
-  
   if(myRequests.length === 0) {
     container.innerHTML = '<p style="text-align:center;padding:30px;color:#94a3b8;">No reward requests yet.</p>';
     return;
   }
-  
   container.innerHTML = myRequests.map(r => {
     const statusClass = `status-${r.status}`;
     const canDownload = r.status === 'approved' || r.status === 'generated';
     const canCancel = r.status === 'pending';
-    
     return `
     <div class="item-row" style="padding:15px;">
       <div class="item-info">
         <strong>${r.serviceName}</strong>
         <small>${new Date(r.requestedAt).toLocaleDateString()} • ${r.points} points</small>
-        <small style="color:${r.status === 'approved' ? 'var(--success)' : r.status === 'rejected' ? 'var(--danger)' : 'var(--warning)'};">
-          Status: ${r.status.toUpperCase()}
-        </small>
-        ${r.approvedAt ? `<small>Approved: ${new Date(r.approvedAt).toLocaleDateString()}</small>` : ''}
+        <small style="color:${r.status === 'approved' ? 'var(--success)' : r.status === 'rejected' ? 'var(--danger)' : 'var(--warning)'};">Status: ${r.status.toUpperCase()}</small>
         ${r.rejectedReason ? `<small style="color:var(--danger);">Reason: ${r.rejectedReason}</small>` : ''}
       </div>
       <div class="item-actions">
@@ -1213,11 +1645,7 @@ function renderMyRequests() {
 
 function cancelRequest(requestId) {
   if(!confirm('Cancel this reward request?')) return;
-  
-  db.ref('loyalty/rewardRequests/' + requestId).update({
-    status: 'cancelled',
-    cancelledAt: Date.now()
-  }).then(() => {
+  db.ref('loyalty/rewardRequests/' + requestId).update({status: 'cancelled', cancelledAt: Date.now()}).then(() => {
     showAlert('Request cancelled', 'success');
   });
 }
@@ -1225,15 +1653,12 @@ function cancelRequest(requestId) {
 function viewApprovedVoucher(requestId) {
   const request = rewardRequests.find(r => r.id === requestId);
   if(!request) return;
-  
   let voucher = vouchers.find(v => v.requestId === requestId);
-  
   if(!voucher) {
     const issueDate = Date.now();
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + 1);
     const serialNo = 'VOU-' + Date.now().toString().slice(-8);
-    
     voucher = {
       id: db.ref('loyalty/vouchers').push().key,
       requestId: requestId,
@@ -1251,25 +1676,25 @@ function viewApprovedVoucher(requestId) {
       status: 'generated',
       createdAt: Date.now()
     };
-    
     db.ref('loyalty/vouchers/' + voucher.id).set(voucher);
-    
-    db.ref('loyalty/rewardRequests/' + requestId).update({
-      status: 'generated',
-      voucherId: voucher.id
-    });
-    
+    db.ref('loyalty/rewardRequests/' + requestId).update({status: 'generated', voucherId: voucher.id});
     const emp = employees.find(e => e.employeeId === request.employeeId);
     if(emp) {
       const newPoints = Math.max(0, (emp.points || 0) - request.points);
       const newTotalSpent = (emp.totalSpent || 0) + request.points;
-      db.ref('loyalty/employees/' + emp.id).update({
-        points: newPoints,
-        totalSpent: newTotalSpent
+      db.ref('loyalty/employees/' + emp.id).update({points: newPoints, totalSpent: newTotalSpent});
+      db.ref('loyalty/transactions').push({
+        employeeId: request.employeeId,
+        employeeName: request.employeeName,
+        type: 'spend',
+        serviceName: request.serviceName,
+        points: request.points,
+        runningBalance: newPoints,
+        addedBy: 'system',
+        timestamp: Date.now()
       });
     }
   }
-  
   currentVoucher = {...voucher, hotelName: branding.hotelName || 'Host Loyalty Program', hotelLogo: branding.logo || ''};
   showVoucher(currentVoucher);
 }
@@ -1284,7 +1709,7 @@ function updateStats() {
   document.getElementById('stat-points-redeemed').innerText = employees.reduce((s,e) => s + (e.totalSpent || 0), 0);
 }
 
-// ============ ADMIN: ACTIVITIES (EDIT FIXED) ============
+// ============ ADMIN: ACTIVITIES ============
 function renderActivities() {
   document.getElementById('activities-list').innerHTML = activities.length === 0
     ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No activities yet</p>'
@@ -1317,11 +1742,7 @@ function showAddActivityModal() {
 
 function editActivity(activityId) {
   const activity = activities.find(a => a.id === activityId);
-  if(!activity) {
-    showAlert('Activity not found', 'error');
-    return;
-  }
-  
+  if(!activity) return showAlert('Activity not found', 'error');
   document.getElementById('activity-modal-title').innerText = 'Edit Activity';
   document.getElementById('activity-edit-id').value = activityId;
   document.getElementById('activity-name').value = activity.name || '';
@@ -1342,35 +1763,28 @@ function saveActivity() {
     image: document.getElementById('activity-image').value.trim(),
     updatedAt: Date.now()
   };
-  
   if(!activity.name || !activity.points) return showAlert('Please fill required fields', 'error');
-  
   if(editId) {
     db.ref('loyalty/activities/' + editId).update(activity).then(() => {
       showAlert('Activity updated!', 'success');
       closeModal('activity-modal');
-    }).catch(err => showAlert('Error: ' + err.message, 'error'));
+    });
   } else {
     activity.createdAt = Date.now();
     db.ref('loyalty/activities').push(activity).then(() => {
       showAlert('Activity added!', 'success');
       closeModal('activity-modal');
-    }).catch(err => showAlert('Error: ' + err.message, 'error'));
+    });
   }
 }
 
 function deleteActivity(activityId) {
   if(!confirm('Delete this activity?')) return;
-  db.ref('loyalty/activities/' + activityId).remove().then(() => {
-    showAlert('Activity deleted', 'success');
-  }).catch(err => showAlert('Error: ' + err.message, 'error'));
+  db.ref('loyalty/activities/' + activityId).remove().then(() => showAlert('Activity deleted', 'success'));
 }
 
 function downloadActivityTemplate() {
-  const ws = XLSX.utils.aoa_to_sheet([
-    ['Name', 'Category', 'Points', 'Description', 'ImageURL'],
-    ['Team Building', 'Team Event', '100', 'Annual team building event', '']
-  ]);
+  const ws = XLSX.utils.aoa_to_sheet([['Name', 'Category', 'Points', 'Description', 'ImageURL'], ['Team Building', 'Team Event', '100', 'Annual event', '']]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Activities');
   XLSX.writeFile(wb, 'activities-template.xlsx');
@@ -1379,37 +1793,26 @@ function downloadActivityTemplate() {
 function uploadActivities(input) {
   const file = input.files[0];
   if(!file) return;
-  
   const reader = new FileReader();
   reader.onload = function(e) {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, {type: 'array'});
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-    
     let count = 0;
     jsonData.slice(1).forEach(row => {
       if(row[0] && row[2]) {
-        const activity = {
-          name: row[0],
-          category: row[1] || '',
-          points: parseInt(row[2]) || 0,
-          description: row[3] || '',
-          image: row[4] || '',
-          createdAt: Date.now()
-        };
-        db.ref('loyalty/activities').push(activity);
+        db.ref('loyalty/activities').push({name: row[0], category: row[1] || '', points: parseInt(row[2]) || 0, description: row[3] || '', image: row[4] || '', createdAt: Date.now()});
         count++;
       }
     });
-    
     showAlert(`${count} activities uploaded!`, 'success');
     input.value = '';
   };
   reader.readAsArrayBuffer(file);
 }
 
-// ============ ADMIN: SERVICES (EDIT FIXED) ============
+// ============ ADMIN: SERVICES ============
 function renderServices() {
   document.getElementById('services-list').innerHTML = services.length === 0
     ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No services yet</p>'
@@ -1442,11 +1845,7 @@ function showAddServiceModal() {
 
 function editService(serviceId) {
   const service = services.find(s => s.id === serviceId);
-  if(!service) {
-    showAlert('Service not found', 'error');
-    return;
-  }
-  
+  if(!service) return showAlert('Service not found', 'error');
   document.getElementById('service-modal-title').innerText = 'Edit Service';
   document.getElementById('service-edit-id').value = serviceId;
   document.getElementById('service-name').value = service.name || '';
@@ -1467,35 +1866,28 @@ function saveService() {
     image: document.getElementById('service-image').value.trim(),
     updatedAt: Date.now()
   };
-  
   if(!service.name || !service.points) return showAlert('Please fill required fields', 'error');
-  
   if(editId) {
     db.ref('loyalty/services/' + editId).update(service).then(() => {
       showAlert('Service updated!', 'success');
       closeModal('service-modal');
-    }).catch(err => showAlert('Error: ' + err.message, 'error'));
+    });
   } else {
     service.createdAt = Date.now();
     db.ref('loyalty/services').push(service).then(() => {
       showAlert('Service added!', 'success');
       closeModal('service-modal');
-    }).catch(err => showAlert('Error: ' + err.message, 'error'));
+    });
   }
 }
 
 function deleteService(serviceId) {
   if(!confirm('Delete this service?')) return;
-  db.ref('loyalty/services/' + serviceId).remove().then(() => {
-    showAlert('Service deleted', 'success');
-  }).catch(err => showAlert('Error: ' + err.message, 'error'));
+  db.ref('loyalty/services/' + serviceId).remove().then(() => showAlert('Service deleted', 'success'));
 }
 
 function downloadServiceTemplate() {
-  const ws = XLSX.utils.aoa_to_sheet([
-    ['Name', 'Category', 'Points', 'Description', 'ImageURL'],
-    ['Spa Treatment', 'Wellness', '500', 'Full body massage', '']
-  ]);
+  const ws = XLSX.utils.aoa_to_sheet([['Name', 'Category', 'Points', 'Description', 'ImageURL'], ['Spa Treatment', 'Wellness', '500', 'Full body massage', '']]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Services');
   XLSX.writeFile(wb, 'services-template.xlsx');
@@ -1504,47 +1896,30 @@ function downloadServiceTemplate() {
 function uploadServices(input) {
   const file = input.files[0];
   if(!file) return;
-  
   const reader = new FileReader();
   reader.onload = function(e) {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, {type: 'array'});
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-    
     let count = 0;
     jsonData.slice(1).forEach(row => {
       if(row[0] && row[2]) {
-        const service = {
-          name: row[0],
-          category: row[1] || '',
-          points: parseInt(row[2]) || 0,
-          description: row[3] || '',
-          image: row[4] || '',
-          createdAt: Date.now()
-        };
-        db.ref('loyalty/services').push(service);
+        db.ref('loyalty/services').push({name: row[0], category: row[1] || '', points: parseInt(row[2]) || 0, description: row[3] || '', image: row[4] || '', createdAt: Date.now()});
         count++;
       }
     });
-    
     showAlert(`${count} services uploaded!`, 'success');
     input.value = '';
   };
   reader.readAsArrayBuffer(file);
 }
 
-// ============ ADMIN: EMPLOYEES (EDIT FIXED, PASSWORD REMOVED) ============
+// ============ ADMIN: EMPLOYEES ============
 function renderEmployees() {
   const sortValue = document.getElementById('employee-sort').value;
   const searchTerm = document.getElementById('employee-search').value.toLowerCase();
-  
-  let filtered = employees.filter(e => 
-    e.name.toLowerCase().includes(searchTerm) ||
-    e.employeeId.toLowerCase().includes(searchTerm) ||
-    (e.department || '').toLowerCase().includes(searchTerm)
-  );
-  
+  let filtered = employees.filter(e => e.name.toLowerCase().includes(searchTerm) || e.employeeId.toLowerCase().includes(searchTerm) || (e.department || '').toLowerCase().includes(searchTerm));
   switch(sortValue) {
     case 'name-asc': filtered.sort((a,b) => a.name.localeCompare(b.name)); break;
     case 'name-desc': filtered.sort((a,b) => b.name.localeCompare(a.name)); break;
@@ -1553,7 +1928,6 @@ function renderEmployees() {
     case 'points-asc': filtered.sort((a,b) => (a.points || 0) - (b.points || 0)); break;
     case 'empid-asc': filtered.sort((a,b) => a.employeeId.localeCompare(b.employeeId)); break;
   }
-  
   document.getElementById('employees-list').innerHTML = filtered.length === 0
     ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No employees found</p>'
     : filtered.map(e => `
@@ -1583,11 +1957,7 @@ function showAddEmployeeModal() {
 
 function editEmployee(employeeId) {
   const employee = employees.find(e => e.id === employeeId);
-  if(!employee) {
-    showAlert('Employee not found', 'error');
-    return;
-  }
-  
+  if(!employee) return showAlert('Employee not found', 'error');
   document.getElementById('employee-modal-title').innerText = 'Edit Employee';
   document.getElementById('employee-edit-id').value = employeeId;
   document.getElementById('employee-empid').value = employee.employeeId || '';
@@ -1603,51 +1973,35 @@ function saveEmployee() {
   const name = document.getElementById('employee-name').value.trim();
   const dept = document.getElementById('employee-dept').value.trim();
   const points = parseInt(document.getElementById('employee-points').value) || 0;
-  
   if(!empId || !name || !dept) return showAlert('Please fill required fields', 'error');
-  
   const duplicate = employees.find(e => e.employeeId === empId && e.id !== editId);
   if(duplicate) return showAlert('Employee ID already exists', 'error');
-  
-  const employee = {
-    employeeId: empId,
-    name: name,
-    department: dept,
-    points: points,
-    updatedAt: Date.now()
-  };
-  
+  const employee = {employeeId: empId, name: name, department: dept, points: points, updatedAt: Date.now()};
   if(editId) {
     db.ref('loyalty/employees/' + editId).update(employee).then(() => {
       showAlert('Employee updated!', 'success');
       closeModal('employee-modal');
-    }).catch(err => showAlert('Error: ' + err.message, 'error'));
+    });
   } else {
     employee.points = points;
     employee.totalEarned = 0;
     employee.totalSpent = 0;
     employee.createdAt = Date.now();
     employee.password = btoa(empId);
-    
     db.ref('loyalty/employees').push(employee).then(() => {
       showAlert('Employee added! Default password is Employee ID.', 'success');
       closeModal('employee-modal');
-    }).catch(err => showAlert('Error: ' + err.message, 'error'));
+    });
   }
 }
 
 function deleteEmployee(employeeId) {
-  if(!confirm('Delete this employee? All their data will be lost.')) return;
-  db.ref('loyalty/employees/' + employeeId).remove().then(() => {
-    showAlert('Employee deleted', 'success');
-  }).catch(err => showAlert('Error: ' + err.message, 'error'));
+  if(!confirm('Delete this employee?')) return;
+  db.ref('loyalty/employees/' + employeeId).remove().then(() => showAlert('Employee deleted', 'success'));
 }
 
 function downloadEmployeeTemplate() {
-  const ws = XLSX.utils.aoa_to_sheet([
-    ['EmployeeID', 'Name', 'Department', 'Points', 'Password'],
-    ['E001', 'John Doe', 'Front Office', '0', 'password123']
-  ]);
+  const ws = XLSX.utils.aoa_to_sheet([['EmployeeID', 'Name', 'Department', 'Points', 'Password'], ['E001', 'John Doe', 'Front Office', '0', 'password123']]);
   const wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, ws, 'Employees');
   XLSX.writeFile(wb, 'employees-template.xlsx');
@@ -1656,123 +2010,84 @@ function downloadEmployeeTemplate() {
 function uploadEmployees(input) {
   const file = input.files[0];
   if(!file) return;
-  
   const reader = new FileReader();
   reader.onload = function(e) {
     const data = new Uint8Array(e.target.result);
     const workbook = XLSX.read(data, {type: 'array'});
     const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
-    
     let count = 0;
     jsonData.slice(1).forEach(row => {
       if(row[0] && row[1] && row[2]) {
-        const employee = {
-          employeeId: row[0],
-          name: row[1],
-          department: row[2],
-          points: parseInt(row[3]) || 0,
-          password: btoa(row[4] || row[0]),
-          totalEarned: 0,
-          totalSpent: 0,
-          createdAt: Date.now()
-        };
-        db.ref('loyalty/employees').push(employee);
+        db.ref('loyalty/employees').push({employeeId: row[0], name: row[1], department: row[2], points: parseInt(row[3]) || 0, password: btoa(row[4] || row[0]), totalEarned: 0, totalSpent: 0, createdAt: Date.now()});
         count++;
       }
     });
-    
     showAlert(`${count} employees uploaded!`, 'success');
     input.value = '';
   };
   reader.readAsArrayBuffer(file);
 }
 
-// ============ ADMIN: VOUCHERS (VIEW/CANCEL/DELETE FIXED) ============
+// ============ ADMIN: VOUCHERS ============
 function renderVouchers() {
   const tbody = document.getElementById('vouchers-tbody');
   if(!tbody) return;
-  
   tbody.innerHTML = vouchers.length === 0
-    ? '<tr><td colspan="8" style="text-align:center;color:#94a3b8;">No vouchers yet</td></tr>'
-    : vouchers.sort((a,b) => b.issueDate - a.issueDate).map(v => {
-      const statusClass = `status-${v.status || 'active'}`;
-      return `
-      <tr>
-        <td><strong>${v.serialNo}</strong></td>
-        <td>${v.employeeName}<br><small>${v.employeeDept || '-'}</small></td>
-        <td>${v.serviceName}<br><small>${v.serviceCategory || 'General'}</small></td>
-        <td>${v.points}</td>
-        <td>${new Date(v.issueDate).toLocaleDateString()}</td>
-        <td>${new Date(v.expiryDate).toLocaleDateString()}</td>
-        <td><span class="status-badge ${statusClass}">${(v.status || 'active').toUpperCase()}</span></td>
-        <td>
-          <button class="btn btn-outline btn-sm" onclick="viewVoucher('${v.id}')">👁️ View</button>
-          ${v.status !== 'used' && v.status !== 'cancelled' ? `
-            <button class="btn btn-warning btn-sm" onclick="cancelVoucher('${v.id}')">❌ Cancel</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteVoucher('${v.id}')">🗑️ Delete</button>
-          ` : '-'}
-        </td>
-      </tr>
-    `}).join('');
+    ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No vouchers yet</td></tr>'
+    : vouchers.sort((a,b) => b.issueDate - a.issueDate).map(v => `
+    <tr>
+      <td><strong>${v.serialNo}</strong></td>
+      <td>${v.employeeName}<br><small>${v.employeeDept || '-'}</small></td>
+      <td>${v.serviceName}<br><small>${v.serviceCategory || 'General'}</small></td>
+      <td>${v.points}</td>
+      <td>${new Date(v.issueDate).toLocaleDateString()}</td>
+      <td>${new Date(v.expiryDate).toLocaleDateString()}</td>
+      <td>
+        <button class="btn btn-outline btn-sm" onclick="viewVoucher('${v.id}')">️ View</button>
+        ${v.status !== 'used' && v.status !== 'cancelled' ? `
+          <button class="btn btn-warning btn-sm" onclick="cancelVoucher('${v.id}')">❌ Cancel</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteVoucher('${v.id}')">🗑️ Delete</button>
+        ` : '-'}
+      </td>
+    </tr>
+  `).join('');
 }
 
 function cancelVoucher(voucherId) {
   const voucher = vouchers.find(v => v.id === voucherId);
-  if(!voucher) {
-    showAlert('Voucher not found', 'error');
-    return;
-  }
-  if(!confirm(`Cancel voucher ${voucher.serialNo} for ${voucher.serviceName}?\n\n${voucher.points} points will be refunded to ${voucher.employeeName}.`)) return;
-  
-  db.ref('loyalty/vouchers/' + voucherId).update({
-    status: 'cancelled',
-    cancelledAt: Date.now()
-  });
-  
+  if(!voucher) return showAlert('Voucher not found', 'error');
+  if(!confirm(`Cancel voucher ${voucher.serialNo}? ${voucher.points} points will be refunded.`)) return;
+  db.ref('loyalty/vouchers/' + voucherId).update({status: 'cancelled', cancelledAt: Date.now()});
   const emp = employees.find(e => e.employeeId === voucher.employeeId);
   if(emp) {
     const newPoints = (emp.points || 0) + voucher.points;
     const newTotalSpent = Math.max(0, (emp.totalSpent || 0) - voucher.points);
-    db.ref('loyalty/employees/' + emp.id).update({
-      points: newPoints,
-      totalSpent: newTotalSpent
+    db.ref('loyalty/employees/' + emp.id).update({points: newPoints, totalSpent: newTotalSpent});
+    db.ref('loyalty/transactions').push({
+      employeeId: voucher.employeeId,
+      employeeName: voucher.employeeName,
+      type: 'cancel',
+      serviceName: voucher.serviceName + ' (Cancelled)',
+      points: voucher.points,
+      runningBalance: newPoints,
+      addedBy: 'admin',
+      timestamp: Date.now()
     });
   }
-  
-  db.ref('loyalty/transactions').push({
-    employeeId: voucher.employeeId,
-    employeeName: voucher.employeeName,
-    type: 'cancel',
-    serviceId: voucher.serviceId,
-    serviceName: voucher.serviceName + ' (Cancelled)',
-    points: voucher.points,
-    serialNo: voucher.serialNo + ' (Cancelled)',
-    timestamp: Date.now()
-  });
-  
-  showAlert(`Voucher cancelled! ${voucher.points} points refunded to ${voucher.employeeName}.`, 'success');
+  showAlert(`Voucher cancelled! ${voucher.points} points refunded.`, 'success');
 }
 
 function deleteVoucher(voucherId) {
   const voucher = vouchers.find(v => v.id === voucherId);
-  if(!voucher) {
-    showAlert('Voucher not found', 'error');
-    return;
-  }
-  if(!confirm(`Permanently delete voucher ${voucher.serialNo}? This cannot be undone.`)) return;
-  
-  db.ref('loyalty/vouchers/' + voucherId).remove().then(() => {
-    showAlert('Voucher deleted permanently', 'success');
-  }).catch(err => showAlert('Error: ' + err.message, 'error'));
+  if(!voucher) return showAlert('Voucher not found', 'error');
+  if(!confirm(`Permanently delete voucher ${voucher.serialNo}?`)) return;
+  db.ref('loyalty/vouchers/' + voucherId).remove().then(() => showAlert('Voucher deleted', 'success'));
 }
 
 function viewVoucher(voucherId) {
   const voucher = vouchers.find(v => v.id === voucherId);
-  if(!voucher) {
-    showAlert('Voucher not found', 'error');
-    return;
-  }
+  if(!voucher) return showAlert('Voucher not found', 'error');
   currentVoucher = {...voucher, hotelName: branding.hotelName || 'Host Loyalty Program', hotelLogo: branding.logo || ''};
   showVoucher(currentVoucher);
 }
@@ -1780,12 +2095,13 @@ function viewVoucher(voucherId) {
 function showVoucher(v) {
   const issueDate = new Date(v.issueDate).toLocaleDateString();
   const expiryDate = new Date(v.expiryDate).toLocaleDateString();
-  
+  const emp = employees.find(e => e.employeeId === v.employeeId);
+  const remainingPoints = emp ? (emp.points || 0) : 0;
   document.getElementById('voucher-content').innerHTML = `
-    <div class="voucher-preview" id="voucher-print">
+    <div class="voucher-preview">
       <div class="voucher-serial">Serial: ${v.serialNo}</div>
       <div class="voucher-header">
-        <div class="voucher-logo">${v.hotelLogo ? `<img src="${v.hotelLogo}">` : '🏨'}</div>
+        <div class="voucher-logo">${v.hotelLogo ? `<img src="${v.hotelLogo}">` : ''}</div>
         <h2 style="color:#78350f;margin:10px 0 5px;">${v.hotelName || 'Host Loyalty Program'}</h2>
         <p style="color:#92400e;font-size:0.9rem;">Service Redemption Voucher</p>
       </div>
@@ -1797,14 +2113,14 @@ function showVoucher(v) {
         <div class="voucher-detail"><label>Issue Date</label><br><strong>${issueDate}</strong></div>
         <div class="voucher-detail"><label>Expiry Date</label><br><strong style="color:#dc2626;">${expiryDate}</strong></div>
         <div class="voucher-detail"><label>Points Redeemed</label><br><strong>${v.points} pts</strong></div>
-        <div class="voucher-detail"><label>Status</label><br><strong style="color:var(--success);">✅ ${v.status || 'Active'}</strong></div>
+        <div class="voucher-detail"><label>Remaining Balance</label><br><strong style="color:var(--success);">${remainingPoints} pts</strong></div>
       </div>
       <div class="voucher-signature">
         <div class="line"></div>
         <div style="color:#78350f;font-size:0.9rem;">Director HR Signature</div>
       </div>
     </div>
-    <p style="text-align:center;color:#64748b;font-size:0.85rem;">This voucher is valid for 1 month from issue date. Present at the service counter.</p>
+    <p style="text-align:center;color:#64748b;font-size:0.85rem;">This voucher is valid for 1 month from issue date.</p>
   `;
   document.getElementById('ticket-modal').classList.add('active');
 }
@@ -1816,7 +2132,8 @@ function downloadVoucherPDF() {
   const v = currentVoucher;
   const issueDate = new Date(v.issueDate).toLocaleDateString();
   const expiryDate = new Date(v.expiryDate).toLocaleDateString();
-  
+  const emp = employees.find(e => e.employeeId === v.employeeId);
+  const remainingPoints = emp ? (emp.points || 0) : 0;
   doc.setFillColor(15, 118, 110);
   doc.rect(0, 0, 210, 40, 'F');
   doc.setTextColor(255, 255, 255);
@@ -1826,15 +2143,12 @@ function downloadVoucherPDF() {
   doc.setFontSize(12);
   doc.setFont(undefined, 'normal');
   doc.text('Service Redemption Voucher', 105, 30, {align: 'center'});
-  
   doc.setTextColor(0, 0, 0);
   doc.setFontSize(10);
   doc.text('Serial No: ' + v.serialNo, 15, 50);
-  
   doc.setDrawColor(245, 158, 11);
   doc.setLineWidth(1);
   doc.rect(10, 45, 190, 180);
-  
   doc.setFontSize(11);
   let y = 65;
   const details = [
@@ -1843,11 +2157,10 @@ function downloadVoucherPDF() {
     ['Service Availed:', v.serviceName],
     ['Category:', v.serviceCategory || 'General'],
     ['Points Redeemed:', v.points + ' pts'],
+    ['Remaining Balance:', remainingPoints + ' pts'],
     ['Issue Date:', issueDate],
-    ['Expiry Date:', expiryDate],
-    ['Status:', v.status || 'Active']
+    ['Expiry Date:', expiryDate]
   ];
-  
   details.forEach(([label, value]) => {
     doc.setFont(undefined, 'bold');
     doc.setTextColor(15, 118, 110);
@@ -1857,16 +2170,13 @@ function downloadVoucherPDF() {
     doc.text(String(value), 80, y);
     y += 15;
   });
-  
   doc.setDrawColor(0, 0, 0);
   doc.line(120, 240, 190, 240);
   doc.setFontSize(10);
   doc.text('Director HR Signature', 155, 248, {align: 'center'});
-  
   doc.setFontSize(9);
   doc.setTextColor(100, 100, 100);
-  doc.text('This voucher is valid for 1 month from issue date. Present at the service counter.', 105, 270, {align: 'center'});
-  
+  doc.text('This voucher is valid for 1 month from issue date.', 105, 270, {align: 'center'});
   doc.save(`Voucher_${v.serialNo}.pdf`);
   showAlert('Voucher PDF downloaded!', 'success');
 }
@@ -1874,7 +2184,6 @@ function downloadVoucherPDF() {
 // ============ ADMIN: APPROVALS ============
 function renderApprovals() {
   const pending = rewardRequests.filter(r => r.status === 'pending').sort((a,b) => a.requestedAt - b.requestedAt);
-  
   document.getElementById('approvals-list').innerHTML = pending.length === 0
     ? '<p style="text-align:center;padding:30px;color:#94a3b8;">No pending approvals</p>'
     : pending.map(r => `
@@ -1895,12 +2204,10 @@ function renderApprovals() {
 function approveRequest(requestId) {
   const request = rewardRequests.find(r => r.id === requestId);
   if(!request) return;
-  
   const issueDate = Date.now();
   const expiryDate = new Date();
   expiryDate.setMonth(expiryDate.getMonth() + 1);
   const serialNo = 'VOU-' + Date.now().toString().slice(-8);
-  
   const voucher = {
     requestId: requestId,
     serialNo: serialNo,
@@ -1917,49 +2224,32 @@ function approveRequest(requestId) {
     status: 'generated',
     createdAt: Date.now()
   };
-  
   const voucherId = db.ref('loyalty/vouchers').push().key;
   db.ref('loyalty/vouchers/' + voucherId).set(voucher);
-  
-  db.ref('loyalty/rewardRequests/' + requestId).update({
-    status: 'approved',
-    approvedAt: Date.now(),
-    voucherId: voucherId
-  });
-  
+  db.ref('loyalty/rewardRequests/' + requestId).update({status: 'approved', approvedAt: Date.now(), voucherId: voucherId});
   const emp = employees.find(e => e.employeeId === request.employeeId);
   if(emp) {
     const newPoints = Math.max(0, (emp.points || 0) - request.points);
     const newTotalSpent = (emp.totalSpent || 0) + request.points;
-    db.ref('loyalty/employees/' + emp.id).update({
-      points: newPoints,
-      totalSpent: newTotalSpent
+    db.ref('loyalty/employees/' + emp.id).update({points: newPoints, totalSpent: newTotalSpent});
+    db.ref('loyalty/transactions').push({
+      employeeId: request.employeeId,
+      employeeName: request.employeeName,
+      type: 'spend',
+      serviceName: request.serviceName,
+      points: request.points,
+      runningBalance: newPoints,
+      addedBy: 'admin-approval',
+      timestamp: Date.now()
     });
   }
-  
-  db.ref('loyalty/transactions').push({
-    employeeId: request.employeeId,
-    employeeName: request.employeeName,
-    type: 'spend',
-    serviceId: request.serviceId,
-    serviceName: request.serviceName,
-    points: request.points,
-    serialNo: serialNo,
-    timestamp: Date.now()
-  });
-  
-  showAlert(`Request approved! Voucher ${serialNo} generated for ${request.employeeName}.`, 'success');
+  showAlert(`Request approved! Voucher ${serialNo} generated.`, 'success');
 }
 
 function rejectRequest(requestId) {
   const reason = prompt('Enter rejection reason:');
   if(!reason) return;
-  
-  db.ref('loyalty/rewardRequests/' + requestId).update({
-    status: 'rejected',
-    rejectedAt: Date.now(),
-    rejectedReason: reason
-  }).then(() => {
+  db.ref('loyalty/rewardRequests/' + requestId).update({status: 'rejected', rejectedAt: Date.now(), rejectedReason: reason}).then(() => {
     showAlert('Request rejected', 'success');
   });
 }
@@ -1970,22 +2260,15 @@ function showApplyBehalfModal() {
   empSelect.innerHTML = employees.sort((a,b) => a.name.localeCompare(b.name)).map(e => 
     `<option value="${e.id}" data-points="${e.points || 0}">${e.name} (${e.employeeId}) - ${e.points || 0} pts</option>`
   ).join('');
-  
   const serviceSelect = document.getElementById('behalf-service-select');
   serviceSelect.innerHTML = services.sort((a,b) => a.name.localeCompare(b.name)).map(s => 
     `<option value="${s.id}" data-points="${s.points}">${s.name} - ${s.points} pts</option>`
   ).join('');
-  
   document.getElementById('behalf-service-details').style.display = 'none';
   document.getElementById('apply-behalf-modal').classList.add('active');
-  
   serviceSelect.onchange = function() {
     const selectedOption = this.options[this.selectedIndex];
-    const points = selectedOption.dataset.points;
-    document.getElementById('behalf-service-details').innerHTML = `
-      <p><strong>Service:</strong> ${selectedOption.text}</p>
-      <p><strong>Points Required:</strong> ${points}</p>
-    `;
+    document.getElementById('behalf-service-details').innerHTML = `<p><strong>Service:</strong> ${selectedOption.text}</p><p><strong>Points Required:</strong> ${selectedOption.dataset.points}</p>`;
     document.getElementById('behalf-service-details').style.display = 'block';
   };
 }
@@ -1993,15 +2276,10 @@ function showApplyBehalfModal() {
 function confirmApplyBehalf() {
   const empId = document.getElementById('behalf-employee-select').value;
   const serviceId = document.getElementById('behalf-service-select').value;
-  
   const employee = employees.find(e => e.id === empId);
   const service = services.find(s => s.id === serviceId);
-  
   if(!employee || !service) return showAlert('Invalid selection', 'error');
-  
-  if((employee.points || 0) < service.points) {
-    return showAlert(`${employee.name} has insufficient points (${employee.points || 0} < ${service.points})`, 'error');
-  }
+  if((employee.points || 0) < service.points) return showAlert(`${employee.name} has insufficient points`, 'error');
   
   const request = {
     employeeId: employee.employeeId,
@@ -2016,7 +2294,6 @@ function confirmApplyBehalf() {
     approvedAt: Date.now(),
     appliedBy: 'admin'
   };
-  
   const requestId = db.ref('loyalty/rewardRequests').push().key;
   db.ref('loyalty/rewardRequests/' + requestId).set(request);
   
@@ -2024,7 +2301,6 @@ function confirmApplyBehalf() {
   const expiryDate = new Date();
   expiryDate.setMonth(expiryDate.getMonth() + 1);
   const serialNo = 'VOU-' + Date.now().toString().slice(-8);
-  
   const voucher = {
     requestId: requestId,
     serialNo: serialNo,
@@ -2041,32 +2317,23 @@ function confirmApplyBehalf() {
     status: 'generated',
     createdAt: Date.now()
   };
-  
   const voucherId = db.ref('loyalty/vouchers').push().key;
   db.ref('loyalty/vouchers/' + voucherId).set(voucher);
-  
-  db.ref('loyalty/rewardRequests/' + requestId).update({
-    voucherId: voucherId
-  });
+  db.ref('loyalty/rewardRequests/' + requestId).update({voucherId: voucherId});
   
   const newPoints = Math.max(0, (employee.points || 0) - service.points);
   const newTotalSpent = (employee.totalSpent || 0) + service.points;
-  db.ref('loyalty/employees/' + employee.id).update({
-    points: newPoints,
-    totalSpent: newTotalSpent
-  });
-  
+  db.ref('loyalty/employees/' + employee.id).update({points: newPoints, totalSpent: newTotalSpent});
   db.ref('loyalty/transactions').push({
     employeeId: employee.employeeId,
     employeeName: employee.name,
     type: 'spend',
-    serviceId: service.id,
     serviceName: service.name,
     points: service.points,
-    serialNo: serialNo,
+    runningBalance: newPoints,
+    addedBy: 'admin-on-behalf',
     timestamp: Date.now()
   });
-  
   showAlert(`Voucher ${serialNo} generated for ${employee.name}!`, 'success');
   closeModal('apply-behalf-modal');
 }
@@ -2075,14 +2342,8 @@ function confirmApplyBehalf() {
 function renderReports() {
   const monthTabs = document.getElementById('report-month-tabs');
   const months = getUniqueMonths(transactions);
-  
-  monthTabs.innerHTML = months.map((m, i) => `
-    <button class="month-tab ${i === 0 ? 'active' : ''}" onclick="switchReportMonth('${m}', this)">${m}</button>
-  `).join('');
-  
-  if(months.length > 0) {
-    loadReportData(months[0]);
-  }
+  monthTabs.innerHTML = months.map((m, i) => `<button class="month-tab ${i === 0 ? 'active' : ''}" onclick="switchReportMonth('${m}', this)">${m}</button>`).join('');
+  if(months.length > 0) loadReportData(months[0]);
 }
 
 function getUniqueMonths(transactions) {
@@ -2103,56 +2364,21 @@ function switchReportMonth(month, btn) {
 function loadReportData(month) {
   const monthTrans = transactions.filter(t => {
     const d = new Date(t.timestamp);
-    const m = d.toLocaleString('default', {month: 'long', year: 'numeric'});
-    return m === month;
+    return d.toLocaleString('default', {month: 'long', year: 'numeric'}) === month;
   });
-  
   const earned = monthTrans.filter(t => t.type === 'earn');
   const spent = monthTrans.filter(t => t.type === 'spend');
   const cancelled = monthTrans.filter(t => t.type === 'cancel');
-  
   document.getElementById('report-activities').innerHTML = earned.length === 0
     ? '<p style="color:#94a3b8;">No activities this month</p>'
-    : earned.map(t => `
-      <div class="item-row" style="padding:10px;">
-        <div class="item-info">
-          <strong>${t.employeeName}</strong>
-          <small>${t.activityName} • ${new Date(t.timestamp).toLocaleDateString()}</small>
-        </div>
-        <div class="item-points" style="color:var(--success);">+${t.points}</div>
-      </div>
-    `).join('');
-  
+    : earned.map(t => `<div class="item-row" style="padding:10px;"><div class="item-info"><strong>${t.employeeName}</strong><small>${t.activityName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--success);">+${t.points}</div></div>`).join('');
   document.getElementById('report-services').innerHTML = (spent.length + cancelled.length) === 0
     ? '<p style="color:#94a3b8;">No services this month</p>'
-    : [...spent.map(t => `
-      <div class="item-row" style="padding:10px;">
-        <div class="item-info">
-          <strong>${t.employeeName}</strong>
-          <small>${t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small>
-        </div>
-        <div class="item-points" style="color:var(--danger);">-${t.points}</div>
-      </div>
-    `), ...cancelled.map(t => `
-      <div class="item-row" style="padding:10px;background:#fef3c7;">
-        <div class="item-info">
-          <strong>${t.employeeName} (Cancelled)</strong>
-          <small>${t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small>
-        </div>
-        <div class="item-points" style="color:var(--warning);">+${t.points} (refunded)</div>
-      </div>
-    `)].join('');
-  
+    : [...spent.map(t => `<div class="item-row" style="padding:10px;"><div class="item-info"><strong>${t.employeeName}</strong><small>${t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--danger);">-${t.points}</div></div>`), ...cancelled.map(t => `<div class="item-row" style="padding:10px;background:#fef3c7;"><div class="item-info"><strong>${t.employeeName} (Cancelled)</strong><small>${t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--warning);">+${t.points} (refunded)</div></div>`)].join('');
   document.getElementById('report-employees-tbody').innerHTML = employees.map(e => {
     const empEarned = earned.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0);
     const empSpent = spent.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0);
-    return `<tr>
-      <td><strong>${e.name}</strong></td>
-      <td>${e.department || '-'}</td>
-      <td style="color:var(--success);">+${empEarned}</td>
-      <td style="color:var(--danger);">-${empSpent}</td>
-      <td><strong style="color:var(--gold);">${e.points || 0}</strong></td>
-    </tr>`;
+    return `<tr><td><strong>${e.name}</strong></td><td>${e.department || '-'}</td><td style="color:var(--success);">+${empEarned}</td><td style="color:var(--danger);">-${empSpent}</td><td><strong style="color:var(--gold);">${e.points || 0}</strong></td></tr>`;
   }).join('');
 }
 
