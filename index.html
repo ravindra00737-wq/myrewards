@@ -162,7 +162,26 @@ tr:hover{background:#f8fafc;}
 .sort-controls{display:flex;gap:10px;margin-bottom:15px;flex-wrap:wrap;align-items:center;}
 .sort-controls select{width:auto;min-width:200px;}
 
-.status-badge{padding:4px 12px;border-radius:12px;font-size:0.85rem;font-weight:600;display:inline-block;}
+.status-badge.status-account-created {
+    background-color: #d1fae5;
+    color: #065f46;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+    border: 1px solid #6ee7b7;
+}
+.status-pending {
+    background-color: #fef3c7;
+    color: #92400e;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+    border: 1px solid #fde68a;
+}
 .status-pending{background:#fef3c7;color:#92400e;}
 .status-approved{background:#d1fae5;color:#065f46;}
 .status-rejected{background:#fee2e2;color:#991b1b;}
@@ -753,14 +772,13 @@ tr:hover{background:#f8fafc;}
 <script>
 // ============ FIREBASE CONFIG ============
 const firebaseConfig = {
-  apiKey: "AIzaSyDsq9c2468sYFl-RkhZQIF9hnFKONUJL1w",
+  apiKey: "YOUR_API_KEY_HERE",
   authDomain: "hostloyaltyprogram.firebaseapp.com",
   databaseURL: "https://hostloyaltyprogram-default-rtdb.firebaseio.com",
   projectId: "hostloyaltyprogram",
-  storageBucket: "hostloyaltyprogram.firebasestorage.app",
+  storageBucket: "hostloyaltyprogram.appspot.com",
   messagingSenderId: "254555925884",
-  appId: "1:254555925884:web:94cd19460f148a0db108f9",
-  measurementId: "G-PXEGXGEM5C"
+  appId: "YOUR_APP_ID_HERE"
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
@@ -1919,7 +1937,14 @@ function uploadServices(input) {
 function renderEmployees() {
   const sortValue = document.getElementById('employee-sort').value;
   const searchTerm = document.getElementById('employee-search').value.toLowerCase();
-  let filtered = employees.filter(e => e.name.toLowerCase().includes(searchTerm) || e.employeeId.toLowerCase().includes(searchTerm) || (e.department || '').toLowerCase().includes(searchTerm));
+  
+  let filtered = employees.filter(e => 
+    e.name.toLowerCase().includes(searchTerm) ||
+    e.employeeId.toLowerCase().includes(searchTerm) ||
+    (e.department || '').toLowerCase().includes(searchTerm)
+  );
+  
+  // Sorting logic
   switch(sortValue) {
     case 'name-asc': filtered.sort((a,b) => a.name.localeCompare(b.name)); break;
     case 'name-desc': filtered.sort((a,b) => b.name.localeCompare(a.name)); break;
@@ -1928,21 +1953,32 @@ function renderEmployees() {
     case 'points-asc': filtered.sort((a,b) => (a.points || 0) - (b.points || 0)); break;
     case 'empid-asc': filtered.sort((a,b) => a.employeeId.localeCompare(b.employeeId)); break;
   }
+  
   document.getElementById('employees-list').innerHTML = filtered.length === 0
     ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No employees found</p>'
-    : filtered.map(e => `
-    <div class="item-row">
-      <div class="item-info">
-        <strong>${e.name}</strong>
-        <small>${e.employeeId} • ${e.department || 'N/A'}</small>
+    : filtered.map(e => {
+      // LOGIC: Check if accountStatus is 'Account Created', otherwise default to 'Pending'
+      const status = e.accountStatus === 'Account Created' ? 'Account Created' : 'Pending';
+      const badgeClass = status === 'Account Created' ? 'status-account-created' : 'status-pending';
+      const icon = status === 'Account Created' ? '✅' : '⏳';
+      
+      return `
+      <div class="item-row">
+        <div class="item-info">
+          <strong>${e.name}</strong>
+          <small>${e.employeeId} • ${e.department || 'N/A'}</small>
+          <div style="margin-top: 8px;">
+            <span class="${badgeClass}">${icon} ${status}</span>
+            ${e.lastLogin ? `<small style="margin-left:10px; color:#64748b;">Last Login: ${new Date(e.lastLogin).toLocaleDateString()}</small>` : ''}
+          </div>
+        </div>
+        <div class="item-points">${e.points || 0} pts</div>
+        <div class="item-actions">
+          <button class="btn btn-outline btn-sm" onclick="editEmployee('${e.id}')">✏️ Edit</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${e.id}')">🗑️ Delete</button>
+        </div>
       </div>
-      <div class="item-points">${e.points || 0}</div>
-      <div class="item-actions">
-        <button class="btn btn-outline btn-sm" onclick="editEmployee('${e.id}')">✏️ Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteEmployee('${e.id}')">🗑️ Delete</button>
-      </div>
-    </div>
-  `).join('');
+    `}).join('');
 }
 
 function showAddEmployeeModal() {
@@ -1988,6 +2024,7 @@ function saveEmployee() {
     employee.totalSpent = 0;
     employee.createdAt = Date.now();
     employee.password = btoa(empId);
+    employee.accountStatus = 'Pending';
     db.ref('loyalty/employees').push(employee).then(() => {
       showAlert('Employee added! Default password is Employee ID.', 'success');
       closeModal('employee-modal');
@@ -2019,7 +2056,7 @@ function uploadEmployees(input) {
     let count = 0;
     jsonData.slice(1).forEach(row => {
       if(row[0] && row[1] && row[2]) {
-        db.ref('loyalty/employees').push({employeeId: row[0], name: row[1], department: row[2], points: parseInt(row[3]) || 0, password: btoa(row[4] || row[0]), totalEarned: 0, totalSpent: 0, createdAt: Date.now()});
+        db.ref('loyalty/employees').push({employeeId: row[0], name: row[1], department: row[2], points: parseInt(row[3]) || 0, password: btoa(row[4] || row[0]), totalEarned: 0, totalSpent: 0, accountStatus: 'Pending', createdAt: Date.now()});
         count++;
       }
     });
