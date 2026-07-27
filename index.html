@@ -204,9 +204,9 @@ tr:hover{background:#f8fafc;}
     <button class="nav-btn hidden" id="nav-my-requests" onclick="switchTab('my-requests',this)">📋 My Requests</button>
     
     <button class="nav-btn hidden" id="nav-dashboard" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
-    <button class="nav-btn hidden" id="nav-branding" onclick="switchTab('branding',this)">🎨 Branding</button>
+    <button class="nav-btn hidden" id="nav-branding" onclick="switchTab('branding',this)"> Branding</button>
     <button class="nav-btn hidden" id="nav-activities" onclick="switchTab('activities',this)">🎯 Activities</button>
-    <button class="nav-btn hidden" id="nav-admin-services" onclick="switchTab('admin-services',this)"> Services</button>
+    <button class="nav-btn hidden" id="nav-admin-services" onclick="switchTab('admin-services',this)">🎁 Services</button>
     <button class="nav-btn hidden" id="nav-employees" onclick="switchTab('employees',this)">👥 Employees</button>
     <button class="nav-btn hidden" id="nav-vouchers" onclick="switchTab('vouchers',this)">🎟️ Vouchers</button>
     <button class="nav-btn hidden" id="nav-approvals" onclick="switchTab('approvals',this)">✅ Approvals</button>
@@ -344,7 +344,7 @@ tr:hover{background:#f8fafc;}
   <!-- EMPLOYEE: SERVICES TAB -->
   <div id="tab-services" class="tab-content">
     <div class="card">
-      <h2> All Services</h2>
+      <h2>🎁 All Services</h2>
       <div class="service-grid" id="all-services-list"></div>
     </div>
   </div>
@@ -369,7 +369,7 @@ tr:hover{background:#f8fafc;}
   <!-- ADMIN: DASHBOARD TAB -->
   <div id="tab-dashboard" class="tab-content">
     <div class="card">
-      <h2>📊 Dashboard Overview</h2>
+      <h2> Dashboard Overview</h2>
       <div class="stats-grid">
         <div class="stat-card">
           <div class="number" id="stat-employees">0</div>
@@ -443,7 +443,7 @@ tr:hover{background:#f8fafc;}
       <h2>🎯 Manage Activities</h2>
       <div style="margin-bottom:20px;">
         <button class="btn btn-primary" onclick="showAddActivityModal()">➕ Add Activity</button>
-        <button class="btn btn-outline" onclick="downloadActivityTemplate()" style="margin-left:10px;"> Download Template</button>
+        <button class="btn btn-outline" onclick="downloadActivityTemplate()" style="margin-left:10px;">📥 Download Template</button>
         <label class="btn btn-success" style="margin-left:10px;cursor:pointer;">
           📤 Bulk Upload
           <input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadActivities(this)">
@@ -552,7 +552,7 @@ tr:hover{background:#f8fafc;}
         <tbody id="report-employees-tbody"></tbody>
       </table>
       
-      <button class="btn btn-primary" onclick="downloadReport()" style="margin-top:20px;"> Download Report</button>
+      <button class="btn btn-primary" onclick="downloadReport()" style="margin-top:20px;">📥 Download Report</button>
     </div>
   </div>
 </div>
@@ -617,7 +617,7 @@ tr:hover{background:#f8fafc;}
   </div>
 </div>
 
-<!-- Modal: Add/Edit Employee -->
+<!-- Modal: Add/Edit Employee (PASSWORD REMOVED) -->
 <div id="employee-modal" class="modal">
   <div class="modal-content">
     <h2 style="color:var(--brand);margin-bottom:20px;" id="employee-modal-title">Add Employee</h2>
@@ -637,10 +637,6 @@ tr:hover{background:#f8fafc;}
     <div class="form-group">
       <label>Available Reward Points *</label>
       <input type="number" id="employee-points" placeholder="0" min="0" value="0">
-    </div>
-    <div class="form-group">
-      <label>Password *</label>
-      <input type="password" id="employee-password" placeholder="Min 6 characters">
     </div>
     <button class="btn btn-success btn-full" onclick="saveEmployee()">💾 Save Employee</button>
     <button class="btn btn-outline btn-full" onclick="closeModal('employee-modal')" style="margin-top:10px;">Cancel</button>
@@ -662,7 +658,7 @@ tr:hover{background:#f8fafc;}
   <div class="modal-content" style="max-width:700px;">
     <h2 style="color:var(--brand);margin-bottom:15px;">🎟️ Service Voucher</h2>
     <div id="voucher-content"></div>
-    <button class="btn btn-primary btn-full" onclick="downloadVoucherPDF()"> Download PDF</button>
+    <button class="btn btn-primary btn-full" onclick="downloadVoucherPDF()">📥 Download PDF</button>
     <button class="btn btn-outline btn-full" onclick="closeModal('ticket-modal')" style="margin-top:10px;">Close</button>
   </div>
 </div>
@@ -688,7 +684,7 @@ tr:hover{background:#f8fafc;}
 <script>
 // ============ FIREBASE CONFIG ============
 const firebaseConfig = {
-  apiKey: "AIzaSyDsq9c2468sYFl-RkhZQIF9hnFKONUJL1w",
+   apiKey: "AIzaSyDsq9c2468sYFl-RkhZQIF9hnFKONUJL1w",
   authDomain: "hostloyaltyprogram.firebaseapp.com",
   databaseURL: "https://hostloyaltyprogram-default-rtdb.firebaseio.com",
   projectId: "hostloyaltyprogram",
@@ -738,20 +734,24 @@ function setupFileUploads() {
 }
 
 function loadData() {
+  // FIXED: Properly map Firebase keys to id property
   db.ref('loyalty/employees').on('value', snap => {
-    employees = snap.val() ? Object.values(snap.val()) : [];
+    const data = snap.val();
+    employees = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
     if(isAdmin) renderEmployees();
     updateWalletDisplays();
   });
   
   db.ref('loyalty/activities').on('value', snap => {
-    activities = snap.val() ? Object.values(snap.val()) : [];
+    const data = snap.val();
+    activities = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
     if(isAdmin) renderActivities();
     if(currentUser) renderActivityHistory();
   });
   
   db.ref('loyalty/services').on('value', snap => {
-    services = snap.val() ? Object.values(snap.val()) : [];
+    const data = snap.val();
+    services = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
     if(isAdmin) renderServices();
     if(currentUser) {
       renderAllServices();
@@ -760,13 +760,15 @@ function loadData() {
   });
   
   db.ref('loyalty/vouchers').on('value', snap => {
-    vouchers = snap.val() ? Object.values(snap.val()) : [];
+    const data = snap.val();
+    vouchers = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
     if(isAdmin) renderVouchers();
     updateStats();
   });
   
   db.ref('loyalty/transactions').on('value', snap => {
-    transactions = snap.val() ? Object.values(snap.val()) : [];
+    const data = snap.val();
+    transactions = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
     if(currentUser) {
       renderActivityHistory();
       updateWalletDisplays();
@@ -774,7 +776,8 @@ function loadData() {
   });
   
   db.ref('loyalty/rewardRequests').on('value', snap => {
-    rewardRequests = snap.val() ? Object.values(snap.val()) : [];
+    const data = snap.val();
+    rewardRequests = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
     if(isAdmin) renderApprovals();
     if(currentUser) renderMyRequests();
   });
@@ -1108,7 +1111,7 @@ function renderAvailableServices() {
           <h3>${s.name}</h3>
           <div class="points">-${s.points} pts</div>
           <p class="desc">${s.description || 'No description'}</p>
-          <button class="btn btn-warning btn-full"> Redeem Now</button>
+          <button class="btn btn-warning btn-full">🎁 Redeem Now</button>
         </div>
       </div>
     `).join('');
@@ -1137,7 +1140,7 @@ function openRedeem(serviceId) {
         <span>Voucher Valid Until:</span><strong>${expiryDate.toLocaleDateString()}</strong>
       </div>
       <div style="background:#fef3c7;padding:10px;border-radius:8px;margin-top:10px;">
-        <strong style="color:#92400e;">️ Note:</strong>
+        <strong style="color:#92400e;">⚠️ Note:</strong>
         <p style="color:#78350f;font-size:0.9rem;margin-top:5px;">This request will be sent to admin for approval. Voucher will be generated after approval.</p>
       </div>
     </div>
@@ -1223,11 +1226,9 @@ function viewApprovedVoucher(requestId) {
   const request = rewardRequests.find(r => r.id === requestId);
   if(!request) return;
   
-  // Find or generate voucher for this request
   let voucher = vouchers.find(v => v.requestId === requestId);
   
   if(!voucher) {
-    // Generate voucher if not exists
     const issueDate = Date.now();
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + 1);
@@ -1251,16 +1252,13 @@ function viewApprovedVoucher(requestId) {
       createdAt: Date.now()
     };
     
-    // Save voucher
     db.ref('loyalty/vouchers/' + voucher.id).set(voucher);
     
-    // Update request status
     db.ref('loyalty/rewardRequests/' + requestId).update({
       status: 'generated',
       voucherId: voucher.id
     });
     
-    // Deduct points
     const emp = employees.find(e => e.employeeId === request.employeeId);
     if(emp) {
       const newPoints = Math.max(0, (emp.points || 0) - request.points);
@@ -1286,7 +1284,7 @@ function updateStats() {
   document.getElementById('stat-points-redeemed').innerText = employees.reduce((s,e) => s + (e.totalSpent || 0), 0);
 }
 
-// ============ ADMIN: ACTIVITIES ============
+// ============ ADMIN: ACTIVITIES (EDIT FIXED) ============
 function renderActivities() {
   document.getElementById('activities-list').innerHTML = activities.length === 0
     ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No activities yet</p>'
@@ -1300,7 +1298,7 @@ function renderActivities() {
       <div class="item-points">+${a.points}</div>
       <div class="item-actions">
         <button class="btn btn-outline btn-sm" onclick="editActivity('${a.id}')">✏️ Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')">🗑️ Delete</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')">️ Delete</button>
       </div>
     </div>
   `).join('');
@@ -1319,13 +1317,16 @@ function showAddActivityModal() {
 
 function editActivity(activityId) {
   const activity = activities.find(a => a.id === activityId);
-  if(!activity) return;
+  if(!activity) {
+    showAlert('Activity not found', 'error');
+    return;
+  }
   
   document.getElementById('activity-modal-title').innerText = 'Edit Activity';
   document.getElementById('activity-edit-id').value = activityId;
-  document.getElementById('activity-name').value = activity.name;
+  document.getElementById('activity-name').value = activity.name || '';
   document.getElementById('activity-category').value = activity.category || '';
-  document.getElementById('activity-points').value = activity.points;
+  document.getElementById('activity-points').value = activity.points || 0;
   document.getElementById('activity-desc').value = activity.description || '';
   document.getElementById('activity-image').value = activity.image || '';
   document.getElementById('activity-modal').classList.add('active');
@@ -1348,13 +1349,13 @@ function saveActivity() {
     db.ref('loyalty/activities/' + editId).update(activity).then(() => {
       showAlert('Activity updated!', 'success');
       closeModal('activity-modal');
-    });
+    }).catch(err => showAlert('Error: ' + err.message, 'error'));
   } else {
     activity.createdAt = Date.now();
     db.ref('loyalty/activities').push(activity).then(() => {
       showAlert('Activity added!', 'success');
       closeModal('activity-modal');
-    });
+    }).catch(err => showAlert('Error: ' + err.message, 'error'));
   }
 }
 
@@ -1362,7 +1363,7 @@ function deleteActivity(activityId) {
   if(!confirm('Delete this activity?')) return;
   db.ref('loyalty/activities/' + activityId).remove().then(() => {
     showAlert('Activity deleted', 'success');
-  });
+  }).catch(err => showAlert('Error: ' + err.message, 'error'));
 }
 
 function downloadActivityTemplate() {
@@ -1408,7 +1409,7 @@ function uploadActivities(input) {
   reader.readAsArrayBuffer(file);
 }
 
-// ============ ADMIN: SERVICES ============
+// ============ ADMIN: SERVICES (EDIT FIXED) ============
 function renderServices() {
   document.getElementById('services-list').innerHTML = services.length === 0
     ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No services yet</p>'
@@ -1422,7 +1423,7 @@ function renderServices() {
       <div class="item-points">-${s.points}</div>
       <div class="item-actions">
         <button class="btn btn-outline btn-sm" onclick="editService('${s.id}')">✏️ Edit</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteService('${s.id}')">️ Delete</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteService('${s.id}')">🗑️ Delete</button>
       </div>
     </div>
   `).join('');
@@ -1441,13 +1442,16 @@ function showAddServiceModal() {
 
 function editService(serviceId) {
   const service = services.find(s => s.id === serviceId);
-  if(!service) return;
+  if(!service) {
+    showAlert('Service not found', 'error');
+    return;
+  }
   
   document.getElementById('service-modal-title').innerText = 'Edit Service';
   document.getElementById('service-edit-id').value = serviceId;
-  document.getElementById('service-name').value = service.name;
+  document.getElementById('service-name').value = service.name || '';
   document.getElementById('service-category').value = service.category || '';
-  document.getElementById('service-points').value = service.points;
+  document.getElementById('service-points').value = service.points || 0;
   document.getElementById('service-desc').value = service.description || '';
   document.getElementById('service-image').value = service.image || '';
   document.getElementById('service-modal').classList.add('active');
@@ -1470,13 +1474,13 @@ function saveService() {
     db.ref('loyalty/services/' + editId).update(service).then(() => {
       showAlert('Service updated!', 'success');
       closeModal('service-modal');
-    });
+    }).catch(err => showAlert('Error: ' + err.message, 'error'));
   } else {
     service.createdAt = Date.now();
     db.ref('loyalty/services').push(service).then(() => {
       showAlert('Service added!', 'success');
       closeModal('service-modal');
-    });
+    }).catch(err => showAlert('Error: ' + err.message, 'error'));
   }
 }
 
@@ -1484,7 +1488,7 @@ function deleteService(serviceId) {
   if(!confirm('Delete this service?')) return;
   db.ref('loyalty/services/' + serviceId).remove().then(() => {
     showAlert('Service deleted', 'success');
-  });
+  }).catch(err => showAlert('Error: ' + err.message, 'error'));
 }
 
 function downloadServiceTemplate() {
@@ -1530,7 +1534,7 @@ function uploadServices(input) {
   reader.readAsArrayBuffer(file);
 }
 
-// ============ ADMIN: EMPLOYEES ============
+// ============ ADMIN: EMPLOYEES (EDIT FIXED, PASSWORD REMOVED) ============
 function renderEmployees() {
   const sortValue = document.getElementById('employee-sort').value;
   const searchTerm = document.getElementById('employee-search').value.toLowerCase();
@@ -1574,21 +1578,22 @@ function showAddEmployeeModal() {
   document.getElementById('employee-name').value = '';
   document.getElementById('employee-dept').value = '';
   document.getElementById('employee-points').value = '0';
-  document.getElementById('employee-password').value = '';
   document.getElementById('employee-modal').classList.add('active');
 }
 
 function editEmployee(employeeId) {
   const employee = employees.find(e => e.id === employeeId);
-  if(!employee) return;
+  if(!employee) {
+    showAlert('Employee not found', 'error');
+    return;
+  }
   
   document.getElementById('employee-modal-title').innerText = 'Edit Employee';
   document.getElementById('employee-edit-id').value = employeeId;
-  document.getElementById('employee-empid').value = employee.employeeId;
-  document.getElementById('employee-name').value = employee.name;
+  document.getElementById('employee-empid').value = employee.employeeId || '';
+  document.getElementById('employee-name').value = employee.name || '';
   document.getElementById('employee-dept').value = employee.department || '';
   document.getElementById('employee-points').value = employee.points || 0;
-  document.getElementById('employee-password').value = '';
   document.getElementById('employee-modal').classList.add('active');
 }
 
@@ -1598,11 +1603,9 @@ function saveEmployee() {
   const name = document.getElementById('employee-name').value.trim();
   const dept = document.getElementById('employee-dept').value.trim();
   const points = parseInt(document.getElementById('employee-points').value) || 0;
-  const password = document.getElementById('employee-password').value;
   
   if(!empId || !name || !dept) return showAlert('Please fill required fields', 'error');
   
-  // Check for duplicate employee ID
   const duplicate = employees.find(e => e.employeeId === empId && e.id !== editId);
   if(duplicate) return showAlert('Employee ID already exists', 'error');
   
@@ -1614,27 +1617,22 @@ function saveEmployee() {
     updatedAt: Date.now()
   };
   
-  if(password) {
-    employee.password = btoa(password);
-  }
-  
   if(editId) {
     db.ref('loyalty/employees/' + editId).update(employee).then(() => {
       showAlert('Employee updated!', 'success');
       closeModal('employee-modal');
-    });
+    }).catch(err => showAlert('Error: ' + err.message, 'error'));
   } else {
-    if(!password) return showAlert('Password is required for new employees', 'error');
-    
     employee.points = points;
     employee.totalEarned = 0;
     employee.totalSpent = 0;
     employee.createdAt = Date.now();
+    employee.password = btoa(empId);
     
     db.ref('loyalty/employees').push(employee).then(() => {
-      showAlert('Employee added!', 'success');
+      showAlert('Employee added! Default password is Employee ID.', 'success');
       closeModal('employee-modal');
-    });
+    }).catch(err => showAlert('Error: ' + err.message, 'error'));
   }
 }
 
@@ -1642,7 +1640,7 @@ function deleteEmployee(employeeId) {
   if(!confirm('Delete this employee? All their data will be lost.')) return;
   db.ref('loyalty/employees/' + employeeId).remove().then(() => {
     showAlert('Employee deleted', 'success');
-  });
+  }).catch(err => showAlert('Error: ' + err.message, 'error'));
 }
 
 function downloadEmployeeTemplate() {
@@ -1674,7 +1672,7 @@ function uploadEmployees(input) {
           name: row[1],
           department: row[2],
           points: parseInt(row[3]) || 0,
-          password: btoa(row[4] || 'password123'),
+          password: btoa(row[4] || row[0]),
           totalEarned: 0,
           totalSpent: 0,
           createdAt: Date.now()
@@ -1690,21 +1688,14 @@ function uploadEmployees(input) {
   reader.readAsArrayBuffer(file);
 }
 
-// ============ ADMIN: VOUCHERS ============
+// ============ ADMIN: VOUCHERS (VIEW/CANCEL/DELETE FIXED) ============
 function renderVouchers() {
   const tbody = document.getElementById('vouchers-tbody');
   if(!tbody) return;
   
-  const filtered = vouchers.filter(v => {
-    if(!currentMonth) return true;
-    const vMonth = new Date(v.issueDate).getMonth();
-    const vYear = new Date(v.issueDate).getFullYear();
-    return vMonth === currentMonth.getMonth() && vYear === currentMonth.getFullYear();
-  });
-  
-  tbody.innerHTML = filtered.length === 0
+  tbody.innerHTML = vouchers.length === 0
     ? '<tr><td colspan="8" style="text-align:center;color:#94a3b8;">No vouchers yet</td></tr>'
-    : filtered.sort((a,b) => b.issueDate - a.issueDate).map(v => {
+    : vouchers.sort((a,b) => b.issueDate - a.issueDate).map(v => {
       const statusClass = `status-${v.status || 'active'}`;
       return `
       <tr>
@@ -1716,7 +1707,7 @@ function renderVouchers() {
         <td>${new Date(v.expiryDate).toLocaleDateString()}</td>
         <td><span class="status-badge ${statusClass}">${(v.status || 'active').toUpperCase()}</span></td>
         <td>
-          <button class="btn btn-outline btn-sm" onclick="viewVoucher('${v.id}')">👁️</button>
+          <button class="btn btn-outline btn-sm" onclick="viewVoucher('${v.id}')">👁️ View</button>
           ${v.status !== 'used' && v.status !== 'cancelled' ? `
             <button class="btn btn-warning btn-sm" onclick="cancelVoucher('${v.id}')">❌ Cancel</button>
             <button class="btn btn-danger btn-sm" onclick="deleteVoucher('${v.id}')">🗑️ Delete</button>
@@ -1728,16 +1719,17 @@ function renderVouchers() {
 
 function cancelVoucher(voucherId) {
   const voucher = vouchers.find(v => v.id === voucherId);
-  if(!voucher) return;
+  if(!voucher) {
+    showAlert('Voucher not found', 'error');
+    return;
+  }
   if(!confirm(`Cancel voucher ${voucher.serialNo} for ${voucher.serviceName}?\n\n${voucher.points} points will be refunded to ${voucher.employeeName}.`)) return;
   
-  // Mark voucher as cancelled
   db.ref('loyalty/vouchers/' + voucherId).update({
     status: 'cancelled',
     cancelledAt: Date.now()
   });
   
-  // Refund points to employee
   const emp = employees.find(e => e.employeeId === voucher.employeeId);
   if(emp) {
     const newPoints = (emp.points || 0) + voucher.points;
@@ -1748,7 +1740,6 @@ function cancelVoucher(voucherId) {
     });
   }
   
-  // Record cancellation transaction
   db.ref('loyalty/transactions').push({
     employeeId: voucher.employeeId,
     employeeName: voucher.employeeName,
@@ -1765,17 +1756,23 @@ function cancelVoucher(voucherId) {
 
 function deleteVoucher(voucherId) {
   const voucher = vouchers.find(v => v.id === voucherId);
-  if(!voucher) return;
+  if(!voucher) {
+    showAlert('Voucher not found', 'error');
+    return;
+  }
   if(!confirm(`Permanently delete voucher ${voucher.serialNo}? This cannot be undone.`)) return;
   
   db.ref('loyalty/vouchers/' + voucherId).remove().then(() => {
     showAlert('Voucher deleted permanently', 'success');
-  });
+  }).catch(err => showAlert('Error: ' + err.message, 'error'));
 }
 
 function viewVoucher(voucherId) {
   const voucher = vouchers.find(v => v.id === voucherId);
-  if(!voucher) return;
+  if(!voucher) {
+    showAlert('Voucher not found', 'error');
+    return;
+  }
   currentVoucher = {...voucher, hotelName: branding.hotelName || 'Host Loyalty Program', hotelLogo: branding.logo || ''};
   showVoucher(currentVoucher);
 }
@@ -1921,18 +1918,15 @@ function approveRequest(requestId) {
     createdAt: Date.now()
   };
   
-  // Create voucher
   const voucherId = db.ref('loyalty/vouchers').push().key;
   db.ref('loyalty/vouchers/' + voucherId).set(voucher);
   
-  // Update request status
   db.ref('loyalty/rewardRequests/' + requestId).update({
     status: 'approved',
     approvedAt: Date.now(),
     voucherId: voucherId
   });
   
-  // Deduct points from employee
   const emp = employees.find(e => e.employeeId === request.employeeId);
   if(emp) {
     const newPoints = Math.max(0, (emp.points || 0) - request.points);
@@ -1943,7 +1937,6 @@ function approveRequest(requestId) {
     });
   }
   
-  // Record transaction
   db.ref('loyalty/transactions').push({
     employeeId: request.employeeId,
     employeeName: request.employeeName,
@@ -2027,7 +2020,6 @@ function confirmApplyBehalf() {
   const requestId = db.ref('loyalty/rewardRequests').push().key;
   db.ref('loyalty/rewardRequests/' + requestId).set(request);
   
-  // Generate voucher immediately
   const issueDate = Date.now();
   const expiryDate = new Date();
   expiryDate.setMonth(expiryDate.getMonth() + 1);
@@ -2053,12 +2045,10 @@ function confirmApplyBehalf() {
   const voucherId = db.ref('loyalty/vouchers').push().key;
   db.ref('loyalty/vouchers/' + voucherId).set(voucher);
   
-  // Update request
   db.ref('loyalty/rewardRequests/' + requestId).update({
     voucherId: voucherId
   });
   
-  // Deduct points
   const newPoints = Math.max(0, (employee.points || 0) - service.points);
   const newTotalSpent = (employee.totalSpent || 0) + service.points;
   db.ref('loyalty/employees/' + employee.id).update({
@@ -2066,7 +2056,6 @@ function confirmApplyBehalf() {
     totalSpent: newTotalSpent
   });
   
-  // Record transaction
   db.ref('loyalty/transactions').push({
     employeeId: employee.employeeId,
     employeeName: employee.name,
