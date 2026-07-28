@@ -170,7 +170,6 @@ tr:hover{background:#f8fafc;}
 .status-used{background:#e5e7eb;color:#374151;}
 .status-cancelled{background:#f3f4f6;color:#6b7280;}
 
-/* NEW STATUS BADGES FOR ACCOUNT STATUS */
 .status-account-created {
     background-color: #d1fae5;
     color: #065f46;
@@ -240,7 +239,7 @@ tr:hover{background:#f8fafc;}
 <div class="navbar">
   <div class="nav-content">
     <button class="nav-btn hidden" id="nav-points" onclick="switchTab('points',this)">💰 My Points</button>
-    <button class="nav-btn hidden" id="nav-history" onclick="switchTab('history',this)"> Activity History</button>
+    <button class="nav-btn hidden" id="nav-history" onclick="switchTab('history',this)">📜 Activity History</button>
     <button class="nav-btn hidden" id="nav-activities" onclick="switchTab('activities',this)">🎯 Activities</button>
     <button class="nav-btn hidden" id="nav-services" onclick="switchTab('services',this)">🎁 All Services</button>
     <button class="nav-btn hidden" id="nav-available" onclick="switchTab('available',this)">✅ Available to Me</button>
@@ -250,7 +249,7 @@ tr:hover{background:#f8fafc;}
     <button class="nav-btn hidden" id="nav-dashboard" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
     <button class="nav-btn hidden" id="nav-branding" onclick="switchTab('branding',this)">🎨 Branding</button>
     <button class="nav-btn hidden" id="nav-employee-points" onclick="switchTab('employee-points',this)">⭐ Employee Activity Points</button>
-    <button class="nav-btn hidden" id="nav-admin-activities" onclick="switchTab('admin-activities',this)"> Activities</button>
+    <button class="nav-btn hidden" id="nav-admin-activities" onclick="switchTab('admin-activities',this)">🎯 Activities</button>
     <button class="nav-btn hidden" id="nav-admin-services" onclick="switchTab('admin-services',this)">🎁 Services</button>
     <button class="nav-btn hidden" id="nav-employees" onclick="switchTab('employees',this)">👥 Employees</button>
     <button class="nav-btn hidden" id="nav-vouchers" onclick="switchTab('vouchers',this)">🎟️ Vouchers</button>
@@ -258,7 +257,7 @@ tr:hover{background:#f8fafc;}
     <button class="nav-btn hidden" id="nav-reports" onclick="switchTab('reports',this)">📊 Reports</button>
     
     <button class="nav-btn" id="nav-login" onclick="showLogin()">🔐 Login</button>
-    <button class="nav-btn" id="nav-admin-btn" onclick="showAdminLogin()" style="margin-left:auto;">️ Admin</button>
+    <button class="nav-btn" id="nav-admin-btn" onclick="showAdminLogin()" style="margin-left:auto;">⚙️ Admin</button>
     <div class="user-info hidden" id="user-info">
       <span id="user-name-display">👤 User</span>
       <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
@@ -276,7 +275,7 @@ tr:hover{background:#f8fafc;}
   <div id="tab-login" class="tab-content active">
     <div class="login-box">
       <div class="card">
-        <h2> Employee Login</h2>
+        <h2>🔐 Employee Login</h2>
         <div class="form-group"><label>Employee ID</label><input type="text" id="login-empid" placeholder="Enter your Employee ID"></div>
         <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="Enter your password"></div>
         <button class="btn btn-primary btn-full" onclick="employeeLogin()">Login</button>
@@ -381,7 +380,7 @@ tr:hover{background:#f8fafc;}
   <!-- EMPLOYEE: MY REQUESTS TAB -->
   <div id="tab-my-requests" class="tab-content">
     <div class="card">
-      <h2> My Reward Requests</h2>
+      <h2>📋 My Reward Requests</h2>
       <div id="my-requests-list"></div>
     </div>
   </div>
@@ -389,7 +388,7 @@ tr:hover{background:#f8fafc;}
   <!-- EMPLOYEE: TRANSACTIONS TAB -->
   <div id="tab-transactions" class="tab-content">
     <div class="card">
-      <h2> Transaction History</h2>
+      <h2>📊 Transaction History</h2>
       <p style="color:#64748b;margin-bottom:20px;">Complete audit trail of all your points transactions</p>
       <div class="filter-row">
         <div class="form-group"><label>Filter by Month</label><select id="trans-month-filter" onchange="renderEmployeeTransactions()"><option value="">All Months</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
@@ -455,7 +454,7 @@ tr:hover{background:#f8fafc;}
         <button class="btn btn-success" onclick="addManualActivity()">➕ Add Activity & Award Points</button>
       </div>
       <div style="background:#f8fafc;padding:20px;border-radius:10px;margin-bottom:25px;">
-        <h3 style="margin-bottom:15px;"> Bulk Upload via Excel</h3>
+        <h3 style="margin-bottom:15px;">📤 Bulk Upload via Excel</h3>
         <p style="color:#64748b;margin-bottom:15px;">Upload Excel file with columns: Activity Date, Employee ID, Employee Name, Activity Name, Points Earned</p>
         <div class="file-upload" id="bulk-activity-upload"><p style="font-size:2rem;">📊</p><p><strong>Click to upload Excel file</strong></p><input type="file" id="bulk-activity-file" accept=".xlsx,.xls"></div>
         <button class="btn btn-outline" onclick="downloadActivityUploadTemplate()" style="margin-top:10px;">📥 Download Template</button>
@@ -481,7 +480,7 @@ tr:hover{background:#f8fafc;}
       <h2>🎯 Manage Activities</h2>
       <div style="margin-bottom:20px;">
         <button class="btn btn-primary" onclick="showAddActivityModal()">➕ Add Activity</button>
-        <button class="btn btn-outline" onclick="downloadActivityTemplate()" style="margin-left:10px;"> Download Template</button>
+        <button class="btn btn-outline" onclick="downloadActivityTemplate()" style="margin-left:10px;">📥 Download Template</button>
         <label class="btn btn-success" style="margin-left:10px;cursor:pointer;">📤 Bulk Upload<input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadActivities(this)"></label>
       </div>
       <div class="item-list" id="activities-list"></div>
@@ -493,7 +492,7 @@ tr:hover{background:#f8fafc;}
     <div class="card">
       <h2>🎁 Manage Services</h2>
       <div style="margin-bottom:20px;">
-        <button class="btn btn-primary" onclick="showAddServiceModal()"> Add Service</button>
+        <button class="btn btn-primary" onclick="showAddServiceModal()">➕ Add Service</button>
         <button class="btn btn-outline" onclick="downloadServiceTemplate()" style="margin-left:10px;">📥 Download Template</button>
         <label class="btn btn-success" style="margin-left:10px;cursor:pointer;">📤 Bulk Upload<input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadServices(this)"></label>
       </div>
@@ -506,9 +505,9 @@ tr:hover{background:#f8fafc;}
     <div class="card">
       <h2>👥 Manage Employees</h2>
       <div style="margin-bottom:20px;display:flex;gap:10px;flex-wrap:wrap;">
-        <button class="btn btn-primary" onclick="showAddEmployeeModal()"> Add Employee Manually</button>
+        <button class="btn btn-primary" onclick="showAddEmployeeModal()">➕ Add Employee Manually</button>
         <button class="btn btn-outline" onclick="downloadEmployeeTemplate()">📥 Download Template</button>
-        <label class="btn btn-success" style="cursor:pointer;"> Bulk Import<input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadEmployees(this)"></label>
+        <label class="btn btn-success" style="cursor:pointer;">📤 Bulk Import<input type="file" accept=".xlsx,.xls" style="display:none;" onchange="uploadEmployees(this)"></label>
       </div>
       <div class="sort-controls">
         <select id="employee-sort" onchange="renderEmployees()">
@@ -566,8 +565,8 @@ tr:hover{background:#f8fafc;}
   </div>
 </div>
 
-<!-- Modals (Activity, Service, Employee, Redeem, Ticket, Apply Behalf) -->
-<div id="activity-modal" class="modal"><div class="modal-content"><h2 style="color:var(--brand);margin-bottom:20px;" id="activity-modal-title">Add Activity</h2><input type="hidden" id="activity-edit-id"><div class="form-group"><label>Activity Name *</label><input type="text" id="activity-name"></div><div class="form-group"><label>Category</label><input type="text" id="activity-category"></div><div class="form-group"><label>Points *</label><input type="number" id="activity-points" min="0"></div><div class="form-group"><label>Description</label><textarea id="activity-desc"></textarea></div><div class="form-group"><label>Image URL</label><input type="text" id="activity-image"></div><button class="btn btn-success btn-full" onclick="saveActivity()"> Save Activity</button><button class="btn btn-outline btn-full" onclick="closeModal('activity-modal')" style="margin-top:10px;">Cancel</button></div></div>
+<!-- Modals -->
+<div id="activity-modal" class="modal"><div class="modal-content"><h2 style="color:var(--brand);margin-bottom:20px;" id="activity-modal-title">Add Activity</h2><input type="hidden" id="activity-edit-id"><div class="form-group"><label>Activity Name *</label><input type="text" id="activity-name"></div><div class="form-group"><label>Category</label><input type="text" id="activity-category"></div><div class="form-group"><label>Points *</label><input type="number" id="activity-points" min="0"></div><div class="form-group"><label>Description</label><textarea id="activity-desc"></textarea></div><div class="form-group"><label>Image URL</label><input type="text" id="activity-image"></div><button class="btn btn-success btn-full" onclick="saveActivity()">💾 Save Activity</button><button class="btn btn-outline btn-full" onclick="closeModal('activity-modal')" style="margin-top:10px;">Cancel</button></div></div>
 <div id="service-modal" class="modal"><div class="modal-content"><h2 style="color:var(--brand);margin-bottom:20px;" id="service-modal-title">Add Service</h2><input type="hidden" id="service-edit-id"><div class="form-group"><label>Service Name *</label><input type="text" id="service-name"></div><div class="form-group"><label>Category</label><input type="text" id="service-category"></div><div class="form-group"><label>Points Required *</label><input type="number" id="service-points" min="0"></div><div class="form-group"><label>Description</label><textarea id="service-desc"></textarea></div><div class="form-group"><label>Image URL</label><input type="text" id="service-image"></div><button class="btn btn-success btn-full" onclick="saveService()">💾 Save Service</button><button class="btn btn-outline btn-full" onclick="closeModal('service-modal')" style="margin-top:10px;">Cancel</button></div></div>
 <div id="employee-modal" class="modal"><div class="modal-content"><h2 style="color:var(--brand);margin-bottom:20px;" id="employee-modal-title">Add Employee</h2><input type="hidden" id="employee-edit-id"><div class="form-group"><label>Employee ID *</label><input type="text" id="employee-empid"></div><div class="form-group"><label>Full Name *</label><input type="text" id="employee-name"></div><div class="form-group"><label>Department *</label><input type="text" id="employee-dept"></div><div class="form-group"><label>Available Reward Points *</label><input type="number" id="employee-points" min="0" value="0"></div><button class="btn btn-success btn-full" onclick="saveEmployee()">💾 Save Employee</button><button class="btn btn-outline btn-full" onclick="closeModal('employee-modal')" style="margin-top:10px;">Cancel</button></div></div>
 <div id="redeem-modal" class="modal"><div class="modal-content"><h2 style="color:var(--brand);margin-bottom:20px;">🎁 Redeem Service</h2><div id="redeem-details"></div><button class="btn btn-warning btn-full" onclick="confirmRedeem()">🎟️ Request Voucher</button><button class="btn btn-outline btn-full" onclick="closeRedeemModal()" style="margin-top:10px;">Cancel</button></div></div>
@@ -721,10 +720,10 @@ function updateNavVisibility() {
   } else if(isLoggedIn) {
     ['nav-points','nav-history','nav-activities','nav-services','nav-available','nav-my-requests','nav-transactions'].forEach(id => { document.getElementById(id).classList.remove('hidden'); });
     document.getElementById('user-info').classList.remove('hidden');
-    document.getElementById('user-name-display').innerText = ' ' + currentUser.name;
+    document.getElementById('user-name-display').innerText = '👤 ' + currentUser.name;
   } else {
     document.getElementById('nav-login').classList.remove('hidden');
-    document.getElementById('nav-login').innerText = ' Login';
+    document.getElementById('nav-login').innerText = '🔐 Login';
   }
 }
 
@@ -744,11 +743,7 @@ function employeeLogin() {
     if(found) {
       currentUser = found;
       isAdmin = false;
-      // UPDATE STATUS TO 'Account Created' UPON LOGIN
-      db.ref('loyalty/employees/' + employeeKey).update({
-        accountStatus: 'Account Created',
-        lastLogin: Date.now()
-      });
+      db.ref('loyalty/employees/' + employeeKey).update({ accountStatus: 'Account Created', lastLogin: Date.now() });
       onLoginSuccess();
     } else {
       showAlert('Invalid Employee ID or Password', 'error');
@@ -933,7 +928,23 @@ function renderAdminActivityRecords() {
   filtered.sort((a,b) => b.createdAt - a.createdAt);
   tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No activity records found</td></tr>' : filtered.map(r => `<tr><td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td><td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td><td>${r.activityName}</td><td style="color:var(--success);font-weight:bold;">+${r.points}</td><td>${r.monthName || ''} ${r.year || ''}</td><td>${r.remarks || '-'}</td><td><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td></tr>`).join('');
 }
-function deleteActivityRecord(recordId) { if(!confirm('Delete this activity record? Note: Points already awarded will NOT be reversed.')) return; db.ref('loyalty/employeeActivities/' + recordId).remove().then(() => { showAlert('Activity record deleted', 'success'); }); }
+
+function deleteActivityRecord(recordId) {
+  if(!confirm('Delete this activity record? Points will be reversed from employee balance.')) return;
+  const record = employeeActivities.find(a => a.id === recordId);
+  if(!record) return showAlert('Activity record not found', 'error');
+  const emp = employees.find(e => e.employeeId === record.employeeId);
+  if(!emp) return showAlert('Employee not found', 'error');
+  const newPoints = Math.max(0, (emp.points || 0) - record.points);
+  const newTotalEarned = Math.max(0, (emp.totalEarned || 0) - record.points);
+  db.ref('loyalty/employees/' + emp.id).update({ points: newPoints, totalEarned: newTotalEarned }).then(() => {
+    db.ref('loyalty/transactions').push({ employeeId: record.employeeId, employeeName: record.employeeName, type: 'reverse', activityName: record.activityName + ' (Reversed)', points: -record.points, runningBalance: newPoints, addedBy: 'admin', timestamp: Date.now() }).then(() => {
+      db.ref('loyalty/employeeActivities/' + recordId).remove().then(() => {
+        showAlert(`Activity deleted! ${record.points} points reversed from ${record.employeeName}.`, 'success');
+      });
+    });
+  }).catch(err => { showAlert('Error: ' + err.message, 'error'); });
+}
 
 // ============ EMPLOYEE: ACTIVITY HISTORY ============
 function renderEmployeeActivityHistory() {
@@ -946,7 +957,7 @@ function renderEmployeeActivityHistory() {
   const monthStats = {};
   myActivities.forEach(a => { const key = `${a.monthName || ''} ${a.year || ''}`; if(!monthStats[key]) monthStats[key] = {count:0, points:0}; monthStats[key].count++; monthStats[key].points += a.points; });
   document.getElementById('activity-history-stats').innerHTML = Object.entries(monthStats).map(([month,stats]) => `<div style="background:linear-gradient(135deg,var(--brand),var(--brand-light));color:#fff;padding:15px;border-radius:10px;text-align:center;"><div style="font-size:1.5rem;font-weight:bold;">${stats.points} pts</div><div style="font-size:0.9rem;opacity:0.9;">${month}</div><div style="font-size:0.8rem;opacity:0.8;">${stats.count} activities</div></div>`).join('') || '<p style="color:#94a3b8;">No activity history yet</p>';
-  document.getElementById('activity-history-list').innerHTML = myActivities.length === 0 ? '<p style="text-align:center;padding:30px;color:#94a3b8;">No activities attended yet.</p>' : myActivities.map(a => `<div class="transaction-item earn"><div class="transaction-info"><strong>🎯 ${a.activityName}</strong><small>📅 ${a.activityDate ? new Date(a.activityDate).toLocaleDateString() : 'N/A'} • 📆 ${a.monthName || ''} ${a.year || ''}</small>${a.remarks ? `<small> ${a.remarks}</small>` : ''}</div><div class="transaction-points earn">+${a.points} pts</div></div>`).join('');
+  document.getElementById('activity-history-list').innerHTML = myActivities.length === 0 ? '<p style="text-align:center;padding:30px;color:#94a3b8;">No activities attended yet.</p>' : myActivities.map(a => `<div class="transaction-item earn"><div class="transaction-info"><strong>🎯 ${a.activityName}</strong><small>📅 ${a.activityDate ? new Date(a.activityDate).toLocaleDateString() : 'N/A'} • 📆 ${a.monthName || ''} ${a.year || ''}</small>${a.remarks ? `<small>📝 ${a.remarks}</small>` : ''}</div><div class="transaction-points earn">+${a.points} pts</div></div>`).join('');
 }
 
 // ============ EMPLOYEE: TRANSACTIONS ============
@@ -958,7 +969,7 @@ function renderEmployeeTransactions() {
   if(yearFilter) myTrans = myTrans.filter(t => { const d = new Date(t.timestamp); return d.getFullYear() === parseInt(yearFilter); });
   myTrans.sort((a,b) => b.timestamp - a.timestamp);
   const tbody = document.getElementById('employee-transactions-tbody');
-  tbody.innerHTML = myTrans.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:#94a3b8;">No transactions yet</td></tr>' : myTrans.map(t => { const typeIcon = t.type === 'earn' ? '📈' : t.type === 'spend' ? '📉' : '️'; const typeClass = t.type === 'earn' ? 'earn' : t.type === 'spend' ? 'spend' : 'cancel'; const pointsDisplay = t.type === 'earn' ? `+${t.points}` : t.type === 'spend' ? `-${t.points}` : `+${t.points} (refunded)`; return `<tr><td>${new Date(t.timestamp).toLocaleDateString()}</td><td><span class="transaction-points ${typeClass}">${typeIcon} ${t.type.toUpperCase()}</span></td><td><strong>${t.activityName || t.serviceName || 'N/A'}</strong><br><small>${t.addedBy ? 'By: ' + t.addedBy : ''}</small></td><td class="transaction-points ${typeClass}">${pointsDisplay}</td><td><strong>${t.runningBalance || 0}</strong></td></tr>`}).join('');
+  tbody.innerHTML = myTrans.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:#94a3b8;">No transactions yet</td></tr>' : myTrans.map(t => { const typeIcon = t.type === 'earn' ? '📈' : t.type === 'spend' ? '📉' : t.type === 'reverse' ? '↩️' : '↩️'; const typeClass = t.type === 'earn' ? 'earn' : t.type === 'spend' ? 'spend' : t.type === 'reverse' ? 'cancel' : 'cancel'; const pointsDisplay = t.type === 'earn' ? `+${t.points}` : t.type === 'spend' ? `-${t.points}` : t.type === 'reverse' ? `-${Math.abs(t.points)} (Reversed)` : `+${t.points} (refunded)`; return `<tr><td>${new Date(t.timestamp).toLocaleDateString()}</td><td><span class="transaction-points ${typeClass}">${typeIcon} ${t.type.toUpperCase()}</span></td><td><strong>${t.activityName || t.serviceName || 'N/A'}</strong><br><small>${t.addedBy ? 'By: ' + t.addedBy : ''}</small></td><td class="transaction-points ${typeClass}">${pointsDisplay}</td><td><strong>${t.runningBalance || 0}</strong></td></tr>`}).join('');
 }
 
 // ============ EMPLOYEE: ACTIVITIES ============
@@ -1001,7 +1012,7 @@ function renderMyRequests() {
   const myRequests = rewardRequests.filter(r => r.employeeId === currentUser.employeeId).sort((a,b) => b.requestedAt - a.requestedAt);
   const container = document.getElementById('my-requests-list');
   if(myRequests.length === 0) { container.innerHTML = '<p style="text-align:center;padding:30px;color:#94a3b8;">No reward requests yet.</p>'; return; }
-  container.innerHTML = myRequests.map(r => { const statusClass = `status-${r.status}`; const canDownload = r.status === 'approved' || r.status === 'generated'; const canCancel = r.status === 'pending'; return `<div class="item-row" style="padding:15px;"><div class="item-info"><strong>${r.serviceName}</strong><small>${new Date(r.requestedAt).toLocaleDateString()} • ${r.points} points</small><small style="color:${r.status === 'approved' ? 'var(--success)' : r.status === 'rejected' ? 'var(--danger)' : 'var(--warning)'};">Status: ${r.status.toUpperCase()}</small>${r.rejectedReason ? `<small style="color:var(--danger);">Reason: ${r.rejectedReason}</small>` : ''}</div><div class="item-actions">${canDownload ? `<button class="btn btn-primary btn-sm" onclick="viewApprovedVoucher('${r.id}')">🎟️ View Voucher</button>` : ''}${canCancel ? `<button class="btn btn-danger btn-sm" onclick="cancelRequest('${r.id}')"> Cancel</button>` : ''}</div></div>`}).join('');
+  container.innerHTML = myRequests.map(r => { const statusClass = `status-${r.status}`; const canDownload = r.status === 'approved' || r.status === 'generated'; const canCancel = r.status === 'pending'; return `<div class="item-row" style="padding:15px;"><div class="item-info"><strong>${r.serviceName}</strong><small>${new Date(r.requestedAt).toLocaleDateString()} • ${r.points} points</small><small style="color:${r.status === 'approved' ? 'var(--success)' : r.status === 'rejected' ? 'var(--danger)' : 'var(--warning)'};">Status: ${r.status.toUpperCase()}</small>${r.rejectedReason ? `<small style="color:var(--danger);">Reason: ${r.rejectedReason}</small>` : ''}</div><div class="item-actions">${canDownload ? `<button class="btn btn-primary btn-sm" onclick="viewApprovedVoucher('${r.id}')">🎟️ View Voucher</button>` : ''}${canCancel ? `<button class="btn btn-danger btn-sm" onclick="cancelRequest('${r.id}')">❌ Cancel</button>` : ''}</div></div>`}).join('');
 }
 function cancelRequest(requestId) { if(!confirm('Cancel this reward request?')) return; db.ref('loyalty/rewardRequests/' + requestId).update({status: 'cancelled', cancelledAt: Date.now()}).then(() => { showAlert('Request cancelled', 'success'); }); }
 function viewApprovedVoucher(requestId) {
@@ -1062,7 +1073,7 @@ function uploadActivities(input) {
 
 // ============ ADMIN: SERVICES ============
 function renderServices() {
-  document.getElementById('services-list').innerHTML = services.length === 0 ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No services yet</p>' : services.map(s => `<div class="item-row"><div class="item-info"><strong>${s.name}</strong><small>${s.category || 'General'} • ${s.points} points</small>${s.description ? `<small>${s.description}</small>` : ''}</div><div class="item-points">-${s.points}</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editService('${s.id}')">️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteService('${s.id}')">🗑️ Delete</button></div></div>`).join('');
+  document.getElementById('services-list').innerHTML = services.length === 0 ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No services yet</p>' : services.map(s => `<div class="item-row"><div class="item-info"><strong>${s.name}</strong><small>${s.category || 'General'} • ${s.points} points</small>${s.description ? `<small>${s.description}</small>` : ''}</div><div class="item-points">-${s.points}</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editService('${s.id}')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteService('${s.id}')">🗑️ Delete</button></div></div>`).join('');
 }
 function showAddServiceModal() { document.getElementById('service-modal-title').innerText = 'Add Service'; document.getElementById('service-edit-id').value = ''; document.getElementById('service-name').value = ''; document.getElementById('service-category').value = ''; document.getElementById('service-points').value = ''; document.getElementById('service-desc').value = ''; document.getElementById('service-image').value = ''; document.getElementById('service-modal').classList.add('active'); }
 function editService(serviceId) { const service = services.find(s => s.id === serviceId); if(!service) return showAlert('Service not found', 'error'); document.getElementById('service-modal-title').innerText = 'Edit Service'; document.getElementById('service-edit-id').value = serviceId; document.getElementById('service-name').value = service.name || ''; document.getElementById('service-category').value = service.category || ''; document.getElementById('service-points').value = service.points || 0; document.getElementById('service-desc').value = service.description || ''; document.getElementById('service-image').value = service.image || ''; document.getElementById('service-modal').classList.add('active'); }
@@ -1101,7 +1112,6 @@ function renderEmployees() {
     case 'empid-asc': filtered.sort((a,b) => a.employeeId.localeCompare(b.employeeId)); break;
   }
   document.getElementById('employees-list').innerHTML = filtered.length === 0 ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No employees found</p>' : filtered.map(e => {
-    // Check status exactly as written in database
     const status = e.accountStatus === 'Account Created' ? 'Account Created' : 'Pending';
     const badgeClass = status === 'Account Created' ? 'status-account-created' : 'status-pending-account';
     const icon = status === 'Account Created' ? '✅' : '⏳';
@@ -1124,7 +1134,7 @@ function saveEmployee() {
   if(editId) { db.ref('loyalty/employees/' + editId).update(employee).then(() => { showAlert('Employee updated!', 'success'); closeModal('employee-modal'); }); }
   else {
     employee.points = points; employee.totalEarned = 0; employee.totalSpent = 0; employee.createdAt = Date.now(); employee.password = btoa(empId);
-    employee.accountStatus = 'Pending'; // <--- ADD THIS LINE
+    employee.accountStatus = 'Pending';
     db.ref('loyalty/employees').push(employee).then(() => { showAlert('Employee added! Default password is Employee ID.', 'success'); closeModal('employee-modal'); });
   }
 }
@@ -1141,7 +1151,7 @@ function uploadEmployees(input) {
         db.ref('loyalty/employees').push({
           employeeId: row[0], name: row[1], department: row[2], points: parseInt(row[3]) || 0, password: btoa(row[4] || row[0]),
           totalEarned: 0, totalSpent: 0, createdAt: Date.now(),
-          accountStatus: 'Pending' // <--- ADD THIS LINE
+          accountStatus: 'Pending'
         });
         count++;
       }
@@ -1154,8 +1164,9 @@ function uploadEmployees(input) {
 // ============ ADMIN: VOUCHERS ============
 function renderVouchers() {
   const tbody = document.getElementById('vouchers-tbody'); if(!tbody) return;
-  tbody.innerHTML = vouchers.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No vouchers yet</td></tr>' : vouchers.sort((a,b) => b.issueDate - a.issueDate).map(v => `<tr><td><strong>${v.serialNo}</strong></td><td>${v.employeeName}<br><small>${v.employeeDept || '-'}</small></td><td>${v.serviceName}<br><small>${v.serviceCategory || 'General'}</small></td><td>${v.points}</td><td>${new Date(v.issueDate).toLocaleDateString()}</td><td>${new Date(v.expiryDate).toLocaleDateString()}</td><td><button class="btn btn-outline btn-sm" onclick="viewVoucher('${v.id}')">️ View</button>${v.status !== 'used' && v.status !== 'cancelled' ? `<button class="btn btn-warning btn-sm" onclick="cancelVoucher('${v.id}')">❌ Cancel</button><button class="btn btn-danger btn-sm" onclick="deleteVoucher('${v.id}')">🗑️ Delete</button>` : '-'}</td></tr>`).join('');
+  tbody.innerHTML = vouchers.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No vouchers yet</td></tr>' : vouchers.sort((a,b) => b.issueDate - a.issueDate).map(v => `<tr><td><strong>${v.serialNo}</strong></td><td>${v.employeeName}<br><small>${v.employeeDept || '-'}</small></td><td>${v.serviceName}<br><small>${v.serviceCategory || 'General'}</small></td><td>${v.points}</td><td>${new Date(v.issueDate).toLocaleDateString()}</td><td>${new Date(v.expiryDate).toLocaleDateString()}</td><td><button class="btn btn-outline btn-sm" onclick="viewVoucher('${v.id}')">👁️ View</button>${v.status !== 'used' && v.status !== 'cancelled' ? `<button class="btn btn-warning btn-sm" onclick="cancelVoucher('${v.id}')">❌ Cancel</button><button class="btn btn-danger btn-sm" onclick="deleteVoucher('${v.id}')">🗑️ Delete</button>` : '-'}</td></tr>`).join('');
 }
+
 function cancelVoucher(voucherId) {
   const voucher = vouchers.find(v => v.id === voucherId); if(!voucher) return showAlert('Voucher not found', 'error');
   if(!confirm(`Cancel voucher ${voucher.serialNo}? ${voucher.points} points will be refunded.`)) return;
@@ -1168,7 +1179,14 @@ function cancelVoucher(voucherId) {
   }
   showAlert(`Voucher cancelled! ${voucher.points} points refunded.`, 'success');
 }
-function deleteVoucher(voucherId) { const voucher = vouchers.find(v => v.id === voucherId); if(!voucher) return showAlert('Voucher not found', 'error'); if(!confirm(`Permanently delete voucher ${voucher.serialNo}?`)) return; db.ref('loyalty/vouchers/' + voucherId).remove().then(() => showAlert('Voucher deleted', 'success')); }
+
+function deleteVoucher(voucherId) { 
+  const voucher = vouchers.find(v => v.id === voucherId); 
+  if(!voucher) return showAlert('Voucher not found', 'error'); 
+  if(!confirm(`Permanently delete voucher ${voucher.serialNo}?\n\nNote: This will NOT refund points. Use 'Cancel' if you want to refund points to the employee.`)) return; 
+  db.ref('loyalty/vouchers/' + voucherId).remove().then(() => showAlert('Voucher deleted permanently', 'success')); 
+}
+
 function viewVoucher(voucherId) { const voucher = vouchers.find(v => v.id === voucherId); if(!voucher) return showAlert('Voucher not found', 'error'); currentVoucher = {...voucher, hotelName: branding.hotelName || 'Host Loyalty Program', hotelLogo: branding.logo || ''}; showVoucher(currentVoucher); }
 function showVoucher(v) {
   const issueDate = new Date(v.issueDate).toLocaleDateString(); const expiryDate = new Date(v.expiryDate).toLocaleDateString();
@@ -1235,9 +1253,9 @@ function getUniqueMonths(transactions) { const months = new Set(); transactions.
 function switchReportMonth(month, btn) { document.querySelectorAll('#report-month-tabs .month-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); loadReportData(month); }
 function loadReportData(month) {
   const monthTrans = transactions.filter(t => { const d = new Date(t.timestamp); return d.toLocaleString('default', {month: 'long', year: 'numeric'}) === month; });
-  const earned = monthTrans.filter(t => t.type === 'earn'); const spent = monthTrans.filter(t => t.type === 'spend'); const cancelled = monthTrans.filter(t => t.type === 'cancel');
+  const earned = monthTrans.filter(t => t.type === 'earn'); const spent = monthTrans.filter(t => t.type === 'spend'); const cancelled = monthTrans.filter(t => t.type === 'cancel' || t.type === 'reverse');
   document.getElementById('report-activities').innerHTML = earned.length === 0 ? '<p style="color:#94a3b8;">No activities this month</p>' : earned.map(t => `<div class="item-row" style="padding:10px;"><div class="item-info"><strong>${t.employeeName}</strong><small>${t.activityName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--success);">+${t.points}</div></div>`).join('');
-  document.getElementById('report-services').innerHTML = (spent.length + cancelled.length) === 0 ? '<p style="color:#94a3b8;">No services this month</p>' : [...spent.map(t => `<div class="item-row" style="padding:10px;"><div class="item-info"><strong>${t.employeeName}</strong><small>${t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--danger);">-${t.points}</div></div>`), ...cancelled.map(t => `<div class="item-row" style="padding:10px;background:#fef3c7;"><div class="item-info"><strong>${t.employeeName} (Cancelled)</strong><small>${t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--warning);">+${t.points} (refunded)</div></div>`)].join('');
+  document.getElementById('report-services').innerHTML = (spent.length + cancelled.length) === 0 ? '<p style="color:#94a3b8;">No services this month</p>' : [...spent.map(t => `<div class="item-row" style="padding:10px;"><div class="item-info"><strong>${t.employeeName}</strong><small>${t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--danger);">-${t.points}</div></div>`), ...cancelled.map(t => `<div class="item-row" style="padding:10px;background:#fef3c7;"><div class="item-info"><strong>${t.employeeName} ${t.type === 'reverse' ? '(Points Reversed)' : '(Cancelled)'}</strong><small>${t.activityName || t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--warning);">${t.type === 'reverse' ? '-' : '+'}${Math.abs(t.points)} ${t.type === 'reverse' ? '(Reversed)' : '(refunded)'}</div></div>`)].join('');
   document.getElementById('report-employees-tbody').innerHTML = employees.map(e => { const empEarned = earned.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0); const empSpent = spent.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0); return `<tr><td><strong>${e.name}</strong></td><td>${e.department || '-'}</td><td style="color:var(--success);">+${empEarned}</td><td style="color:var(--danger);">-${empSpent}</td><td><strong style="color:var(--gold);">${e.points || 0}</strong></td></tr>`; }).join('');
 }
 function downloadReport() { let csv = 'Employee,Department,Points Earned,Points Spent,Current Balance\n'; employees.forEach(e => { csv += `"${e.name}","${e.department || ''}",${e.totalEarned || 0},${e.totalSpent || 0},${e.points || 0}\n`; }); const blob = new Blob([csv], {type: 'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `loyalty-report-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); }
