@@ -401,10 +401,42 @@ tr:hover{background:#f8fafc;}
     </div>
   </div>
 
-  <!-- ADMIN: DASHBOARD TAB -->
+  <!-- ✅ UPDATED: ADMIN DASHBOARD TAB WITH MONTH/YEAR FILTER -->
   <div id="tab-dashboard" class="tab-content">
     <div class="card">
       <h2>📊 Dashboard Overview</h2>
+      
+      <div class="filter-row" style="margin-bottom: 20px;">
+        <div class="form-group">
+          <label>Filter by Month</label>
+          <select id="dashboard-month-filter" onchange="updateDashboardStats()">
+            <option value="all">All Months</option>
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Filter by Year</label>
+          <select id="dashboard-year-filter" onchange="updateDashboardStats()">
+            <option value="all">All Years</option>
+            <option value="2024">2024</option>
+            <option value="2025">2025</option>
+            <option value="2026">2026</option>
+            <option value="2027">2027</option>
+          </select>
+        </div>
+      </div>
+
       <div class="stats-grid">
         <div class="stat-card"><div class="number" id="stat-employees">0</div><div class="label">Total Employees</div></div>
         <div class="stat-card" style="background:linear-gradient(135deg,var(--warning),var(--gold-light));"><div class="number" id="stat-activities">0</div><div class="label">Total Activities</div></div>
@@ -460,7 +492,12 @@ tr:hover{background:#f8fafc;}
         <button class="btn btn-outline" onclick="downloadActivityUploadTemplate()" style="margin-top:10px;">📥 Download Template</button>
         <div id="bulk-upload-results" style="margin-top:15px;"></div>
       </div>
-      <h3 style="margin-bottom:15px;">📋 Activity Records</h3>
+      
+      <!-- ✅ UPDATED: ADDED DOWNLOAD EXCEL BUTTON -->
+      <h3 style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
+        📋 Activity Records 
+        <button class="btn btn-success btn-sm" onclick="downloadActivityRecordsExcel()">📥 Download Excel</button>
+      </h3>
       <div class="filter-row">
         <div class="form-group"><label>Filter by Month</label><select id="admin-activity-month" onchange="renderAdminActivityRecords()"><option value="">All Months</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
         <div class="form-group"><label>Filter by Year</label><select id="admin-activity-year" onchange="renderAdminActivityRecords()"><option value="">All Years</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option></select></div>
@@ -646,8 +683,7 @@ function loadData() {
   db.ref('loyalty/vouchers').on('value', snap => {
     const data = snap.val();
     vouchers = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
-    if(isAdmin) renderVouchers();
-    updateStats();
+    if(isAdmin) { renderVouchers(); updateDashboardStats(); }
   });
   db.ref('loyalty/transactions').on('value', snap => {
     const data = snap.val();
@@ -663,7 +699,7 @@ function loadData() {
   db.ref('loyalty/employeeActivities').on('value', snap => {
     const data = snap.val();
     employeeActivities = data ? Object.entries(data).map(([id, val]) => ({id, ...val})) : [];
-    if(isAdmin) renderAdminActivityRecords();
+    if(isAdmin) { renderAdminActivityRecords(); updateDashboardStats(); }
     if(currentUser) renderEmployeeActivityHistory();
   });
   db.ref('loyalty/branding').on('value', snap => {
@@ -695,7 +731,7 @@ function switchTab(tab, btn) {
   if(tab === 'available' && currentUser) renderAvailableServices();
   if(tab === 'my-requests' && currentUser) renderMyRequests();
   if(tab === 'transactions' && currentUser) renderEmployeeTransactions();
-  if(tab === 'dashboard') updateStats();
+  if(tab === 'dashboard') updateDashboardStats();
   if(tab === 'employee-points' && isAdmin) renderAdminActivityRecords();
   if(tab === 'admin-activities' && isAdmin) renderActivities();
   if(tab === 'admin-services' && isAdmin) renderServices();
@@ -929,6 +965,36 @@ function renderAdminActivityRecords() {
   tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No activity records found</td></tr>' : filtered.map(r => `<tr><td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td><td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td><td>${r.activityName}</td><td style="color:var(--success);font-weight:bold;">+${r.points}</td><td>${r.monthName || ''} ${r.year || ''}</td><td>${r.remarks || '-'}</td><td><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td></tr>`).join('');
 }
 
+// ✅ NEW: DOWNLOAD ACTIVITY RECORDS TO EXCEL
+function downloadActivityRecordsExcel() {
+  const monthFilter = document.getElementById('admin-activity-month').value;
+  const yearFilter = document.getElementById('admin-activity-year').value;
+  
+  let filtered = employeeActivities;
+  if (monthFilter !== '') filtered = filtered.filter(r => r.month === parseInt(monthFilter));
+  if (yearFilter !== '') filtered = filtered.filter(r => r.year === parseInt(yearFilter));
+  
+  filtered.sort((a,b) => b.createdAt - a.createdAt);
+  
+  const exportData = filtered.map(r => ({
+    'Date': r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A',
+    'Employee Name': r.employeeName,
+    'Employee ID': r.employeeId,
+    'Activity': r.activityName,
+    'Points': r.points,
+    'Month/Year': `${r.monthName || ''} ${r.year || ''}`,
+    'Remarks': r.remarks || '-'
+  }));
+  
+  const ws = XLSX.utils.json_to_sheet(exportData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Activity Records");
+  
+  const fileName = `Activity-Records-${monthFilter !== '' ? monthFilter : 'All'}-${yearFilter !== '' ? yearFilter : 'All'}.xlsx`;
+  XLSX.writeFile(wb, fileName);
+  showAlert('Activity records downloaded successfully!', 'success');
+}
+
 function deleteActivityRecord(recordId) {
   if(!confirm('Delete this activity record? Points will be reversed from employee balance.')) return;
   const record = employeeActivities.find(a => a.id === recordId);
@@ -1034,14 +1100,46 @@ function viewApprovedVoucher(requestId) {
   showVoucher(currentVoucher);
 }
 
-// ============ ADMIN: DASHBOARD ============
-function updateStats() {
+// ✅ UPDATED: DASHBOARD STATS WITH MONTH/YEAR FILTER
+function updateDashboardStats() {
+  const monthFilter = document.getElementById('dashboard-month-filter')?.value || 'all';
+  const yearFilter = document.getElementById('dashboard-year-filter')?.value || 'all';
+
+  // Filter employee activities (points distributed)
+  let filteredActivities = employeeActivities;
+  if (monthFilter !== 'all') filteredActivities = filteredActivities.filter(a => a.month === parseInt(monthFilter));
+  if (yearFilter !== 'all') filteredActivities = filteredActivities.filter(a => a.year === parseInt(yearFilter));
+  const pointsDistributed = filteredActivities.reduce((sum, a) => sum + (a.points || 0), 0);
+
+  // Filter transactions (points redeemed)
+  let filteredTransactions = transactions.filter(t => t.type === 'spend' || t.type === 'cancel');
+  if (monthFilter !== 'all') filteredTransactions = filteredTransactions.filter(t => {
+    const d = new Date(t.timestamp);
+    return (d.getMonth() + 1) === parseInt(monthFilter);
+  });
+  if (yearFilter !== 'all') filteredTransactions = filteredTransactions.filter(t => {
+    const d = new Date(t.timestamp);
+    return d.getFullYear() === parseInt(yearFilter);
+  });
+  const pointsRedeemed = filteredTransactions.reduce((sum, t) => sum + Math.abs(t.points || 0), 0);
+
+  // Filter vouchers
+  let filteredVouchers = vouchers.filter(v => !v.cancelled && v.status !== 'used');
+  if (monthFilter !== 'all') filteredVouchers = filteredVouchers.filter(v => {
+    const d = new Date(v.issueDate);
+    return (d.getMonth() + 1) === parseInt(monthFilter);
+  });
+  if (yearFilter !== 'all') filteredVouchers = filteredVouchers.filter(v => {
+    const d = new Date(v.issueDate);
+    return d.getFullYear() === parseInt(yearFilter);
+  });
+
   document.getElementById('stat-employees').innerText = employees.length;
   document.getElementById('stat-activities').innerText = activities.length;
   document.getElementById('stat-services').innerText = services.length;
-  document.getElementById('stat-vouchers-admin').innerText = vouchers.filter(v => !v.cancelled && v.status !== 'used').length;
-  document.getElementById('stat-points-distributed').innerText = employees.reduce((s,e) => s + (e.totalEarned || 0), 0);
-  document.getElementById('stat-points-redeemed').innerText = employees.reduce((s,e) => s + (e.totalSpent || 0), 0);
+  document.getElementById('stat-vouchers-admin').innerText = filteredVouchers.length;
+  document.getElementById('stat-points-distributed').innerText = pointsDistributed;
+  document.getElementById('stat-points-redeemed').innerText = pointsRedeemed;
 }
 
 // ============ ADMIN: ACTIVITIES ============
