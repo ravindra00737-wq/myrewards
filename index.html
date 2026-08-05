@@ -249,7 +249,7 @@ tr:hover{background:#f8fafc;}
     <button class="nav-btn hidden" id="nav-dashboard" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
     <button class="nav-btn hidden" id="nav-branding" onclick="switchTab('branding',this)">🎨 Branding</button>
     <button class="nav-btn hidden" id="nav-employee-points" onclick="switchTab('employee-points',this)">⭐ Employee Activity Points</button>
-    <button class="nav-btn hidden" id="nav-admin-activities" onclick="switchTab('admin-activities',this)">🎯 Activities</button>
+    <button class="nav-btn hidden" id="nav-admin-activities" onclick="switchTab('admin-activities',this)"> Activities</button>
     <button class="nav-btn hidden" id="nav-admin-services" onclick="switchTab('admin-services',this)">🎁 Services</button>
     <button class="nav-btn hidden" id="nav-employees" onclick="switchTab('employees',this)">👥 Employees</button>
     <button class="nav-btn hidden" id="nav-vouchers" onclick="switchTab('vouchers',this)">🎟️ Vouchers</button>
@@ -275,7 +275,7 @@ tr:hover{background:#f8fafc;}
   <div id="tab-login" class="tab-content active">
     <div class="login-box">
       <div class="card">
-        <h2>🔐 Employee Login</h2>
+        <h2> Employee Login</h2>
         <div class="form-group"><label>Employee ID</label><input type="text" id="login-empid" placeholder="Enter your Employee ID"></div>
         <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="Enter your password"></div>
         <button class="btn btn-primary btn-full" onclick="employeeLogin()">Login</button>
@@ -461,7 +461,7 @@ tr:hover{background:#f8fafc;}
       </div>
       <div class="form-group">
         <label>Background Image</label>
-        <div class="file-upload" id="bg-upload"><p style="font-size:2rem;">🌄</p><p><strong>Click to upload background</strong></p><input type="file" id="brand-bg-file" accept="image/*"></div>
+        <div class="file-upload" id="bg-upload"><p style="font-size:2rem;"></p><p><strong>Click to upload background</strong></p><input type="file" id="brand-bg-file" accept="image/*"></div>
         <img id="brand-bg-preview" style="max-width:100%;margin-top:10px;border-radius:10px;display:none;">
       </div>
       <div class="form-group"><label>Primary Color</label><input type="color" id="brand-color" value="#0f766e" style="width:100px;height:40px;"></div>
@@ -609,6 +609,8 @@ tr:hover{background:#f8fafc;}
 <div id="redeem-modal" class="modal"><div class="modal-content"><h2 style="color:var(--brand);margin-bottom:20px;">🎁 Redeem Service</h2><div id="redeem-details"></div><button class="btn btn-warning btn-full" onclick="confirmRedeem()">🎟️ Request Voucher</button><button class="btn btn-outline btn-full" onclick="closeRedeemModal()" style="margin-top:10px;">Cancel</button></div></div>
 <div id="ticket-modal" class="modal"><div class="modal-content" style="max-width:700px;"><h2 style="color:var(--brand);margin-bottom:15px;">🎟️ Service Voucher</h2><div id="voucher-content"></div><button class="btn btn-primary btn-full" onclick="downloadVoucherPDF()">📥 Download PDF</button><button class="btn btn-outline btn-full" onclick="closeModal('ticket-modal')" style="margin-top:10px;">Close</button></div></div>
 <div id="apply-behalf-modal" class="modal"><div class="modal-content"><h2 style="color:var(--brand);margin-bottom:20px;">🎁 Apply on Behalf of Employee</h2><div class="form-group"><label>Select Employee *</label><select id="behalf-employee-select"></select></div><div class="form-group"><label>Select Service *</label><select id="behalf-service-select"></select></div><div id="behalf-service-details" style="background:#f8fafc;padding:15px;border-radius:8px;margin-bottom:15px;display:none;"></div><button class="btn btn-warning btn-full" onclick="confirmApplyBehalf()">🎟️ Generate Voucher</button><button class="btn btn-outline btn-full" onclick="closeModal('apply-behalf-modal')" style="margin-top:10px;">Cancel</button></div></div>
+<!-- Edit Activity Record Modal -->
+<div id="edit-activity-modal" class="modal"><div class="modal-content"><h2 style="color:var(--brand);margin-bottom:20px;">✏️ Edit Activity Record</h2><input type="hidden" id="edit-activity-record-id"><div class="form-group"><label>Activity Date *</label><input type="date" id="edit-activity-date"></div><div class="form-group"><label>Employee Name *</label><input type="text" id="edit-employee-name"></div><div class="form-group"><label>Employee ID *</label><input type="text" id="edit-employee-id"></div><div class="form-group"><label>Activity Name *</label><input type="text" id="edit-activity-name"></div><div class="form-group"><label>Points *</label><input type="number" id="edit-activity-points" min="0"></div><div class="form-group"><label>Remarks</label><textarea id="edit-activity-remarks"></textarea></div><button class="btn btn-success btn-full" onclick="saveEditedActivityRecord()">💾 Save Changes</button><button class="btn btn-outline btn-full" onclick="closeModal('edit-activity-modal')" style="margin-top:10px;">Cancel</button></div></div>
 
 <script>
 // ============ FIREBASE CONFIG ============
@@ -912,18 +914,33 @@ function handleBulkActivityUpload(e) {
   reader.onload = function(ev) {
     try {
       const data = new Uint8Array(ev.target.result);
-      const workbook = XLSX.read(data, {type: 'array'});
+      const workbook = XLSX.read(data, {type: 'array', cellDates: true});
       const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet);
+      const rows = XLSX.utils.sheet_to_json(sheet, {raw: false});
       const results = []; let successCount = 0; let errorCount = 0;
       rows.forEach((row, index) => {
-        const activityDate = row['Activity Date'] || row['activityDate'] || row['Date'];
+        let activityDate = row['Activity Date'] || row['activityDate'] || row['Date'];
         const empId = row['Employee ID'] || row['employeeId'] || row['EmpID'];
         const empName = row['Employee Name'] || row['employeeName'] || row['Name'];
         const activityName = row['Activity Name'] || row['activityName'] || row['Activity'];
         const points = parseInt(row['Points Earned'] || row['points'] || row['Points']);
         const remarks = row['Remarks'] || row['remarks'] || '';
         const errors = [];
+        
+        // Fix date parsing - convert Excel serial date if needed
+        if(activityDate && typeof activityDate === 'number') {
+          // Excel serial date conversion
+          const excelEpoch = new Date(1899, 11, 30);
+          activityDate = new Date(excelEpoch.getTime() + (activityDate * 86400000));
+          activityDate = activityDate.toISOString().split('T')[0];
+        } else if(activityDate) {
+          // Try to parse as date string
+          const dateObj = new Date(activityDate);
+          if(!isNaN(dateObj.getTime())) {
+            activityDate = dateObj.toISOString().split('T')[0];
+          }
+        }
+        
         if(!activityDate) errors.push('Missing Activity Date');
         if(!empId) errors.push('Missing Employee ID');
         if(!empName) errors.push('Missing Employee Name');
@@ -962,7 +979,7 @@ function renderAdminActivityRecords() {
   if(monthFilter) filtered = filtered.filter(r => r.month === parseInt(monthFilter));
   if(yearFilter) filtered = filtered.filter(r => r.year === parseInt(yearFilter));
   filtered.sort((a,b) => b.createdAt - a.createdAt);
-  tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No activity records found</td></tr>' : filtered.map(r => `<tr><td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td><td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td><td>${r.activityName}</td><td style="color:var(--success);font-weight:bold;">+${r.points}</td><td>${r.monthName || ''} ${r.year || ''}</td><td>${r.remarks || '-'}</td><td><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td></tr>`).join('');
+  tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No activity records found</td></tr>' : filtered.map(r => `<tr><td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td><td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td><td>${r.activityName}</td><td style="color:var(--success);font-weight:bold;">+${r.points}</td><td>${r.monthName || ''} ${r.year || ''}</td><td>${r.remarks || '-'}</td><td><button class="btn btn-outline btn-sm" onclick="editActivityRecord('${r.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td></tr>`).join('');
 }
 
 // ✅ NEW: DOWNLOAD ACTIVITY RECORDS TO EXCEL
@@ -993,6 +1010,91 @@ function downloadActivityRecordsExcel() {
   const fileName = `Activity-Records-${monthFilter !== '' ? monthFilter : 'All'}-${yearFilter !== '' ? yearFilter : 'All'}.xlsx`;
   XLSX.writeFile(wb, fileName);
   showAlert('Activity records downloaded successfully!', 'success');
+}
+
+// ✅ NEW: EDIT ACTIVITY RECORD
+function editActivityRecord(recordId) {
+  const record = employeeActivities.find(a => a.id === recordId);
+  if(!record) return showAlert('Activity record not found', 'error');
+  
+  document.getElementById('edit-activity-record-id').value = recordId;
+  document.getElementById('edit-activity-date').value = record.activityDate || '';
+  document.getElementById('edit-employee-name').value = record.employeeName || '';
+  document.getElementById('edit-employee-id').value = record.employeeId || '';
+  document.getElementById('edit-activity-name').value = record.activityName || '';
+  document.getElementById('edit-activity-points').value = record.points || '';
+  document.getElementById('edit-activity-remarks').value = record.remarks || '';
+  
+  document.getElementById('edit-activity-modal').classList.add('active');
+}
+
+function saveEditedActivityRecord() {
+  const recordId = document.getElementById('edit-activity-record-id').value;
+  const activityDate = document.getElementById('edit-activity-date').value;
+  const empName = document.getElementById('edit-employee-name').value.trim();
+  const empId = document.getElementById('edit-employee-id').value.trim();
+  const activityName = document.getElementById('edit-activity-name').value.trim();
+  const points = parseInt(document.getElementById('edit-activity-points').value);
+  const remarks = document.getElementById('edit-activity-remarks').value.trim();
+  
+  if(!activityDate || !empName || !empId || !activityName || !points) {
+    showAlert('Please fill all required fields', 'error');
+    return;
+  }
+  
+  const record = employeeActivities.find(a => a.id === recordId);
+  if(!record) return showAlert('Activity record not found', 'error');
+  
+  const emp = employees.find(e => e.employeeId === empId);
+  if(!emp) return showAlert('Employee not found', 'error');
+  
+  // Calculate points difference
+  const pointsDiff = points - record.points;
+  
+  const dateObj = new Date(activityDate);
+  const month = dateObj.getMonth() + 1;
+  const year = dateObj.getFullYear();
+  const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  
+  const updatedRecord = {
+    employeeId: empId,
+    employeeName: empName,
+    employeeDept: emp.department || '',
+    activityName: activityName,
+    points: points,
+    activityDate: activityDate,
+    month: month,
+    monthName: monthNames[month - 1],
+    year: year,
+    remarks: remarks,
+    updatedAt: Date.now()
+  };
+  
+  db.ref('loyalty/employeeActivities/' + recordId).update(updatedRecord).then(() => {
+    // Update employee points
+    const newPoints = (emp.points || 0) + pointsDiff;
+    const newTotalEarned = (emp.totalEarned || 0) + pointsDiff;
+    db.ref('loyalty/employees/' + emp.id).update({ points: newPoints, totalEarned: newTotalEarned });
+    
+    // Add transaction record for the change
+    if(pointsDiff !== 0) {
+      db.ref('loyalty/transactions').push({
+        employeeId: empId,
+        employeeName: empName,
+        type: pointsDiff > 0 ? 'earn' : 'reverse',
+        activityName: activityName + ' (Edited)',
+        points: pointsDiff,
+        runningBalance: newPoints,
+        addedBy: 'admin-edit',
+        timestamp: Date.now()
+      });
+    }
+    
+    showAlert('Activity record updated successfully!', 'success');
+    closeModal('edit-activity-modal');
+  }).catch(err => {
+    showAlert('Error: ' + err.message, 'error');
+  });
 }
 
 function deleteActivityRecord(recordId) {
@@ -1144,7 +1246,7 @@ function updateDashboardStats() {
 
 // ============ ADMIN: ACTIVITIES ============
 function renderActivities() {
-  document.getElementById('activities-list').innerHTML = activities.length === 0 ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No activities yet</p>' : activities.map(a => `<div class="item-row"><div class="item-info"><strong>${a.name}</strong><small>${a.category || 'General'} • ${a.points} points</small>${a.description ? `<small>${a.description}</small>` : ''}</div><div class="item-points">+${a.points}</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editActivity('${a.id}')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')">🗑️ Delete</button></div></div>`).join('');
+  document.getElementById('activities-list').innerHTML = activities.length === 0 ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No activities yet</p>' : activities.map(a => `<div class="item-row"><div class="item-info"><strong>${a.name}</strong><small>${a.category || 'General'} • ${a.points} points</small>${a.description ? `<small>${a.description}</small>` : ''}</div><div class="item-points">+${a.points}</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editActivity('${a.id}')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')">️ Delete</button></div></div>`).join('');
 }
 function showAddActivityModal() { document.getElementById('activity-modal-title').innerText = 'Add Activity'; document.getElementById('activity-edit-id').value = ''; document.getElementById('activity-name').value = ''; document.getElementById('activity-category').value = ''; document.getElementById('activity-points').value = ''; document.getElementById('activity-desc').value = ''; document.getElementById('activity-image').value = ''; document.getElementById('activity-modal').classList.add('active'); }
 function editActivity(activityId) { const activity = activities.find(a => a.id === activityId); if(!activity) return showAlert('Activity not found', 'error'); document.getElementById('activity-modal-title').innerText = 'Edit Activity'; document.getElementById('activity-edit-id').value = activityId; document.getElementById('activity-name').value = activity.name || ''; document.getElementById('activity-category').value = activity.category || ''; document.getElementById('activity-points').value = activity.points || 0; document.getElementById('activity-desc').value = activity.description || ''; document.getElementById('activity-image').value = activity.image || ''; document.getElementById('activity-modal').classList.add('active'); }
