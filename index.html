@@ -477,17 +477,18 @@ tr:hover{background:#f8fafc;}
         <h3 style="margin-bottom:15px;">➕ Manual Entry - Award Points</h3>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
           <div class="form-group"><label>Activity Date *</label><input type="date" id="manual-activity-date"></div>
-          <div class="form-group"><label>Points Earned *</label><input type="number" id="manual-points" placeholder="Auto-populated from activity" min="0"></div>
+          <div class="form-group"><label>Quantity / Mentions</label><input type="number" id="manual-quantity" value="1" min="1" oninput="updateManualPoints()"></div>
         </div>
         <div class="form-group autocomplete-container"><label>Employee Name *</label><input type="text" id="manual-emp-name" placeholder="Start typing employee name..." oninput="showEmployeeNameSuggestions(this.value)"><div class="autocomplete-list" id="emp-name-suggestions"></div></div>
         <div class="form-group autocomplete-container"><label>Employee ID *</label><input type="text" id="manual-emp-id" placeholder="Start typing employee ID..." oninput="showEmployeeIdSuggestions(this.value)"><div class="autocomplete-list" id="emp-id-suggestions"></div></div>
-        <div class="form-group autocomplete-container"><label>Activity Name *</label><input type="text" id="manual-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestions(this.value)"><div class="autocomplete-list" id="activity-suggestions"></div></div>
+        <div class="form-group autocomplete-container"><label>Activity Name *</label><input type="text" id="manual-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestions(this.value); updateManualPoints();"><div class="autocomplete-list" id="activity-suggestions"></div></div>
+        <div class="form-group"><label>Total Points Earned *</label><input type="number" id="manual-points" placeholder="Auto-calculated (Base x Quantity)" min="0"></div>
         <div class="form-group"><label>Remarks (Optional)</label><textarea id="manual-remarks" placeholder="Any additional notes..."></textarea></div>
         <button class="btn btn-success" onclick="addManualActivity()">➕ Add Activity & Award Points</button>
       </div>
       <div style="background:#f8fafc;padding:20px;border-radius:10px;margin-bottom:25px;">
         <h3 style="margin-bottom:15px;">📤 Bulk Upload via Excel</h3>
-        <p style="color:#64748b;margin-bottom:15px;">Upload Excel file with columns: Activity Date, Employee ID, Employee Name, Activity Name, Points Earned</p>
+        <p style="color:#64748b;margin-bottom:15px;">Upload Excel file with columns: Activity Date, Employee ID, Employee Name, Activity Name, Quantity, Points Earned</p>
         <div class="file-upload" id="bulk-activity-upload"><p style="font-size:2rem;">📊</p><p><strong>Click to upload Excel file</strong></p><input type="file" id="bulk-activity-file" accept=".xlsx,.xls"></div>
         <button class="btn btn-outline" onclick="downloadActivityUploadTemplate()" style="margin-top:10px;">📥 Download Template</button>
         <div id="bulk-upload-results" style="margin-top:15px;"></div>
@@ -878,10 +879,25 @@ function showActivitySuggestions(query) {
 }
 function selectEmployeeByName(empId) { const emp = employees.find(e => e.id === empId); if(!emp) return; document.getElementById('manual-emp-name').value = emp.name; document.getElementById('manual-emp-id').value = emp.employeeId; document.getElementById('emp-name-suggestions').classList.remove('active'); }
 function selectEmployeeById(empId) { const emp = employees.find(e => e.id === empId); if(!emp) return; document.getElementById('manual-emp-id').value = emp.employeeId; document.getElementById('manual-emp-name').value = emp.name; document.getElementById('emp-id-suggestions').classList.remove('active'); }
-function selectActivity(activityId) { const activity = activities.find(a => a.id === activityId); if(!activity) return; document.getElementById('manual-activity-name').value = activity.name; document.getElementById('manual-points').value = activity.points; document.getElementById('activity-suggestions').classList.remove('active'); }
+function selectActivity(activityId) { 
+  const activity = activities.find(a => a.id === activityId); 
+  if(!activity) return; 
+  document.getElementById('manual-activity-name').value = activity.name; 
+  document.getElementById('activity-suggestions').classList.remove('active'); 
+  updateManualPoints();
+}
 document.addEventListener('click', function(e) { if(!e.target.closest('.autocomplete-container')) { document.querySelectorAll('.autocomplete-list').forEach(l => l.classList.remove('active')); } });
 
 // ============ MANUAL ACTIVITY ENTRY ============
+function updateManualPoints() {
+  const actName = document.getElementById('manual-activity-name').value.trim();
+  const qty = parseInt(document.getElementById('manual-quantity').value) || 1;
+  const activity = activities.find(a => a.name.toLowerCase() === actName.toLowerCase());
+  if (activity) {
+    document.getElementById('manual-points').value = activity.points * qty;
+  }
+}
+
 function addManualActivity() {
   const activityDate = document.getElementById('manual-activity-date').value;
   const empName = document.getElementById('manual-emp-name').value.trim();
@@ -903,7 +919,13 @@ function addManualActivity() {
     db.ref('loyalty/employees/' + emp.id).update({ points: newPoints, totalEarned: newTotalEarned });
     db.ref('loyalty/transactions').push({ employeeId: empId, employeeName: empName, type: 'earn', activityName: activityName, points: points, runningBalance: newPoints, addedBy: 'admin', timestamp: Date.now() });
     showAlert(`Successfully awarded ${points} points to ${empName}!`, 'success');
-    document.getElementById('manual-activity-date').value = ''; document.getElementById('manual-emp-name').value = ''; document.getElementById('manual-emp-id').value = ''; document.getElementById('manual-activity-name').value = ''; document.getElementById('manual-points').value = ''; document.getElementById('manual-remarks').value = '';
+    document.getElementById('manual-activity-date').value = ''; 
+    document.getElementById('manual-emp-name').value = ''; 
+    document.getElementById('manual-emp-id').value = ''; 
+    document.getElementById('manual-activity-name').value = ''; 
+    document.getElementById('manual-points').value = ''; 
+    document.getElementById('manual-quantity').value = '1';
+    document.getElementById('manual-remarks').value = '';
   }).catch(err => showAlert('Error: ' + err.message, 'error'));
 }
 
@@ -923,7 +945,8 @@ function handleBulkActivityUpload(e) {
         const empId = row['Employee ID'] || row['employeeId'] || row['EmpID'];
         const empName = row['Employee Name'] || row['employeeName'] || row['Name'];
         const activityName = row['Activity Name'] || row['activityName'] || row['Activity'];
-        const points = parseInt(row['Points Earned'] || row['points'] || row['Points']);
+        const quantity = parseInt(row['Quantity'] || row['quantity'] || 1) || 1;
+        let points = parseInt(row['Points Earned'] || row['points'] || row['Points']);
         const remarks = row['Remarks'] || row['remarks'] || '';
         const errors = [];
         
@@ -945,11 +968,17 @@ function handleBulkActivityUpload(e) {
         if(!empId) errors.push('Missing Employee ID');
         if(!empName) errors.push('Missing Employee Name');
         if(!activityName) errors.push('Missing Activity Name');
-        if(!points) errors.push('Missing Points');
         const emp = employees.find(e => e.employeeId === String(empId));
         if(!emp) errors.push('Employee ID not found');
         const activity = activities.find(a => a.name.toLowerCase() === String(activityName).toLowerCase());
         if(!activity) errors.push('Activity Name not found in database');
+        
+        if (!points && activity) {
+            points = activity.points * quantity;
+        }
+        
+        if(!points) errors.push('Missing Points');
+        
         if(errors.length > 0) { results.push({row: index + 2, status: 'error', errors: errors, data: row}); errorCount++; }
         else {
           const dateObj = new Date(activityDate); const month = dateObj.getMonth() + 1; const year = dateObj.getFullYear();
@@ -969,7 +998,15 @@ function handleBulkActivityUpload(e) {
   };
   reader.readAsArrayBuffer(file); e.target.value = '';
 }
-function downloadActivityUploadTemplate() { const ws = XLSX.utils.aoa_to_sheet([['Activity Date', 'Employee ID', 'Employee Name', 'Activity Name', 'Points Earned', 'Remarks'], ['2026-07-26', '317', 'OM Prakash', 'Team Building', '100', 'Optional remarks']]); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Activity Points'); XLSX.writeFile(wb, 'employee-activity-points-template.xlsx'); }
+function downloadActivityUploadTemplate() { 
+  const ws = XLSX.utils.aoa_to_sheet([
+    ['Activity Date', 'Employee ID', 'Employee Name', 'Activity Name', 'Quantity', 'Points Earned', 'Remarks'], 
+    ['2026-07-26', '317', 'OM Prakash', 'Social Media Mentions', '5', '25', 'Mentioned in 5 TripAdvisor reviews']
+  ]); 
+  const wb = XLSX.utils.book_new(); 
+  XLSX.utils.book_append_sheet(wb, ws, 'Activity Points'); 
+  XLSX.writeFile(wb, 'employee-activity-points-template.xlsx'); 
+}
 
 // ============ ADMIN: ACTIVITY RECORDS ============
 function renderAdminActivityRecords() {
