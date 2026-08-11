@@ -210,6 +210,27 @@ tr:hover{background:#f8fafc;}
 .filter-row{display:flex;gap:15px;flex-wrap:wrap;margin-bottom:20px;align-items:end;}
 .filter-row .form-group{margin-bottom:0;flex:1;min-width:150px;}
 
+.social-media-notice {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  border-left: 4px solid var(--warning);
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  display: none;
+}
+.social-media-notice.visible {
+  display: block;
+  animation: slideIn 0.3s;
+}
+.social-media-notice strong {
+  color: #92400e;
+}
+.social-media-notice .calculation {
+  margin-top: 5px;
+  font-weight: 600;
+  color: #78350f;
+}
+
 @media(max-width:768px){
   .header-content{flex-direction:column;text-align:center;}
   .nav-content{flex-direction:column;}
@@ -249,7 +270,7 @@ tr:hover{background:#f8fafc;}
     <button class="nav-btn hidden" id="nav-dashboard" onclick="switchTab('dashboard',this)">📊 Dashboard</button>
     <button class="nav-btn hidden" id="nav-branding" onclick="switchTab('branding',this)">🎨 Branding</button>
     <button class="nav-btn hidden" id="nav-employee-points" onclick="switchTab('employee-points',this)">⭐ Employee Activity Points</button>
-    <button class="nav-btn hidden" id="nav-admin-activities" onclick="switchTab('admin-activities',this)"> Activities</button>
+    <button class="nav-btn hidden" id="nav-admin-activities" onclick="switchTab('admin-activities',this)">🎯 Activities</button>
     <button class="nav-btn hidden" id="nav-admin-services" onclick="switchTab('admin-services',this)">🎁 Services</button>
     <button class="nav-btn hidden" id="nav-employees" onclick="switchTab('employees',this)">👥 Employees</button>
     <button class="nav-btn hidden" id="nav-vouchers" onclick="switchTab('vouchers',this)">🎟️ Vouchers</button>
@@ -275,7 +296,7 @@ tr:hover{background:#f8fafc;}
   <div id="tab-login" class="tab-content active">
     <div class="login-box">
       <div class="card">
-        <h2> Employee Login</h2>
+        <h2>👤 Employee Login</h2>
         <div class="form-group"><label>Employee ID</label><input type="text" id="login-empid" placeholder="Enter your Employee ID"></div>
         <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="Enter your password"></div>
         <button class="btn btn-primary btn-full" onclick="employeeLogin()">Login</button>
@@ -401,7 +422,7 @@ tr:hover{background:#f8fafc;}
     </div>
   </div>
 
-  <!-- ✅ UPDATED: ADMIN DASHBOARD TAB WITH MONTH/YEAR FILTER -->
+  <!-- ADMIN DASHBOARD TAB WITH MONTH/YEAR FILTER -->
   <div id="tab-dashboard" class="tab-content">
     <div class="card">
       <h2>📊 Dashboard Overview</h2>
@@ -461,7 +482,7 @@ tr:hover{background:#f8fafc;}
       </div>
       <div class="form-group">
         <label>Background Image</label>
-        <div class="file-upload" id="bg-upload"><p style="font-size:2rem;"></p><p><strong>Click to upload background</strong></p><input type="file" id="brand-bg-file" accept="image/*"></div>
+        <div class="file-upload" id="bg-upload"><p style="font-size:2rem;">🌄</p><p><strong>Click to upload background</strong></p><input type="file" id="brand-bg-file" accept="image/*"></div>
         <img id="brand-bg-preview" style="max-width:100%;margin-top:10px;border-radius:10px;display:none;">
       </div>
       <div class="form-group"><label>Primary Color</label><input type="color" id="brand-color" value="#0f766e" style="width:100px;height:40px;"></div>
@@ -475,14 +496,26 @@ tr:hover{background:#f8fafc;}
       <h2>⭐ Employee Activity Points Management</h2>
       <div style="background:#f8fafc;padding:20px;border-radius:10px;margin-bottom:25px;">
         <h3 style="margin-bottom:15px;">➕ Manual Entry - Award Points</h3>
+        
+        <!-- Social Media Mentions Notice -->
+        <div class="social-media-notice" id="social-media-notice">
+          <strong>📱 Social Media Mentions</strong>
+          <p style="margin-top:5px;color:#78350f;">Award 5 points per guest mention on social media (TripAdvisor, Google Reviews, etc.)</p>
+          <div class="calculation" id="social-media-calculation">Enter number of mentions below</div>
+        </div>
+        
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;">
           <div class="form-group"><label>Activity Date *</label><input type="date" id="manual-activity-date"></div>
-          <div class="form-group"><label>Quantity / Mentions</label><input type="number" id="manual-quantity" value="1" min="1" oninput="updateManualPoints()"></div>
+          <div class="form-group">
+            <label>Number of Mentions / Quantity</label>
+            <input type="number" id="manual-quantity" value="1" min="1" oninput="updateManualPoints()">
+            <small style="color:#64748b;display:block;margin-top:5px;">For Social Media Mentions: Enter how many times employee was mentioned (e.g., 5 mentions = 25 points)</small>
+          </div>
         </div>
         <div class="form-group autocomplete-container"><label>Employee Name *</label><input type="text" id="manual-emp-name" placeholder="Start typing employee name..." oninput="showEmployeeNameSuggestions(this.value)"><div class="autocomplete-list" id="emp-name-suggestions"></div></div>
         <div class="form-group autocomplete-container"><label>Employee ID *</label><input type="text" id="manual-emp-id" placeholder="Start typing employee ID..." oninput="showEmployeeIdSuggestions(this.value)"><div class="autocomplete-list" id="emp-id-suggestions"></div></div>
-        <div class="form-group autocomplete-container"><label>Activity Name *</label><input type="text" id="manual-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestions(this.value); updateManualPoints();"><div class="autocomplete-list" id="activity-suggestions"></div></div>
-        <div class="form-group"><label>Total Points Earned *</label><input type="number" id="manual-points" placeholder="Auto-calculated (Base x Quantity)" min="0"></div>
+        <div class="form-group autocomplete-container"><label>Activity Name *</label><input type="text" id="manual-activity-name" placeholder="Start typing activity name (e.g., Social Media Mentions)..." oninput="showActivitySuggestions(this.value); updateManualPoints();"><div class="autocomplete-list" id="activity-suggestions"></div></div>
+        <div class="form-group"><label>Total Points to Award *</label><input type="number" id="manual-points" placeholder="Auto-calculated" min="0" readonly style="background:#f0fdfa;font-weight:bold;color:var(--brand);"></div>
         <div class="form-group"><label>Remarks (Optional)</label><textarea id="manual-remarks" placeholder="Any additional notes..."></textarea></div>
         <button class="btn btn-success" onclick="addManualActivity()">➕ Add Activity & Award Points</button>
       </div>
@@ -494,7 +527,6 @@ tr:hover{background:#f8fafc;}
         <div id="bulk-upload-results" style="margin-top:15px;"></div>
       </div>
       
-      <!-- ✅ UPDATED: ADDED DOWNLOAD EXCEL BUTTON -->
       <h3 style="margin-bottom:15px; display:flex; justify-content:space-between; align-items:center;">
         📋 Activity Records 
         <button class="btn btn-success btn-sm" onclick="downloadActivityRecordsExcel()">📥 Download Excel</button>
@@ -616,7 +648,7 @@ tr:hover{background:#f8fafc;}
 <script>
 // ============ FIREBASE CONFIG ============
 const firebaseConfig = {
- apiKey: "AIzaSyDsq9c2468sYFl-RkhZQIF9hnFKONUJL1w",
+  apiKey: "AIzaSyDsq9c2468sYFl-RkhZQIF9hnFKONUJL1w",
   authDomain: "hostloyaltyprogram.firebaseapp.com",
   databaseURL: "https://hostloyaltyprogram-default-rtdb.firebaseio.com",
   projectId: "hostloyaltyprogram",
@@ -892,9 +924,26 @@ document.addEventListener('click', function(e) { if(!e.target.closest('.autocomp
 function updateManualPoints() {
   const actName = document.getElementById('manual-activity-name').value.trim();
   const qty = parseInt(document.getElementById('manual-quantity').value) || 1;
-  const activity = activities.find(a => a.name.toLowerCase() === actName.toLowerCase());
-  if (activity) {
-    document.getElementById('manual-points').value = activity.points * qty;
+  const notice = document.getElementById('social-media-notice');
+  const calculation = document.getElementById('social-media-calculation');
+  
+  // Check if activity is "Social Media Mentions"
+  const isSocialMedia = actName.toLowerCase().includes('social media') || actName.toLowerCase().includes('mention');
+  
+  if (isSocialMedia) {
+    notice.classList.add('visible');
+    const basePoints = 5;
+    const totalPoints = basePoints * qty;
+    document.getElementById('manual-points').value = totalPoints;
+    calculation.innerText = `${qty} mention${qty > 1 ? 's' : ''} × 5 points = ${totalPoints} points`;
+  } else {
+    notice.classList.remove('visible');
+    const activity = activities.find(a => a.name.toLowerCase() === actName.toLowerCase());
+    if (activity) {
+      document.getElementById('manual-points').value = activity.points * qty;
+    } else {
+      document.getElementById('manual-points').value = '';
+    }
   }
 }
 
@@ -926,6 +975,7 @@ function addManualActivity() {
     document.getElementById('manual-points').value = ''; 
     document.getElementById('manual-quantity').value = '1';
     document.getElementById('manual-remarks').value = '';
+    document.getElementById('social-media-notice').classList.remove('visible');
   }).catch(err => showAlert('Error: ' + err.message, 'error'));
 }
 
@@ -952,12 +1002,10 @@ function handleBulkActivityUpload(e) {
         
         // Fix date parsing - convert Excel serial date if needed
         if(activityDate && typeof activityDate === 'number') {
-          // Excel serial date conversion
           const excelEpoch = new Date(1899, 11, 30);
           activityDate = new Date(excelEpoch.getTime() + (activityDate * 86400000));
           activityDate = activityDate.toISOString().split('T')[0];
         } else if(activityDate) {
-          // Try to parse as date string
           const dateObj = new Date(activityDate);
           if(!isNaN(dateObj.getTime())) {
             activityDate = dateObj.toISOString().split('T')[0];
@@ -970,11 +1018,17 @@ function handleBulkActivityUpload(e) {
         if(!activityName) errors.push('Missing Activity Name');
         const emp = employees.find(e => e.employeeId === String(empId));
         if(!emp) errors.push('Employee ID not found');
-        const activity = activities.find(a => a.name.toLowerCase() === String(activityName).toLowerCase());
-        if(!activity) errors.push('Activity Name not found in database');
         
-        if (!points && activity) {
+        // Special handling for Social Media Mentions
+        const isSocialMedia = String(activityName).toLowerCase().includes('social media') || String(activityName).toLowerCase().includes('mention');
+        
+        if (isSocialMedia && !points) {
+          points = 5 * quantity; // 5 points per mention
+        } else if (!points && !isSocialMedia) {
+          const activity = activities.find(a => a.name.toLowerCase() === String(activityName).toLowerCase());
+          if(activity) {
             points = activity.points * quantity;
+          }
         }
         
         if(!points) errors.push('Missing Points');
@@ -1019,7 +1073,6 @@ function renderAdminActivityRecords() {
   tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No activity records found</td></tr>' : filtered.map(r => `<tr><td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td><td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td><td>${r.activityName}</td><td style="color:var(--success);font-weight:bold;">+${r.points}</td><td>${r.monthName || ''} ${r.year || ''}</td><td>${r.remarks || '-'}</td><td><button class="btn btn-outline btn-sm" onclick="editActivityRecord('${r.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td></tr>`).join('');
 }
 
-// ✅ NEW: DOWNLOAD ACTIVITY RECORDS TO EXCEL
 function downloadActivityRecordsExcel() {
   const monthFilter = document.getElementById('admin-activity-month').value;
   const yearFilter = document.getElementById('admin-activity-year').value;
@@ -1049,7 +1102,6 @@ function downloadActivityRecordsExcel() {
   showAlert('Activity records downloaded successfully!', 'success');
 }
 
-// ✅ NEW: EDIT ACTIVITY RECORD
 function editActivityRecord(recordId) {
   const record = employeeActivities.find(a => a.id === recordId);
   if(!record) return showAlert('Activity record not found', 'error');
@@ -1085,7 +1137,6 @@ function saveEditedActivityRecord() {
   const emp = employees.find(e => e.employeeId === empId);
   if(!emp) return showAlert('Employee not found', 'error');
   
-  // Calculate points difference
   const pointsDiff = points - record.points;
   
   const dateObj = new Date(activityDate);
@@ -1108,12 +1159,10 @@ function saveEditedActivityRecord() {
   };
   
   db.ref('loyalty/employeeActivities/' + recordId).update(updatedRecord).then(() => {
-    // Update employee points
     const newPoints = (emp.points || 0) + pointsDiff;
     const newTotalEarned = (emp.totalEarned || 0) + pointsDiff;
     db.ref('loyalty/employees/' + emp.id).update({ points: newPoints, totalEarned: newTotalEarned });
     
-    // Add transaction record for the change
     if(pointsDiff !== 0) {
       db.ref('loyalty/transactions').push({
         employeeId: empId,
@@ -1239,18 +1288,15 @@ function viewApprovedVoucher(requestId) {
   showVoucher(currentVoucher);
 }
 
-// ✅ UPDATED: DASHBOARD STATS WITH MONTH/YEAR FILTER
 function updateDashboardStats() {
   const monthFilter = document.getElementById('dashboard-month-filter')?.value || 'all';
   const yearFilter = document.getElementById('dashboard-year-filter')?.value || 'all';
 
-  // Filter employee activities (points distributed)
   let filteredActivities = employeeActivities;
   if (monthFilter !== 'all') filteredActivities = filteredActivities.filter(a => a.month === parseInt(monthFilter));
   if (yearFilter !== 'all') filteredActivities = filteredActivities.filter(a => a.year === parseInt(yearFilter));
   const pointsDistributed = filteredActivities.reduce((sum, a) => sum + (a.points || 0), 0);
 
-  // Filter transactions (points redeemed)
   let filteredTransactions = transactions.filter(t => t.type === 'spend' || t.type === 'cancel');
   if (monthFilter !== 'all') filteredTransactions = filteredTransactions.filter(t => {
     const d = new Date(t.timestamp);
@@ -1262,7 +1308,6 @@ function updateDashboardStats() {
   });
   const pointsRedeemed = filteredTransactions.reduce((sum, t) => sum + Math.abs(t.points || 0), 0);
 
-  // Filter vouchers
   let filteredVouchers = vouchers.filter(v => !v.cancelled && v.status !== 'used');
   if (monthFilter !== 'all') filteredVouchers = filteredVouchers.filter(v => {
     const d = new Date(v.issueDate);
@@ -1283,7 +1328,7 @@ function updateDashboardStats() {
 
 // ============ ADMIN: ACTIVITIES ============
 function renderActivities() {
-  document.getElementById('activities-list').innerHTML = activities.length === 0 ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No activities yet</p>' : activities.map(a => `<div class="item-row"><div class="item-info"><strong>${a.name}</strong><small>${a.category || 'General'} • ${a.points} points</small>${a.description ? `<small>${a.description}</small>` : ''}</div><div class="item-points">+${a.points}</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editActivity('${a.id}')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')">️ Delete</button></div></div>`).join('');
+  document.getElementById('activities-list').innerHTML = activities.length === 0 ? '<p style="color:#94a3b8;text-align:center;padding:20px;">No activities yet</p>' : activities.map(a => `<div class="item-row"><div class="item-info"><strong>${a.name}</strong><small>${a.category || 'General'} • ${a.points} points</small>${a.description ? `<small>${a.description}</small>` : ''}</div><div class="item-points">+${a.points}</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editActivity('${a.id}')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')">🗑️ Delete</button></div></div>`).join('');
 }
 function showAddActivityModal() { document.getElementById('activity-modal-title').innerText = 'Add Activity'; document.getElementById('activity-edit-id').value = ''; document.getElementById('activity-name').value = ''; document.getElementById('activity-category').value = ''; document.getElementById('activity-points').value = ''; document.getElementById('activity-desc').value = ''; document.getElementById('activity-image').value = ''; document.getElementById('activity-modal').classList.add('active'); }
 function editActivity(activityId) { const activity = activities.find(a => a.id === activityId); if(!activity) return showAlert('Activity not found', 'error'); document.getElementById('activity-modal-title').innerText = 'Edit Activity'; document.getElementById('activity-edit-id').value = activityId; document.getElementById('activity-name').value = activity.name || ''; document.getElementById('activity-category').value = activity.category || ''; document.getElementById('activity-points').value = activity.points || 0; document.getElementById('activity-desc').value = activity.description || ''; document.getElementById('activity-image').value = activity.image || ''; document.getElementById('activity-modal').classList.add('active'); }
