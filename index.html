@@ -313,14 +313,41 @@ tr:hover{background:#f8fafc;}
     <div class="login-box">
       <div class="card">
         <h2>📝 Employee Sign Up</h2>
-        <p style="color:#64748b;margin-bottom:20px;">Create your loyalty account</p>
-        <div class="form-group"><label>Employee ID *</label><input type="text" id="signup-empid" placeholder="e.g., E001"></div>
-        <div class="form-group"><label>Full Name *</label><input type="text" id="signup-name" placeholder="Your full name"></div>
-        <div class="form-group"><label>Department *</label><input type="text" id="signup-dept" placeholder="e.g., Front Office"></div>
-        <div class="form-group"><label>Create Password *</label><input type="password" id="signup-password" placeholder="Min 6 characters"></div>
-        <div class="form-group"><label>Confirm Password *</label><input type="password" id="signup-confirm" placeholder="Re-enter password"></div>
-        <button class="btn btn-primary btn-full" onclick="employeeSignup()">Create Account</button>
-        <button class="btn btn-outline btn-full" onclick="showLogin()" style="margin-top:10px;">← Back to Login</button>
+        <p style="color:#64748b;margin-bottom:20px;">Link your existing employee profile to create your loyalty account</p>
+        
+        <div class="form-group autocomplete-container">
+          <label>Search Employee ID or Name *</label>
+          <input type="text" id="signup-search" placeholder="Start typing Employee ID or Name..." oninput="showSignupSuggestions(this.value)">
+          <div class="autocomplete-list" id="signup-suggestions"></div>
+          <small style="color:#64748b;display:block;margin-top:5px;">Select your profile from the database</small>
+        </div>
+
+        <div class="form-group">
+          <label>Employee ID</label>
+          <input type="text" id="signup-empid" readonly style="background:#f1f5f9;cursor:not-allowed;">
+        </div>
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="signup-name" readonly style="background:#f1f5f9;cursor:not-allowed;">
+        </div>
+        <div class="form-group">
+          <label>Department</label>
+          <input type="text" id="signup-dept" readonly style="background:#f1f5f9;cursor:not-allowed;">
+        </div>
+        
+        <div id="signup-password-section" style="display:none; border-top: 2px solid var(--border); padding-top: 15px; margin-top: 10px; animation: fadeIn 0.4s;">
+          <div class="form-group">
+            <label>Create Password *</label>
+            <input type="password" id="signup-password" placeholder="Min 6 characters">
+          </div>
+          <div class="form-group">
+            <label>Confirm Password *</label>
+            <input type="password" id="signup-confirm" placeholder="Re-enter password">
+          </div>
+          <button class="btn btn-primary btn-full" onclick="employeeSignup()">Create Account</button>
+        </div>
+        
+        <button class="btn btn-outline btn-full" onclick="showLogin()" style="margin-top:15px;">← Back to Login</button>
       </div>
     </div>
   </div>
@@ -673,6 +700,7 @@ let employeeActivities = [];
 let branding = {};
 let pendingRedeem = null;
 let currentVoucher = null;
+let selectedSignupEmployee = null;
 
 // ============ INIT ============
 document.addEventListener('DOMContentLoaded', () => {
@@ -777,7 +805,19 @@ function switchTab(tab, btn) {
 }
 
 function showLogin() { if(isAdmin) logoutAdmin(); document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById('tab-login').classList.add('active'); updateNavVisibility(); }
-function showSignup() { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById('tab-signup').classList.add('active'); }
+function showSignup() { 
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); 
+  document.getElementById('tab-signup').classList.add('active'); 
+  // Reset form when showing signup
+  document.getElementById('signup-search').value = '';
+  document.getElementById('signup-empid').value = '';
+  document.getElementById('signup-name').value = '';
+  document.getElementById('signup-dept').value = '';
+  document.getElementById('signup-password').value = '';
+  document.getElementById('signup-confirm').value = '';
+  document.getElementById('signup-password-section').style.display = 'none';
+  selectedSignupEmployee = null;
+}
 function showForgotPassword() { document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active')); document.getElementById('tab-forgot').classList.add('active'); }
 
 function updateNavVisibility() {
@@ -822,21 +862,77 @@ function employeeLogin() {
   });
 }
 
+function showSignupSuggestions(query) {
+  const container = document.getElementById('signup-suggestions');
+  if(!query || query.length < 2) { container.classList.remove('active'); return; }
+  
+  const matches = employees.filter(e => {
+    const matchSearch = e.name.toLowerCase().includes(query.toLowerCase()) || e.employeeId.toLowerCase().includes(query.toLowerCase());
+    return matchSearch;
+  }).slice(0, 5);
+  
+  if(matches.length === 0) { 
+    container.innerHTML = '<div class="autocomplete-item" style="color:var(--danger);cursor:default;"><small>No matching employees found. Please contact HR.</small></div>';
+    container.classList.add('active'); 
+    return; 
+  }
+  
+  container.innerHTML = matches.map(e => {
+    const statusBadge = e.accountStatus === 'Account Created' ? '<span style="color:var(--danger);font-size:0.75rem;"> (Account Already Created)</span>' : '';
+    return `<div class="autocomplete-item" onclick="selectSignupEmployee('${e.id}')"><strong>${e.name}</strong>${statusBadge}<small>ID: ${e.employeeId} • ${e.department || 'N/A'}</small></div>`;
+  }).join('');
+  container.classList.add('active');
+}
+
+function selectSignupEmployee(empId) {
+  const emp = employees.find(e => e.id === empId);
+  if(!emp) return;
+  
+  if(emp.accountStatus === 'Account Created') {
+    showAlert('This employee profile already has an account. Please login or use Forgot Password.', 'warning');
+    return;
+  }
+  
+  selectedSignupEmployee = emp;
+  document.getElementById('signup-empid').value = emp.employeeId;
+  document.getElementById('signup-name').value = emp.name;
+  document.getElementById('signup-dept').value = emp.department || '';
+  document.getElementById('signup-search').value = emp.name + ' (' + emp.employeeId + ')';
+  document.getElementById('signup-suggestions').classList.remove('active');
+  document.getElementById('signup-password-section').style.display = 'block';
+}
+
 function employeeSignup() {
-  const empId = document.getElementById('signup-empid').value.trim();
-  const name = document.getElementById('signup-name').value.trim();
-  const dept = document.getElementById('signup-dept').value.trim();
+  if(!selectedSignupEmployee) return showAlert('Please select an employee profile first.', 'error');
+  
   const password = document.getElementById('signup-password').value;
   const confirm = document.getElementById('signup-confirm').value;
-  if(!empId || !name || !dept || !password) return showAlert('Please fill all fields', 'error');
+  
+  if(!password) return showAlert('Please enter a password', 'error');
   if(password.length < 6) return showAlert('Password must be at least 6 characters', 'error');
   if(password !== confirm) return showAlert('Passwords do not match', 'error');
-  db.ref('loyalty/employees').orderByChild('employeeId').equalTo(empId).once('value', snap => {
-    if(snap.exists()){ showAlert('Employee ID already registered. Please login.', 'error'); return; }
-    const newUser = { employeeId: empId, name: name, department: dept, points: 0, totalEarned: 0, totalSpent: 0, password: btoa(password), accountStatus: 'Account Created', createdAt: Date.now() };
-    const newId = db.ref('loyalty/employees').push().key;
-    db.ref('loyalty/employees/' + newId).set(newUser).then(() => { currentUser = {id: newId, ...newUser}; isAdmin = false; showAlert('Account created successfully!', 'success'); onLoginSuccess(); });
-  });
+  
+  const emp = selectedSignupEmployee;
+  
+  db.ref('loyalty/employees/' + emp.id).update({
+    password: btoa(password),
+    accountStatus: 'Account Created',
+    lastLogin: Date.now()
+  }).then(() => {
+    currentUser = {id: emp.id, ...emp, password: btoa(password), accountStatus: 'Account Created'};
+    isAdmin = false;
+    showAlert('Account created successfully!', 'success');
+    onLoginSuccess();
+    
+    document.getElementById('signup-search').value = '';
+    document.getElementById('signup-empid').value = '';
+    document.getElementById('signup-name').value = '';
+    document.getElementById('signup-dept').value = '';
+    document.getElementById('signup-password').value = '';
+    document.getElementById('signup-confirm').value = '';
+    document.getElementById('signup-password-section').style.display = 'none';
+    selectedSignupEmployee = null;
+  }).catch(err => showAlert('Error creating account: ' + err.message, 'error'));
 }
 
 function resetPassword() {
