@@ -1168,7 +1168,7 @@ showLogin();
 function onLoginSuccess() { updateNavVisibility(); if(!isAdmin) switchTab('points', document.getElementById('nav-points')); }
 function logout() { currentUser = null; isAdmin = false; updateNavVisibility(); showLogin(); ['login-empid','login-password'].forEach(id => document.getElementById(id).value = ''); }
 function logoutAdmin() { isAdmin = false; updateNavVisibility(); }
-function showAdminLogin() { const password = prompt('Enter admin password:'); if(password === 'Admin@2026') { isAdmin = true; currentUser = null; updateNavVisibility(); switchTab('dashboard', document.getElementById('nav-dashboard')); } else if(password) { showAlert('Invalid password!', 'error'); } }
+function showAdminLogin() { const password = prompt('Enter admin password:'); if(password === '872171') { isAdmin = true; currentUser = null; updateNavVisibility(); switchTab('dashboard', document.getElementById('nav-dashboard')); } else if(password) { showAlert('Invalid password!', 'error'); } }
 function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 // ============ BRANDING ============
 function saveBranding() {
