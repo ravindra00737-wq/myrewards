@@ -775,6 +775,26 @@ th,td{padding:10px 12px;}
 <div class="form-group autocomplete-container"><label>Employee Name *</label><input type="text" id="manual-emp-name" placeholder="Start typing employee name..." oninput="showEmployeeNameSuggestions(this.value)"><div class="autocomplete-list" id="emp-name-suggestions"></div></div>
 <div class="form-group autocomplete-container"><label>Employee ID *</label><input type="text" id="manual-emp-id" placeholder="Start typing employee ID..." oninput="showEmployeeIdSuggestions(this.value)"><div class="autocomplete-list" id="emp-id-suggestions"></div></div>
 <div class="form-group autocomplete-container"><label>Activity Name *</label><input type="text" id="manual-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestions(this.value); updateManualPoints();"><div class="autocomplete-list" id="activity-suggestions"></div></div>
+
+<!-- CUSTOM ACTIVITY SECTION -->
+<div id="custom-activity-section" style="display:none; border: 2px dashed var(--brand); border-radius: var(--radius-md); padding: 20px; margin-bottom: 18px; background: var(--brand-50); animation: fadeIn 0.4s;">
+    <h3 style="color: var(--brand-dark); margin-bottom: 14px; font-size: 1.05rem;">✨ Custom Activity Details</h3>
+    <div class="form-group">
+        <label>Custom Activity Name *</label>
+        <input type="text" id="custom-activity-name" placeholder="e.g., Exceptional Guest Recovery">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div class="form-group">
+            <label>Custom Points *</label>
+            <input type="number" id="custom-activity-points" placeholder="Enter points" min="1" oninput="updateManualPoints()">
+        </div>
+        <div class="form-group">
+            <label>Expiry Date *</label>
+            <input type="date" id="custom-activity-expiry">
+        </div>
+    </div>
+</div>
+
 <div class="star-of-day-section" id="star-of-day-section">
 <h3>⭐ Star of the Day Details</h3>
 <div class="form-group">
@@ -1458,111 +1478,170 @@ container.innerHTML = matches.map(e => `<div class="autocomplete-item" onclick="
 container.classList.add('active');
 }
 function showActivitySuggestions(query) {
-const container = document.getElementById('activity-suggestions');
-if(!query || query.length < 2) { container.classList.remove('active'); return; }
-const matches = activities.filter(a => a.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
-if(matches.length === 0) { container.classList.remove('active'); return; }
-container.innerHTML = matches.map(a => `<div class="autocomplete-item" onclick="selectActivity('${a.id}')"><strong>${a.name}</strong><small>${a.points} points • ${a.category || 'General'}</small></div>`).join('');
-container.classList.add('active');
+    const container = document.getElementById('activity-suggestions');
+    if(!query || query.length < 1) { container.classList.remove('active'); return; }
+    const matches = activities.filter(a => a.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
+    
+    let html = `<div class="autocomplete-item" onclick="selectCustomActivity()" style="background:var(--brand-50);border-bottom:2px solid var(--brand-light);"><strong>✨ Custom Activity</strong><small>Enter custom name, points, and expiry</small></div>`;
+    html += matches.map(a => `<div class="autocomplete-item" onclick="selectActivity('${a.id}')"><strong>${a.name}</strong><small>${a.points} points • ${a.category || 'General'}</small></div>`).join('');
+    
+    container.innerHTML = html;
+    container.classList.add('active');
+}
+function selectCustomActivity() {
+    document.getElementById('manual-activity-name').value = 'Custom';
+    document.getElementById('activity-suggestions').classList.remove('active');
+    document.getElementById('custom-activity-section').style.display = 'block';
+    document.getElementById('social-media-notice').classList.remove('visible');
+    document.getElementById('star-of-day-section').classList.remove('visible');
+    document.getElementById('manual-points').value = '';
+    updateManualPoints();
 }
 function selectEmployeeByName(empId) { const emp = employees.find(e => e.id === empId); if(!emp) return; document.getElementById('manual-emp-name').value = emp.name; document.getElementById('manual-emp-id').value = emp.employeeId; document.getElementById('emp-name-suggestions').classList.remove('active'); }
 function selectEmployeeById(empId) { const emp = employees.find(e => e.id === empId); if(!emp) return; document.getElementById('manual-emp-id').value = emp.employeeId; document.getElementById('manual-emp-name').value = emp.name; document.getElementById('emp-id-suggestions').classList.remove('active'); }
 function selectActivity(activityId) {
-const activity = activities.find(a => a.id === activityId);
-if(!activity) return;
-document.getElementById('manual-activity-name').value = activity.name;
-document.getElementById('activity-suggestions').classList.remove('active');
-updateManualPoints();
+    const activity = activities.find(a => a.id === activityId);
+    if(!activity) return;
+    document.getElementById('manual-activity-name').value = activity.name;
+    document.getElementById('activity-suggestions').classList.remove('active');
+    document.getElementById('custom-activity-section').style.display = 'none';
+    updateManualPoints();
 }
 document.addEventListener('click', function(e) { if(!e.target.closest('.autocomplete-container')) { document.querySelectorAll('.autocomplete-list').forEach(l => l.classList.remove('active')); } });
 function updateManualPoints() {
-const actName = document.getElementById('manual-activity-name').value.trim();
-const qty = parseInt(document.getElementById('manual-quantity').value) || 1;
-const notice = document.getElementById('social-media-notice');
-const calculation = document.getElementById('social-media-calculation');
-const starSection = document.getElementById('star-of-day-section');
-const isSocialMedia = actName.toLowerCase().includes('social media') || actName.toLowerCase().includes('mention');
-if (isStarOfTheDay(actName)) {
-starSection.classList.add('visible');
-} else {
-starSection.classList.remove('visible');
-}
-if (isSocialMedia) {
-notice.classList.add('visible');
-const basePoints = 5;
-const totalPoints = basePoints * qty;
-document.getElementById('manual-points').value = totalPoints;
-calculation.innerText = `${qty} mention${qty > 1 ? 's' : ''} × 5 points = ${totalPoints} points`;
-} else {
-notice.classList.remove('visible');
-const activity = activities.find(a => a.name.toLowerCase() === actName.toLowerCase());
-if (activity) {
-document.getElementById('manual-points').value = activity.points * qty;
-} else {
-document.getElementById('manual-points').value = '';
-}
-}
+    const actName = document.getElementById('manual-activity-name').value.trim();
+    const qty = parseInt(document.getElementById('manual-quantity').value) || 1;
+    const notice = document.getElementById('social-media-notice');
+    const calculation = document.getElementById('social-media-calculation');
+    const starSection = document.getElementById('star-of-day-section');
+    const customSection = document.getElementById('custom-activity-section');
+    const isSocialMedia = actName.toLowerCase().includes('social media') || actName.toLowerCase().includes('mention');
+    
+    if (actName === 'Custom') {
+        if(customSection) customSection.style.display = 'block';
+        starSection.classList.remove('visible');
+        notice.classList.remove('visible');
+        const customPts = parseInt(document.getElementById('custom-activity-points').value) || 0;
+        document.getElementById('manual-points').value = customPts > 0 ? customPts * qty : '';
+        return;
+    } else {
+        if(customSection) customSection.style.display = 'none';
+    }
+
+    if (isStarOfTheDay(actName)) {
+        starSection.classList.add('visible');
+    } else {
+        starSection.classList.remove('visible');
+    }
+    
+    if (isSocialMedia) {
+        notice.classList.add('visible');
+        const basePoints = 5;
+        const totalPoints = basePoints * qty;
+        document.getElementById('manual-points').value = totalPoints;
+        calculation.innerText = `${qty} mention${qty > 1 ? 's' : ''} × 5 points = ${totalPoints} points`;
+    } else {
+        notice.classList.remove('visible');
+        const activity = activities.find(a => a.name.toLowerCase() === actName.toLowerCase());
+        if (activity) {
+            document.getElementById('manual-points').value = activity.points * qty;
+        } else {
+            document.getElementById('manual-points').value = '';
+        }
+    }
 }
 function addManualActivity() {
-const activityDate = document.getElementById('manual-activity-date').value;
-const empName = document.getElementById('manual-emp-name').value.trim();
-const empId = document.getElementById('manual-emp-id').value.trim();
-const activityName = document.getElementById('manual-activity-name').value.trim();
-const points = parseInt(document.getElementById('manual-points').value);
-const remarks = document.getElementById('manual-remarks').value.trim();
-if(!activityDate || !empName || !empId || !activityName || !points) return showAlert('Please fill all required fields', 'error');
-const isStar = isStarOfTheDay(activityName);
-let starGivenBy = '';
-if (isStar) {
-starGivenBy = document.getElementById('star-given-by').value.trim();
-if (!starGivenBy) return showAlert('Please enter the manager name for Star of the Day.', 'error');
-}
-const emp = employees.find(e => e.employeeId === empId && e.name === empName);
-if(!emp) return showAlert('Employee not found. Please select from suggestions.', 'error');
-const dateObj = new Date(activityDate);
-const month = dateObj.getMonth() + 1;
-const year = dateObj.getFullYear();
-const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero – nominee','sustainability hero – winner','group winner (ss brand)','bio blitz winner','bio blitz runner-up'];
-const neverExpires = NEVER_EXPIRE_ACTIVITIES.some(a => activityName.toLowerCase().includes(a));
-const activityRecord = {
-employeeId: empId,
-employeeName: empName,
-employeeDept: emp.department || '',
-activityName: activityName,
-points: points,
-activityDate: activityDate,
-month: month,
-monthName: monthNames[month - 1],
-year: year,
-remarks: remarks,
-addedBy: 'admin',
-createdAt: Date.now(),
-neverExpires: neverExpires
-};
-if (isStar) {
-activityRecord.starGivenBy = starGivenBy;
-if (tempStarPhoto) {
-activityRecord.starPhoto = tempStarPhoto;
-}
-}
-db.ref('loyalty/employeeActivities').push(activityRecord).then(() => {
-const newPoints = (emp.points || 0) + points;
-const newTotalEarned = (emp.totalEarned || 0) + points;
-db.ref('loyalty/employees/' + emp.id).update({ points: newPoints, totalEarned: newTotalEarned });
-db.ref('loyalty/transactions').push({ employeeId: empId, employeeName: empName, type: 'earn', activityName: activityName, points: points, runningBalance: newPoints, addedBy: 'admin', timestamp: Date.now() });
-showAlert(`Successfully awarded ${points} points to ${empName}!`, 'success');
-document.getElementById('manual-activity-date').value = '';
-document.getElementById('manual-emp-name').value = '';
-document.getElementById('manual-emp-id').value = '';
-document.getElementById('manual-activity-name').value = '';
-document.getElementById('manual-points').value = '';
-document.getElementById('manual-quantity').value = '1';
-document.getElementById('manual-remarks').value = '';
-document.getElementById('social-media-notice').classList.remove('visible');
-document.getElementById('star-of-day-section').classList.remove('visible');
-resetStarPhotoManager();
-}).catch(err => showAlert('Error: ' + err.message, 'error'));
+    const activityDate = document.getElementById('manual-activity-date').value;
+    const empName = document.getElementById('manual-emp-name').value.trim();
+    const empId = document.getElementById('manual-emp-id').value.trim();
+    const actNameInput = document.getElementById('manual-activity-name').value.trim();
+    const points = parseInt(document.getElementById('manual-points').value);
+    const remarks = document.getElementById('manual-remarks').value.trim();
+    
+    let activityName = actNameInput;
+    let neverExpires = false;
+    let customExpiryDate = null;
+
+    if (actNameInput === 'Custom') {
+        const customName = document.getElementById('custom-activity-name').value.trim();
+        const customExpiry = document.getElementById('custom-activity-expiry').value;
+        if (!customName) return showAlert('Please enter a Custom Activity Name.', 'error');
+        if (!customExpiry) return showAlert('Please select an Expiry Date for the Custom Activity.', 'error');
+        if (!points || points <= 0) return showAlert('Please enter valid Custom Points.', 'error');
+        
+        activityName = customName;
+        customExpiryDate = customExpiry;
+        neverExpires = false; 
+    }
+
+    if(!activityDate || !empName || !empId || !activityName || !points) return showAlert('Please fill all required fields', 'error');
+    
+    const isStar = isStarOfTheDay(activityName);
+    let starGivenBy = '';
+    if (isStar) {
+        starGivenBy = document.getElementById('star-given-by').value.trim();
+        if (!starGivenBy) return showAlert('Please enter the manager name for Star of the Day.', 'error');
+    }
+    
+    const emp = employees.find(e => e.employeeId === empId && e.name === empName);
+    if(!emp) return showAlert('Employee not found. Please select from suggestions.', 'error');
+    
+    const dateObj = new Date(activityDate);
+    const month = dateObj.getMonth() + 1;
+    const year = dateObj.getFullYear();
+    const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    
+    if (actNameInput !== 'Custom') {
+        const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero – nominee','sustainability hero – winner','group winner (ss brand)','bio blitz winner','bio blitz runner-up'];
+        neverExpires = NEVER_EXPIRE_ACTIVITIES.some(a => activityName.toLowerCase().includes(a));
+    }
+
+    const activityRecord = {
+        employeeId: empId,
+        employeeName: empName,
+        employeeDept: emp.department || '',
+        activityName: activityName,
+        points: points,
+        activityDate: activityDate,
+        month: month,
+        monthName: monthNames[month - 1],
+        year: year,
+        remarks: remarks,
+        addedBy: 'admin',
+        createdAt: Date.now(),
+        neverExpires: neverExpires,
+        expiryDate: customExpiryDate
+    };
+    
+    if (isStar) {
+        activityRecord.starGivenBy = starGivenBy;
+        if (tempStarPhoto) {
+            activityRecord.starPhoto = tempStarPhoto;
+        }
+    }
+    
+    db.ref('loyalty/employeeActivities').push(activityRecord).then(() => {
+        const newPoints = (emp.points || 0) + points;
+        const newTotalEarned = (emp.totalEarned || 0) + points;
+        db.ref('loyalty/employees/' + emp.id).update({ points: newPoints, totalEarned: newTotalEarned });
+        db.ref('loyalty/transactions').push({ employeeId: empId, employeeName: empName, type: 'earn', activityName: activityName, points: points, runningBalance: newPoints, addedBy: 'admin', timestamp: Date.now() });
+        showAlert(`Successfully awarded ${points} points to ${empName}!`, 'success');
+        
+        document.getElementById('manual-activity-date').value = '';
+        document.getElementById('manual-emp-name').value = '';
+        document.getElementById('manual-emp-id').value = '';
+        document.getElementById('manual-activity-name').value = '';
+        document.getElementById('manual-points').value = '';
+        document.getElementById('manual-quantity').value = '1';
+        document.getElementById('manual-remarks').value = '';
+        document.getElementById('social-media-notice').classList.remove('visible');
+        document.getElementById('star-of-day-section').classList.remove('visible');
+        document.getElementById('custom-activity-section').style.display = 'none';
+        document.getElementById('custom-activity-name').value = '';
+        document.getElementById('custom-activity-points').value = '';
+        document.getElementById('custom-activity-expiry').value = '';
+        resetStarPhotoManager();
+    }).catch(err => showAlert('Error: ' + err.message, 'error'));
 }
 function handleBulkActivityUpload(e) {
 const file = e.target.files[0]; if(!file) return;
@@ -1679,7 +1758,8 @@ filtered.sort((a,b) => b.createdAt - a.createdAt);
 tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No activity records found</td></tr>' : filtered.map(r => {
 const starBadge = isStarOfTheDay(r.activityName) ? ' ⭐' : '';
 const neverExpireBadge = r.neverExpires ? '<span style="color:var(--success);font-size:0.7rem;font-weight:700;"> ∞ No Expiry</span>' : '';
-return `<tr><td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td><td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td><td>${r.activityName}${starBadge}${neverExpireBadge}${r.starGivenBy ? '<br><small style="color:var(--gold-dark);">Given by: ' + r.starGivenBy + '</small>' : ''}</td><td style="color:var(--success-dark);font-weight:700;">+${r.points}</td><td>${r.monthName || ''} ${r.year || ''}</td><td>${r.remarks || '-'}</td><td><button class="btn btn-outline btn-sm" onclick="editActivityRecord('${r.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td></tr>`;
+const customExpiryBadge = (!r.neverExpires && r.expiryDate) ? `<span style="color:var(--danger-dark);font-size:0.7rem;font-weight:700;"> Exp: ${new Date(r.expiryDate).toLocaleDateString()}</span>` : '';
+return `<tr><td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td><td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td><td>${r.activityName}${starBadge}${neverExpireBadge}${customExpiryBadge}${r.starGivenBy ? '<br><small style="color:var(--gold-dark);">Given by: ' + r.starGivenBy + '</small>' : ''}</td><td style="color:var(--success-dark);font-weight:700;">+${r.points}</td><td>${r.monthName || ''} ${r.year || ''}</td><td>${r.remarks || '-'}</td><td><button class="btn btn-outline btn-sm" onclick="editActivityRecord('${r.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td></tr>`;
 }).join('');
 }
 function downloadActivityRecordsExcel() {
@@ -1701,6 +1781,7 @@ const exportData = filtered.map(r => ({
 'Points': r.points,
 'Month/Year': `${r.monthName || ''} ${r.year || ''}`,
 'Never Expires': r.neverExpires ? 'Yes' : 'No',
+'Custom Expiry Date': r.expiryDate ? new Date(r.expiryDate).toLocaleDateString() : '-',
 'Given By (Star)': r.starGivenBy || '-',
 'Remarks': r.remarks || '-'
 }));
@@ -1810,8 +1891,9 @@ myActivities.forEach(a => { const key = `${a.monthName || ''} ${a.year || ''}`; 
 document.getElementById('activity-history-stats').innerHTML = Object.entries(monthStats).map(([month,stats]) => `<div style="background:linear-gradient(135deg,var(--brand),var(--brand-light));color:#fff;padding:16px;border-radius:var(--radius-md);text-align:center;box-shadow:var(--shadow);"><div style="font-size:1.6rem;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;">${stats.points} pts</div><div style="font-size:0.875rem;opacity:0.95;margin-top:2px;">${month}</div><div style="font-size:0.75rem;opacity:0.85;margin-top:2px;">${stats.count} activities</div></div>`).join('') || '<p style="color:var(--text-muted);">No activity history yet</p>';
 document.getElementById('activity-history-list').innerHTML = myActivities.length === 0 ? '<p style="text-align:center;padding:30px;color:var(--text-muted);">No activities attended yet.</p>' : myActivities.map(a => {
 const neverExpireTag = a.neverExpires ? '<span style="color:var(--success);font-weight:700;font-size:0.75rem;"> ∞ Never Expires</span>' : '';
+const customExpiryTag = (!a.neverExpires && a.expiryDate) ? `<span style="color:var(--danger-dark);font-weight:700;font-size:0.75rem;"> • Expires: ${new Date(a.expiryDate).toLocaleDateString()}</span>` : '';
 const starTag = a.starGivenBy ? `<small>⭐ Given by: ${a.starGivenBy}</small>` : '';
-return `<div class="transaction-item earn"><div class="transaction-info"><strong>🎯 ${a.activityName}${neverExpireTag}</strong><small>📅 ${a.activityDate ? new Date(a.activityDate).toLocaleDateString() : 'N/A'} • 📆 ${a.monthName || ''} ${a.year || ''}</small>${starTag}${a.remarks ? `<small>📝 ${a.remarks}</small>` : ''}</div><div class="transaction-points earn">+${a.points} pts</div></div>`;
+return `<div class="transaction-item earn"><div class="transaction-info"><strong>🎯 ${a.activityName}${neverExpireTag}${customExpiryTag}</strong><small>📅 ${a.activityDate ? new Date(a.activityDate).toLocaleDateString() : 'N/A'} • 📆 ${a.monthName || ''} ${a.year || ''}</small>${starTag}${a.remarks ? `<small>📝 ${a.remarks}</small>` : ''}</div><div class="transaction-points earn">+${a.points} pts</div></div>`;
 }).join('');
 }
 function renderEmployeeTransactions() {
@@ -2109,9 +2191,7 @@ function renderVouchers() {
 const tbody = document.getElementById('vouchers-tbody'); if(!tbody) return;
 const monthFilter = document.getElementById('voucher-month-filter')?.value;
 const yearFilter = document.getElementById('voucher-year-filter')?.value;
-
 let filtered = [...vouchers];
-
 if(monthFilter !== '' && monthFilter !== undefined) {
 filtered = filtered.filter(v => {
 const d = new Date(v.issueDate);
@@ -2124,18 +2204,13 @@ const d = new Date(v.issueDate);
 return d.getFullYear() === parseInt(yearFilter);
 });
 }
-
 filtered.sort((a,b) => b.issueDate - a.issueDate);
-
 tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No vouchers found</td></tr>' : filtered.map(v => `<tr><td><strong>${v.serialNo}</strong></td><td>${v.employeeName}<br><small>${v.employeeDept || '-'}</small></td><td>${v.serviceName}<br><small>${v.serviceCategory || 'General'}</small></td><td>${v.points}</td><td>${new Date(v.issueDate).toLocaleDateString()}</td><td>${new Date(v.expiryDate).toLocaleDateString()}</td><td><button class="btn btn-outline btn-sm" onclick="viewVoucher('${v.id}')">👁️ View</button>${v.status !== 'used' && v.status !== 'cancelled' ? `<button class="btn btn-warning btn-sm" onclick="cancelVoucher('${v.id}')">❌ Cancel</button>` : ''}${v.status !== 'used' ? `<button class="btn btn-danger btn-sm" onclick="deleteVoucher('${v.id}')">🗑️ Delete</button>` : '-'}</td></tr>`).join('');
 }
-
 function downloadVouchersExcel() {
 const monthFilter = document.getElementById('voucher-month-filter')?.value;
 const yearFilter = document.getElementById('voucher-year-filter')?.value;
-
 let filtered = [...vouchers];
-
 if(monthFilter !== '' && monthFilter !== undefined) {
 filtered = filtered.filter(v => {
 const d = new Date(v.issueDate);
@@ -2148,14 +2223,11 @@ const d = new Date(v.issueDate);
 return d.getFullYear() === parseInt(yearFilter);
 });
 }
-
 filtered.sort((a,b) => b.issueDate - a.issueDate);
-
 if (filtered.length === 0) {
 showAlert('No voucher data matches the selected filters', 'warning');
 return;
 }
-
 const exportData = filtered.map(v => ({
 'Serial No': v.serialNo,
 'Employee Name': v.employeeName,
@@ -2167,20 +2239,16 @@ const exportData = filtered.map(v => ({
 'Expiry Date': new Date(v.expiryDate).toLocaleDateString(),
 'Status': v.status || 'generated'
 }));
-
 const ws = XLSX.utils.json_to_sheet(exportData);
 const wb = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(wb, ws, "Vouchers");
-
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const monthStr = monthFilter !== '' && monthFilter !== undefined ? monthNames[parseInt(monthFilter)] : 'All';
 const yearStr = yearFilter !== '' && yearFilter !== undefined ? yearFilter : 'All';
-
 const fileName = `Vouchers-Report-${monthStr}-${yearStr}.xlsx`;
 XLSX.writeFile(wb, fileName);
 showAlert('Voucher report downloaded successfully!', 'success');
 }
-
 function cancelVoucher(voucherId) {
 const voucher = vouchers.find(v => v.id === voucherId); if(!voucher) return showAlert('Voucher not found', 'error');
 if(!confirm(`Cancel voucher ${voucher.serialNo}? ${voucher.points} points will be refunded.`)) return;
@@ -2196,7 +2264,8 @@ showAlert(`Voucher cancelled! ${voucher.points} points refunded.`, 'success');
 function deleteVoucher(voucherId) {
 const voucher = vouchers.find(v => v.id === voucherId);
 if(!voucher) return showAlert('Voucher not found', 'error');
-if(!confirm(`Permanently delete voucher ${voucher.serialNo}?\nNote: This will NOT refund points. Use 'Cancel' if you want to refund points to the employee.`)) return;
+if(!confirm(`Permanently delete voucher ${voucher.serialNo}?
+Note: This will NOT refund points. Use 'Cancel' if you want to refund points to the employee.`)) return;
 db.ref('loyalty/vouchers/' + voucherId).remove().then(() => showAlert('Voucher deleted permanently', 'success'));
 }
 function viewVoucher(voucherId) { const voucher = vouchers.find(v => v.id === voucherId); if(!voucher) return showAlert('Voucher not found', 'error'); currentVoucher = {...voucher, hotelName: branding.hotelName || 'Host Loyalty Program', hotelLogo: branding.logo || ''}; showVoucher(currentVoucher); }
@@ -2264,7 +2333,9 @@ document.getElementById('report-activities').innerHTML = earned.length === 0 ? '
 document.getElementById('report-services').innerHTML = (spent.length + cancelled.length) === 0 ? '<p style="color:var(--text-muted);">No services this month</p>' : [...spent.map(t => `<div class="item-row" style="padding:12px 16px;"><div class="item-info"><strong>${t.employeeName}</strong><small>${t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--danger-dark);">-${t.points}</div></div>`), ...cancelled.map(t => `<div class="item-row" style="padding:12px 16px;background:var(--warning-light);"><div class="item-info"><strong>${t.employeeName} ${t.type === 'reverse' ? '(Points Reversed)' : '(Cancelled)'}</strong><small>${t.activityName || t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--gold-dark);">${t.type === 'reverse' ? '-' : '+'}${Math.abs(t.points)} ${t.type === 'reverse' ? '(Reversed)' : '(refunded)'}</div></div>`)].join('');
 document.getElementById('report-employees-tbody').innerHTML = employees.map(e => { const empEarned = earned.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0); const empSpent = spent.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0); return `<tr><td><strong>${e.name}</strong></td><td>${e.department || '-'}</td><td style="color:var(--success-dark);">+${empEarned}</td><td style="color:var(--danger-dark);">-${empSpent}</td><td><strong style="color:var(--gold-dark);">${e.points || 0}</strong></td></tr>`; }).join('');
 }
-function downloadReport() { let csv = 'Employee,Department,Points Earned,Points Spent,Current Balance\n'; employees.forEach(e => { csv += `"${e.name}","${e.department || ''}",${e.totalEarned || 0},${e.totalSpent || 0},${e.points || 0}\n`; }); const blob = new Blob([csv], {type: 'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `loyalty-report-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); }
+function downloadReport() { let csv = 'Employee,Department,Points Earned,Points Spent,Current Balance
+'; employees.forEach(e => { csv += `"${e.name}","${e.department || ''}",${e.totalEarned || 0},${e.totalSpent || 0},${e.points || 0}
+`; }); const blob = new Blob([csv], {type: 'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `loyalty-report-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); }
 function showAlert(msg, type) { const el = document.getElementById('alert-' + type); el.innerText = msg; el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 3500); }
 // ============ ACTIVITY WISE BULK POINTS ============
 function switchPointsTab(tab, btn) {
