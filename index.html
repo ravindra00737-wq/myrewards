@@ -453,7 +453,7 @@ border:1px solid var(--border);border-left:4px solid var(--brand);
 .autocomplete-list{
 position:absolute;top:100%;left:0;right:0;background:#fff;
 border:1px solid var(--border);border-radius:var(--radius);
-max-height:220px;overflow-y:auto;z-index:1000;
+max-height:260px;overflow-y:auto;z-index:1000;
 box-shadow:var(--shadow-lg);display:none;margin-top:4px;
 }
 .autocomplete-list.active{display:block;animation:fadeIn 0.2s;}
@@ -465,6 +465,14 @@ border-bottom:1px solid var(--border);
 .autocomplete-item:hover{background:var(--brand-50);}
 .autocomplete-item strong{color:var(--brand-dark);font-weight:700;}
 .autocomplete-item small{color:var(--text-muted);display:block;font-size:0.825rem;margin-top:2px;}
+.autocomplete-item.custom-option{
+background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%);
+border-left:3px solid var(--gold);
+}
+.autocomplete-item.custom-option:hover{
+background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);
+}
+.autocomplete-item.custom-option strong{color:#92400e;}
 .social-media-notice{
 background:linear-gradient(135deg,#fef3c7,#fde68a);
 border-left:4px solid var(--warning);
@@ -482,6 +490,14 @@ animation:fadeIn 0.4s;box-shadow:var(--shadow-sm);
 }
 .star-of-day-section.visible{display:block;}
 .star-of-day-section h3{color:#92400e;margin:0 0 14px;font-size:1.05rem;}
+.custom-activity-section{
+display:none;border:2px solid var(--gold);border-radius:var(--radius-md);
+padding:20px;margin-bottom:18px;
+background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%);
+animation:fadeIn 0.4s;box-shadow:var(--shadow-sm);
+}
+.custom-activity-section.visible{display:block;}
+.custom-activity-section h3{color:#92400e;margin:0 0 14px;font-size:1.05rem;}
 .page-header{
 display:flex;justify-content:space-between;align-items:center;
 margin-bottom:20px;flex-wrap:wrap;gap:12px;
@@ -753,110 +769,127 @@ th,td{padding:10px 12px;}
 <div class="card">
 <h2>⭐ Employee Activity Points Management</h2>
 <div style="display:flex;gap:12px;margin-bottom:24px;border-bottom:2px solid var(--border);padding-bottom:0;">
-  <button class="points-sub-tab active" onclick="switchPointsTab('employee-wise', this)" style="padding:12px 24px;background:transparent;border:none;border-bottom:3px solid var(--brand);cursor:pointer;font-weight:600;font-size:0.95rem;color:var(--brand);transition:all 0.3s;">Add Points – Employee Wise</button>
-  <button class="points-sub-tab" onclick="switchPointsTab('activity-wise', this)" style="padding:12px 24px;background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;font-weight:600;font-size:0.95rem;color:var(--text-muted);transition:all 0.3s;">Add Points – Activity Wise</button>
+<button class="points-sub-tab active" onclick="switchPointsTab('employee-wise', this)" style="padding:12px 24px;background:transparent;border:none;border-bottom:3px solid var(--brand);cursor:pointer;font-weight:600;font-size:0.95rem;color:var(--brand);transition:all 0.3s;">Add Points – Employee Wise</button>
+<button class="points-sub-tab" onclick="switchPointsTab('activity-wise', this)" style="padding:12px 24px;background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;font-weight:600;font-size:0.95rem;color:var(--text-muted);transition:all 0.3s;">Add Points – Activity Wise</button>
 </div>
-
 <div id="points-tab-employee-wise" class="points-sub-tab-content">
-  <div style="background:#f8fafc;padding:24px;border-radius:var(--radius-md);margin-bottom:28px;border:1px solid var(--border);">
-    <h3 style="margin-bottom:16px;">➕ Manual Entry - Award Points</h3>
-    <div class="social-media-notice" id="social-media-notice">
-      <strong>📱 Social Media Mentions</strong>
-      <p style="margin-top:5px;color:#78350f;">Award 5 points per guest mention on social media (TripAdvisor, Google Reviews, etc.)</p>
-      <div class="calculation" id="social-media-calculation">Enter number of mentions below</div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-      <div class="form-group"><label>Activity Date *</label><input type="date" id="manual-activity-date"></div>
-      <div class="form-group">
-        <label>Number of Mentions / Quantity</label>
-        <input type="number" id="manual-quantity" value="1" min="1" oninput="updateManualPoints()">
-        <small style="color:var(--text-muted);display:block;margin-top:5px;">For Social Media Mentions: Enter how many times employee was mentioned</small>
-      </div>
-    </div>
-    <div class="form-group autocomplete-container"><label>Employee Name *</label><input type="text" id="manual-emp-name" placeholder="Start typing employee name..." oninput="showEmployeeNameSuggestions(this.value)"><div class="autocomplete-list" id="emp-name-suggestions"></div></div>
-    <div class="form-group autocomplete-container"><label>Employee ID *</label><input type="text" id="manual-emp-id" placeholder="Start typing employee ID..." oninput="showEmployeeIdSuggestions(this.value)"><div class="autocomplete-list" id="emp-id-suggestions"></div></div>
-    <div class="form-group autocomplete-container"><label>Activity Name *</label><input type="text" id="manual-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestions(this.value); updateManualPoints();"><div class="autocomplete-list" id="activity-suggestions"></div></div>
-    <div class="star-of-day-section" id="star-of-day-section">
-      <h3>⭐ Star of the Day Details</h3>
-      <div class="form-group">
-        <label>Star of the Day Given By (Manager Name) *</label>
-        <input type="text" id="star-given-by" placeholder="Enter manager's full name">
-      </div>
-      <div class="form-group">
-        <label>Upload Proof / Photo</label>
-        <div class="photo-drop" id="star-photo-drop" onclick="if(!this.classList.contains('has-photo')) document.getElementById('star-photo-file').click();">
-          <input type="file" id="star-photo-file" accept="image/*" style="display:none;">
-          <div class="photo-drop-content" id="star-photo-drop-content">
-            <p class="photo-drop-icon">📸</p>
-            <p><strong>Drag &amp; drop photo here</strong></p>
-            <p class="photo-drop-hint">— or —</p>
-            <button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation();document.getElementById('star-photo-file').click();">📤 Upload Photo</button>
-          </div>
-          <img id="star-photo-preview" class="photo-preview" alt="Star of the Day proof">
-        </div>
-        <div class="photo-actions" id="star-photo-actions">
-          <button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('star-photo-file').click();">🔄 Replace Photo</button>
-          <button type="button" class="btn btn-danger btn-sm" onclick="removeStarPhoto()">🗑️ Remove Photo</button>
-        </div>
-      </div>
-    </div>
-    <div class="form-group"><label>Total Points to Award *</label><input type="number" id="manual-points" placeholder="Auto-calculated" min="0" readonly style="background:var(--brand-50);font-weight:700;color:var(--brand-dark);"></div>
-    <div class="form-group"><label>Remarks (Optional)</label><textarea id="manual-remarks" placeholder="Any additional notes..."></textarea></div>
-    <button class="btn btn-success" onclick="addManualActivity()">➕ Add Activity & Award Points</button>
-  </div>
-</div>
-
-<div id="points-tab-activity-wise" class="points-sub-tab-content" style="display:none;">
-  <div style="background:#f8fafc;padding:24px;border-radius:var(--radius-md);margin-bottom:28px;border:1px solid var(--border);">
-    <h3 style="margin-bottom:16px;">➕ Activity Wise Bulk Entry</h3>
-    <p style="color:var(--text-muted);margin-bottom:16px;font-size:0.9rem;">Select a date and activity, then search and add employees one by one. All selected employees will receive the activity points in a single bulk save.</p>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-      <div class="form-group"><label>Activity Date *</label><input type="date" id="bulk-activity-date"></div>
-      <div class="form-group autocomplete-container">
-        <label>Activity Name *</label>
-        <input type="text" id="bulk-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestionsBulk(this.value)">
-        <div class="autocomplete-list" id="bulk-activity-suggestions"></div>
-      </div>
-    </div>
-    <div class="form-group autocomplete-container">
-      <label>Search Employee to Add</label>
-      <input type="text" id="bulk-emp-search" placeholder="Type employee name or ID..." oninput="showEmployeeSuggestionsBulk(this.value)">
-      <div class="autocomplete-list" id="bulk-emp-suggestions"></div>
-    </div>
-    <div id="selected-employees-list" style="margin-top:16px;padding:16px;background:#fff;border-radius:var(--radius);border:1px solid var(--border);">
-      <h4 style="margin-bottom:10px;font-size:0.95rem;color:var(--text-muted);">Selected Employees (<span id="selected-emp-count">0</span>):</h4>
-      <div id="selected-employees-container" style="display:flex;flex-wrap:wrap;gap:8px;">
-        <small style="color:var(--text-muted);">No employees selected yet.</small>
-      </div>
-    </div>
-    <div class="form-group" style="margin-top:16px;"><label>Remarks (Optional)</label><textarea id="bulk-activity-remarks" placeholder="Any additional notes for this bulk entry..."></textarea></div>
-    <button class="btn btn-success" onclick="saveBulkActivityPoints()">➕ Save All Entries</button>
-  </div>
-</div>
-
 <div style="background:#f8fafc;padding:24px;border-radius:var(--radius-md);margin-bottom:28px;border:1px solid var(--border);">
-  <h3 style="margin-bottom:16px;">📤 Bulk Upload via Excel</h3>
-  <p style="color:var(--text-muted);margin-bottom:16px;">Upload Excel file with columns: Activity Date, Employee ID, Employee Name, Activity Name, Quantity, Points Earned</p>
-  <div class="file-upload" id="bulk-activity-upload"><p style="font-size:2rem;">📊</p><p><strong>Click to upload Excel file</strong></p><input type="file" id="bulk-activity-file" accept=".xlsx,.xls"></div>
-  <button class="btn btn-outline" onclick="downloadActivityUploadTemplate()" style="margin-top:10px;">📥 Download Template</button>
-  <div id="bulk-upload-results" style="margin-top:15px;"></div>
+<h3 style="margin-bottom:16px;">➕ Manual Entry - Award Points</h3>
+<div class="social-media-notice" id="social-media-notice">
+<strong>📱 Social Media Mentions</strong>
+<p style="margin-top:5px;color:#78350f;">Award 5 points per guest mention on social media (TripAdvisor, Google Reviews, etc.)</p>
+<div class="calculation" id="social-media-calculation">Enter number of mentions below</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+<div class="form-group"><label>Activity Date *</label><input type="date" id="manual-activity-date"></div>
+<div class="form-group">
+<label>Number of Mentions / Quantity</label>
+<input type="number" id="manual-quantity" value="1" min="1" oninput="updateManualPoints()">
+<small style="color:var(--text-muted);display:block;margin-top:5px;">For Social Media Mentions: Enter how many times employee was mentioned</small>
+</div>
+</div>
+<div class="form-group autocomplete-container"><label>Employee Name *</label><input type="text" id="manual-emp-name" placeholder="Start typing employee name..." oninput="showEmployeeNameSuggestions(this.value)"><div class="autocomplete-list" id="emp-name-suggestions"></div></div>
+<div class="form-group autocomplete-container"><label>Employee ID *</label><input type="text" id="manual-emp-id" placeholder="Start typing employee ID..." oninput="showEmployeeIdSuggestions(this.value)"><div class="autocomplete-list" id="emp-id-suggestions"></div></div>
+<div class="form-group autocomplete-container"><label>Activity Name *</label><input type="text" id="manual-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestions(this.value); updateManualPoints();"><div class="autocomplete-list" id="activity-suggestions"></div></div>
+
+<div class="custom-activity-section" id="custom-activity-section">
+<h3>🎯 Custom Activity Details</h3>
+<p style="color:#78350f;font-size:0.85rem;margin-bottom:14px;">Enter the details for this custom activity. The activity name and points will be recorded as entered below.</p>
+<div class="form-group">
+<label>Custom Activity Name *</label>
+<input type="text" id="custom-activity-name" placeholder="e.g. Special Recognition, Ad-hoc Task, etc.">
+</div>
+<div class="form-group">
+<label>Custom Points *</label>
+<input type="number" id="custom-activity-points" placeholder="Enter any number of points" min="1" oninput="updateCustomPoints()">
+<small style="color:var(--text-muted);display:block;margin-top:5px;">Points are flexible — enter any value you wish to award.</small>
+</div>
+<div class="form-group">
+<label>Expiry Date</label>
+<input type="date" id="custom-activity-expiry">
+<small style="color:var(--text-muted);display:block;margin-top:5px;">Optional. If left blank, points will expire on 31 December of the activity year.</small>
+</div>
+</div>
+
+<div class="star-of-day-section" id="star-of-day-section">
+<h3>⭐ Star of the Day Details</h3>
+<div class="form-group">
+<label>Star of the Day Given By (Manager Name) *</label>
+<input type="text" id="star-given-by" placeholder="Enter manager's full name">
+</div>
+<div class="form-group">
+<label>Upload Proof / Photo</label>
+<div class="photo-drop" id="star-photo-drop" onclick="if(!this.classList.contains('has-photo')) document.getElementById('star-photo-file').click();">
+<input type="file" id="star-photo-file" accept="image/*" style="display:none;">
+<div class="photo-drop-content" id="star-photo-drop-content">
+<p class="photo-drop-icon">📸</p>
+<p><strong>Drag &amp; drop photo here</strong></p>
+<p class="photo-drop-hint">— or —</p>
+<button type="button" class="btn btn-outline btn-sm" onclick="event.stopPropagation();document.getElementById('star-photo-file').click();">📤 Upload Photo</button>
+</div>
+<img id="star-photo-preview" class="photo-preview" alt="Star of the Day proof">
+</div>
+<div class="photo-actions" id="star-photo-actions">
+<button type="button" class="btn btn-outline btn-sm" onclick="document.getElementById('star-photo-file').click();">🔄 Replace Photo</button>
+<button type="button" class="btn btn-danger btn-sm" onclick="removeStarPhoto()">🗑️ Remove Photo</button>
+</div>
+</div>
+</div>
+<div class="form-group"><label>Total Points to Award *</label><input type="number" id="manual-points" placeholder="Auto-calculated" min="0" readonly style="background:var(--brand-50);font-weight:700;color:var(--brand-dark);"></div>
+<div class="form-group"><label>Remarks (Optional)</label><textarea id="manual-remarks" placeholder="Any additional notes..."></textarea></div>
+<button class="btn btn-success" onclick="addManualActivity()">➕ Add Activity & Award Points</button>
+</div>
+</div>
+<div id="points-tab-activity-wise" class="points-sub-tab-content" style="display:none;">
+<div style="background:#f8fafc;padding:24px;border-radius:var(--radius-md);margin-bottom:28px;border:1px solid var(--border);">
+<h3 style="margin-bottom:16px;">➕ Activity Wise Bulk Entry</h3>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:0.9rem;">Select a date and activity, then search and add employees one by one. All selected employees will receive the activity points in a single bulk save.</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+<div class="form-group"><label>Activity Date *</label><input type="date" id="bulk-activity-date"></div>
+<div class="form-group autocomplete-container">
+<label>Activity Name *</label>
+<input type="text" id="bulk-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestionsBulk(this.value)">
+<div class="autocomplete-list" id="bulk-activity-suggestions"></div>
+</div>
+</div>
+<div class="form-group autocomplete-container">
+<label>Search Employee to Add</label>
+<input type="text" id="bulk-emp-search" placeholder="Type employee name or ID..." oninput="showEmployeeSuggestionsBulk(this.value)">
+<div class="autocomplete-list" id="bulk-emp-suggestions"></div>
+</div>
+<div id="selected-employees-list" style="margin-top:16px;padding:16px;background:#fff;border-radius:var(--radius);border:1px solid var(--border);">
+<h4 style="margin-bottom:10px;font-size:0.95rem;color:var(--text-muted);">Selected Employees (<span id="selected-emp-count">0</span>):</h4>
+<div id="selected-employees-container" style="display:flex;flex-wrap:wrap;gap:8px;">
+<small style="color:var(--text-muted);">No employees selected yet.</small>
+</div>
+</div>
+<div class="form-group" style="margin-top:16px;"><label>Remarks (Optional)</label><textarea id="bulk-activity-remarks" placeholder="Any additional notes for this bulk entry..."></textarea></div>
+<button class="btn btn-success" onclick="saveBulkActivityPoints()">➕ Save All Entries</button>
+</div>
+</div>
+<div style="background:#f8fafc;padding:24px;border-radius:var(--radius-md);margin-bottom:28px;border:1px solid var(--border);">
+<h3 style="margin-bottom:16px;">📤 Bulk Upload via Excel</h3>
+<p style="color:var(--text-muted);margin-bottom:16px;">Upload Excel file with columns: Activity Date, Employee ID, Employee Name, Activity Name, Quantity, Points Earned</p>
+<div class="file-upload" id="bulk-activity-upload"><p style="font-size:2rem;">📊</p><p><strong>Click to upload Excel file</strong></p><input type="file" id="bulk-activity-file" accept=".xlsx,.xls"></div>
+<button class="btn btn-outline" onclick="downloadActivityUploadTemplate()" style="margin-top:10px;">📥 Download Template</button>
+<div id="bulk-upload-results" style="margin-top:15px;"></div>
 </div>
 <div class="page-header">
-  <h3 style="margin:0;">📋 Activity Records</h3>
-  <button class="btn btn-success btn-sm" onclick="downloadActivityRecordsExcel()">📥 Download Excel</button>
+<h3 style="margin:0;">📋 Activity Records</h3>
+<button class="btn btn-success btn-sm" onclick="downloadActivityRecordsExcel()">📥 Download Excel</button>
 </div>
 <div class="filter-row">
-  <div class="form-group"><label>Filter by Month</label><select id="admin-activity-month" onchange="renderAdminActivityRecords()"><option value="">All Months</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
-  <div class="form-group"><label>Filter by Year</label><select id="admin-activity-year" onchange="renderAdminActivityRecords()"><option value="">All Years</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option></select></div>
-  <div class="form-group"><label>Search Employee</label><input type="text" id="admin-activity-search-employee" placeholder="🔍 Search by employee name..." oninput="renderAdminActivityRecords()" style="min-width:220px;"></div>
-  <div class="form-group"><label>Search Activity</label><input type="text" id="admin-activity-search" placeholder="🔍 Search by activity name..." oninput="renderAdminActivityRecords()" style="min-width:220px;"></div>
-  <button class="btn btn-outline btn-sm" onclick="resetActivityFilters()">🔄 Reset Filters</button>
+<div class="form-group"><label>Filter by Month</label><select id="admin-activity-month" onchange="renderAdminActivityRecords()"><option value="">All Months</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
+<div class="form-group"><label>Filter by Year</label><select id="admin-activity-year" onchange="renderAdminActivityRecords()"><option value="">All Years</option><option value="2024">2024</option><option value="2025">2025</option><option value="2026">2026</option><option value="2027">2027</option></select></div>
+<div class="form-group"><label>Search Employee</label><input type="text" id="admin-activity-search-employee" placeholder="🔍 Search by employee name..." oninput="renderAdminActivityRecords()" style="min-width:220px;"></div>
+<div class="form-group"><label>Search Activity</label><input type="text" id="admin-activity-search" placeholder="🔍 Search by activity name..." oninput="renderAdminActivityRecords()" style="min-width:220px;"></div>
+<button class="btn btn-outline btn-sm" onclick="resetActivityFilters()">🔄 Reset Filters</button>
 </div>
 <div class="table-wrap">
-  <table>
-    <thead><tr><th onclick="sortActivityRecords('activityDate')">Date ↕</th><th onclick="sortActivityRecords('employeeName')">Employee ↕</th><th onclick="sortActivityRecords('activityName')">Activity ↕</th><th onclick="sortActivityRecords('points')">Points ↕</th><th onclick="sortActivityRecords('monthName')">Month/Year ↕</th><th>Remarks</th><th>Actions</th></tr></thead>
-    <tbody id="admin-activity-records-tbody"></tbody>
-  </table>
+<table>
+<thead><tr><th onclick="sortActivityRecords('activityDate')">Date ↕</th><th onclick="sortActivityRecords('employeeName')">Employee ↕</th><th onclick="sortActivityRecords('activityName')">Activity ↕</th><th onclick="sortActivityRecords('points')">Points ↕</th><th onclick="sortActivityRecords('monthName')">Month/Year ↕</th><th>Remarks</th><th>Actions</th></tr></thead>
+<tbody id="admin-activity-records-tbody"></tbody>
+</table>
 </div>
 </div>
 </div>
@@ -1015,7 +1048,7 @@ let activitySortColumn = null;
 let activitySortDirection = 'asc';
 let tempStarPhoto = null;
 let bulkSelectedEmployees = [];
-
+let isCustomMode = false;
 document.addEventListener('DOMContentLoaded', () => {
 loadData();
 setupFileUploads();
@@ -1442,10 +1475,11 @@ container.classList.add('active');
 }
 function showActivitySuggestions(query) {
 const container = document.getElementById('activity-suggestions');
-if(!query || query.length < 2) { container.classList.remove('active'); return; }
+if(!query || query.length < 1) { container.classList.remove('active'); return; }
 const matches = activities.filter(a => a.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
-if(matches.length === 0) { container.classList.remove('active'); return; }
-container.innerHTML = matches.map(a => `<div class="autocomplete-item" onclick="selectActivity('${a.id}')"><strong>${a.name}</strong><small>${a.points} points • ${a.category || 'General'}</small></div>`).join('');
+let html = matches.map(a => `<div class="autocomplete-item" onclick="selectActivity('${a.id}')"><strong>${a.name}</strong><small>${a.points} points • ${a.category || 'General'}</small></div>`).join('');
+html += `<div class="autocomplete-item custom-option" onclick="selectCustomActivity()"><strong>🎯 Custom Activity</strong><small>Enter custom name, points & expiry date manually</small></div>`;
+container.innerHTML = html;
 container.classList.add('active');
 }
 function selectEmployeeByName(empId) { const emp = employees.find(e => e.id === empId); if(!emp) return; document.getElementById('manual-emp-name').value = emp.name; document.getElementById('manual-emp-id').value = emp.employeeId; document.getElementById('emp-name-suggestions').classList.remove('active'); }
@@ -1453,9 +1487,39 @@ function selectEmployeeById(empId) { const emp = employees.find(e => e.id === em
 function selectActivity(activityId) {
 const activity = activities.find(a => a.id === activityId);
 if(!activity) return;
+if (isCustomMode) {
+exitCustomMode();
+}
 document.getElementById('manual-activity-name').value = activity.name;
+document.getElementById('manual-activity-name').readOnly = false;
 document.getElementById('activity-suggestions').classList.remove('active');
 updateManualPoints();
+}
+function selectCustomActivity() {
+isCustomMode = true;
+document.getElementById('manual-activity-name').value = 'Custom';
+document.getElementById('manual-activity-name').readOnly = true;
+document.getElementById('activity-suggestions').classList.remove('active');
+document.getElementById('custom-activity-section').classList.add('visible');
+document.getElementById('social-media-notice').classList.remove('visible');
+document.getElementById('star-of-day-section').classList.remove('visible');
+document.getElementById('custom-activity-name').value = '';
+document.getElementById('custom-activity-points').value = '';
+document.getElementById('custom-activity-expiry').value = '';
+document.getElementById('manual-points').value = '';
+document.getElementById('custom-activity-name').focus();
+}
+function exitCustomMode() {
+isCustomMode = false;
+document.getElementById('custom-activity-section').classList.remove('visible');
+document.getElementById('manual-activity-name').readOnly = false;
+document.getElementById('custom-activity-name').value = '';
+document.getElementById('custom-activity-points').value = '';
+document.getElementById('custom-activity-expiry').value = '';
+}
+function updateCustomPoints() {
+const customPoints = parseInt(document.getElementById('custom-activity-points').value) || 0;
+document.getElementById('manual-points').value = customPoints > 0 ? customPoints : '';
 }
 document.addEventListener('click', function(e) { if(!e.target.closest('.autocomplete-container')) { document.querySelectorAll('.autocomplete-list').forEach(l => l.classList.remove('active')); } });
 function updateManualPoints() {
@@ -1464,6 +1528,13 @@ const qty = parseInt(document.getElementById('manual-quantity').value) || 1;
 const notice = document.getElementById('social-media-notice');
 const calculation = document.getElementById('social-media-calculation');
 const starSection = document.getElementById('star-of-day-section');
+const customSection = document.getElementById('custom-activity-section');
+if (isCustomMode && actName === 'Custom') {
+return;
+}
+if (isCustomMode && actName !== 'Custom') {
+exitCustomMode();
+}
 const isSocialMedia = actName.toLowerCase().includes('social media') || actName.toLowerCase().includes('mention');
 if (isStarOfTheDay(actName)) {
 starSection.classList.add('visible');
@@ -1490,9 +1561,21 @@ function addManualActivity() {
 const activityDate = document.getElementById('manual-activity-date').value;
 const empName = document.getElementById('manual-emp-name').value.trim();
 const empId = document.getElementById('manual-emp-id').value.trim();
-const activityName = document.getElementById('manual-activity-name').value.trim();
-const points = parseInt(document.getElementById('manual-points').value);
+let activityName = document.getElementById('manual-activity-name').value.trim();
+let points = parseInt(document.getElementById('manual-points').value);
 const remarks = document.getElementById('manual-remarks').value.trim();
+let customExpiryDate = null;
+let isCustomEntry = false;
+if (isCustomMode) {
+const customName = document.getElementById('custom-activity-name').value.trim();
+const customPoints = parseInt(document.getElementById('custom-activity-points').value);
+customExpiryDate = document.getElementById('custom-activity-expiry').value;
+if (!customName) return showAlert('Please enter a custom activity name', 'error');
+if (!customPoints || customPoints <= 0) return showAlert('Please enter valid custom points (greater than 0)', 'error');
+activityName = customName;
+points = customPoints;
+isCustomEntry = true;
+}
 if(!activityDate || !empName || !empId || !activityName || !points) return showAlert('Please fill all required fields', 'error');
 const isStar = isStarOfTheDay(activityName);
 let starGivenBy = '';
@@ -1507,7 +1590,19 @@ const month = dateObj.getMonth() + 1;
 const year = dateObj.getFullYear();
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero – nominee','sustainability hero – winner','group winner (ss brand)','bio blitz winner','bio blitz runner-up'];
-const neverExpires = NEVER_EXPIRE_ACTIVITIES.some(a => activityName.toLowerCase().includes(a));
+let neverExpires = false;
+let expiryDate = null;
+if (isCustomEntry) {
+if (customExpiryDate) {
+expiryDate = customExpiryDate;
+neverExpires = false;
+} else {
+expiryDate = `${year}-12-31`;
+neverExpires = false;
+}
+} else {
+neverExpires = NEVER_EXPIRE_ACTIVITIES.some(a => activityName.toLowerCase().includes(a));
+}
 const activityRecord = {
 employeeId: empId,
 employeeName: empName,
@@ -1521,8 +1616,12 @@ year: year,
 remarks: remarks,
 addedBy: 'admin',
 createdAt: Date.now(),
-neverExpires: neverExpires
+neverExpires: neverExpires,
+isCustom: isCustomEntry
 };
+if (isCustomEntry && expiryDate) {
+activityRecord.expiryDate = expiryDate;
+}
 if (isStar) {
 activityRecord.starGivenBy = starGivenBy;
 if (tempStarPhoto) {
@@ -1539,11 +1638,13 @@ document.getElementById('manual-activity-date').value = '';
 document.getElementById('manual-emp-name').value = '';
 document.getElementById('manual-emp-id').value = '';
 document.getElementById('manual-activity-name').value = '';
+document.getElementById('manual-activity-name').readOnly = false;
 document.getElementById('manual-points').value = '';
 document.getElementById('manual-quantity').value = '1';
 document.getElementById('manual-remarks').value = '';
 document.getElementById('social-media-notice').classList.remove('visible');
 document.getElementById('star-of-day-section').classList.remove('visible');
+exitCustomMode();
 resetStarPhotoManager();
 }).catch(err => showAlert('Error: ' + err.message, 'error'));
 }
@@ -1661,8 +1762,10 @@ filtered.sort((a,b) => b.createdAt - a.createdAt);
 }
 tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No activity records found</td></tr>' : filtered.map(r => {
 const starBadge = isStarOfTheDay(r.activityName) ? ' ⭐' : '';
+const customBadge = r.isCustom ? '<span style="color:var(--gold-dark);font-size:0.7rem;font-weight:700;margin-left:4px;">🎯 Custom</span>' : '';
 const neverExpireBadge = r.neverExpires ? '<span style="color:var(--success);font-size:0.7rem;font-weight:700;"> ∞ No Expiry</span>' : '';
-return `<tr><td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td><td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td><td>${r.activityName}${starBadge}${neverExpireBadge}${r.starGivenBy ? '<br><small style="color:var(--gold-dark);">Given by: ' + r.starGivenBy + '</small>' : ''}</td><td style="color:var(--success-dark);font-weight:700;">+${r.points}</td><td>${r.monthName || ''} ${r.year || ''}</td><td>${r.remarks || '-'}</td><td><button class="btn btn-outline btn-sm" onclick="editActivityRecord('${r.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td></tr>`;
+const expiryBadge = (!r.neverExpires && r.expiryDate) ? `<span style="color:var(--warning);font-size:0.7rem;font-weight:700;"> Expires: ${new Date(r.expiryDate).toLocaleDateString()}</span>` : '';
+return `<tr><td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td><td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td><td>${r.activityName}${starBadge}${customBadge}${neverExpireBadge}${expiryBadge}${r.starGivenBy ? '<br><small style="color:var(--gold-dark);">Given by: ' + r.starGivenBy + '</small>' : ''}</td><td style="color:var(--success-dark);font-weight:700;">+${r.points}</td><td>${r.monthName || ''} ${r.year || ''}</td><td>${r.remarks || '-'}</td><td><button class="btn btn-outline btn-sm" onclick="editActivityRecord('${r.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td></tr>`;
 }).join('');
 }
 function downloadActivityRecordsExcel() {
@@ -1681,9 +1784,11 @@ const exportData = filtered.map(r => ({
 'Employee Name': r.employeeName,
 'Employee ID': r.employeeId,
 'Activity': r.activityName,
+'Custom': r.isCustom ? 'Yes' : 'No',
 'Points': r.points,
 'Month/Year': `${r.monthName || ''} ${r.year || ''}`,
 'Never Expires': r.neverExpires ? 'Yes' : 'No',
+'Expiry Date': r.expiryDate ? new Date(r.expiryDate).toLocaleDateString() : (r.neverExpires ? 'Never' : '31 Dec'),
 'Given By (Star)': r.starGivenBy || '-',
 'Remarks': r.remarks || '-'
 }));
@@ -1741,6 +1846,8 @@ monthName: monthNames[month - 1],
 year: year,
 remarks: remarks,
 neverExpires: neverExpires,
+isCustom: record.isCustom || false,
+expiryDate: record.expiryDate || null,
 updatedAt: Date.now()
 };
 db.ref('loyalty/employeeActivities/' + recordId).update(updatedRecord).then(() => {
@@ -1793,8 +1900,10 @@ myActivities.forEach(a => { const key = `${a.monthName || ''} ${a.year || ''}`; 
 document.getElementById('activity-history-stats').innerHTML = Object.entries(monthStats).map(([month,stats]) => `<div style="background:linear-gradient(135deg,var(--brand),var(--brand-light));color:#fff;padding:16px;border-radius:var(--radius-md);text-align:center;box-shadow:var(--shadow);"><div style="font-size:1.6rem;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;">${stats.points} pts</div><div style="font-size:0.875rem;opacity:0.95;margin-top:2px;">${month}</div><div style="font-size:0.75rem;opacity:0.85;margin-top:2px;">${stats.count} activities</div></div>`).join('') || '<p style="color:var(--text-muted);">No activity history yet</p>';
 document.getElementById('activity-history-list').innerHTML = myActivities.length === 0 ? '<p style="text-align:center;padding:30px;color:var(--text-muted);">No activities attended yet.</p>' : myActivities.map(a => {
 const neverExpireTag = a.neverExpires ? '<span style="color:var(--success);font-weight:700;font-size:0.75rem;"> ∞ Never Expires</span>' : '';
+const expiryTag = (!a.neverExpires && a.expiryDate) ? `<span style="color:var(--warning);font-weight:700;font-size:0.75rem;"> Expires: ${new Date(a.expiryDate).toLocaleDateString()}</span>` : '';
+const customTag = a.isCustom ? '<span style="color:var(--gold-dark);font-weight:700;font-size:0.75rem;"> 🎯 Custom</span>' : '';
 const starTag = a.starGivenBy ? `<small>⭐ Given by: ${a.starGivenBy}</small>` : '';
-return `<div class="transaction-item earn"><div class="transaction-info"><strong>🎯 ${a.activityName}${neverExpireTag}</strong><small>📅 ${a.activityDate ? new Date(a.activityDate).toLocaleDateString() : 'N/A'} • 📆 ${a.monthName || ''} ${a.year || ''}</small>${starTag}${a.remarks ? `<small>📝 ${a.remarks}</small>` : ''}</div><div class="transaction-points earn">+${a.points} pts</div></div>`;
+return `<div class="transaction-item earn"><div class="transaction-info"><strong>🎯 ${a.activityName}${customTag}${neverExpireTag}${expiryTag}</strong><small>📅 ${a.activityDate ? new Date(a.activityDate).toLocaleDateString() : 'N/A'} • 📆 ${a.monthName || ''} ${a.year || ''}</small>${starTag}${a.remarks ? `<small>📝 ${a.remarks}</small>` : ''}</div><div class="transaction-points earn">+${a.points} pts</div></div>`;
 }).join('');
 }
 function renderEmployeeTransactions() {
@@ -2107,7 +2216,8 @@ showAlert(`Voucher cancelled! ${voucher.points} points refunded.`, 'success');
 function deleteVoucher(voucherId) {
 const voucher = vouchers.find(v => v.id === voucherId);
 if(!voucher) return showAlert('Voucher not found', 'error');
-if(!confirm(`Permanently delete voucher ${voucher.serialNo}?\nNote: This will NOT refund points. Use 'Cancel' if you want to refund points to the employee.`)) return;
+if(!confirm(`Permanently delete voucher ${voucher.serialNo}?
+Note: This will NOT refund points. Use 'Cancel' if you want to refund points to the employee.`)) return;
 db.ref('loyalty/vouchers/' + voucherId).remove().then(() => showAlert('Voucher deleted permanently', 'success'));
 }
 function viewVoucher(voucherId) { const voucher = vouchers.find(v => v.id === voucherId); if(!voucher) return showAlert('Voucher not found', 'error'); currentVoucher = {...voucher, hotelName: branding.hotelName || 'Host Loyalty Program', hotelLogo: branding.logo || ''}; showVoucher(currentVoucher); }
@@ -2175,19 +2285,18 @@ document.getElementById('report-activities').innerHTML = earned.length === 0 ? '
 document.getElementById('report-services').innerHTML = (spent.length + cancelled.length) === 0 ? '<p style="color:var(--text-muted);">No services this month</p>' : [...spent.map(t => `<div class="item-row" style="padding:12px 16px;"><div class="item-info"><strong>${t.employeeName}</strong><small>${t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--danger-dark);">-${t.points}</div></div>`), ...cancelled.map(t => `<div class="item-row" style="padding:12px 16px;background:var(--warning-light);"><div class="item-info"><strong>${t.employeeName} ${t.type === 'reverse' ? '(Points Reversed)' : '(Cancelled)'}</strong><small>${t.activityName || t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--gold-dark);">${t.type === 'reverse' ? '-' : '+'}${Math.abs(t.points)} ${t.type === 'reverse' ? '(Reversed)' : '(refunded)'}</div></div>`)].join('');
 document.getElementById('report-employees-tbody').innerHTML = employees.map(e => { const empEarned = earned.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0); const empSpent = spent.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0); return `<tr><td><strong>${e.name}</strong></td><td>${e.department || '-'}</td><td style="color:var(--success-dark);">+${empEarned}</td><td style="color:var(--danger-dark);">-${empSpent}</td><td><strong style="color:var(--gold-dark);">${e.points || 0}</strong></td></tr>`; }).join('');
 }
-function downloadReport() { 
-let csv = 'Employee,Department,Points Earned,Points Spent,Current Balance\n'; 
-employees.forEach(e => { 
-csv += `"${e.name}","${e.department || ''}",${e.totalEarned || 0},${e.totalSpent || 0},${e.points || 0}\n`; 
-}); 
-const blob = new Blob([csv], {type: 'text/csv'}); 
-const a = document.createElement('a'); 
-a.href = URL.createObjectURL(blob); 
-a.download = `loyalty-report-${new Date().toISOString().slice(0, 10)}.csv`; 
-a.click(); 
+function downloadReport() {
+let csv = 'Employee,Department,Points Earned,Points Spent,Current Balance\n';
+employees.forEach(e => {
+csv += `"${e.name}","${e.department || ''}",${e.totalEarned || 0},${e.totalSpent || 0},${e.points || 0}\n`;
+});
+const blob = new Blob([csv], {type: 'text/csv'});
+const a = document.createElement('a');
+a.href = URL.createObjectURL(blob);
+a.download = `loyalty-report-${new Date().toISOString().slice(0, 10)}.csv`;
+a.click();
 }
 function showAlert(msg, type) { const el = document.getElementById('alert-' + type); el.innerText = msg; el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 3500); }
-
 // ============ ACTIVITY WISE BULK POINTS ============
 function switchPointsTab(tab, btn) {
 document.querySelectorAll('.points-sub-tab-content').forEach(el => el.style.display = 'none');
@@ -2331,7 +2440,6 @@ bulkSelectedEmployees = [];
 renderBulkSelectedEmployees();
 });
 }
-
 document.addEventListener('click', function(e) {
 if(window.innerWidth <= 768 && !e.target.closest('.navbar') && !e.target.closest('.nav-btn')) {
 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('show-mobile'));
