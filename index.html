@@ -33,8 +33,7 @@ html{scroll-behavior:smooth;}
 body{
 font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
 background:var(--bg);color:var(--text);min-height:100vh;
-transition:background 0.4s ease;
-font-size:15px;line-height:1.5;
+transition:background 0.4s ease;font-size:15px;line-height:1.5;
 -webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;
 }
 body.has-bg{background-size:cover;background-attachment:fixed;background-position:center;}
@@ -483,14 +482,6 @@ animation:fadeIn 0.4s;box-shadow:var(--shadow-sm);
 }
 .star-of-day-section.visible{display:block;}
 .star-of-day-section h3{color:#92400e;margin:0 0 14px;font-size:1.05rem;}
-.custom-activity-section{
-display:none;border:2px solid var(--brand);border-radius:var(--radius-md);
-padding:20px;margin-bottom:18px;
-background:linear-gradient(135deg,var(--brand-50) 0%,#f0fdfa 100%);
-animation:fadeIn 0.4s;box-shadow:var(--shadow-sm);
-}
-.custom-activity-section.visible{display:block;}
-.custom-activity-section h3{color:var(--brand-dark);margin:0 0 14px;font-size:1.05rem;}
 .page-header{
 display:flex;justify-content:space-between;align-items:center;
 margin-bottom:20px;flex-wrap:wrap;gap:12px;
@@ -514,7 +505,7 @@ body{font-size:14px;}
 .nav-btn{display:none;font-size:0.85rem;padding:9px 14px;}
 .nav-btn.show-mobile{display:inline-flex;}
 .nav-btn.active{display:inline-flex;}
-#nav-login,#nav-admin-btn,#nav-hamburger{display:inline-flex !important;}
+#nav-login,#nav-admin-btn{display:inline-flex !important;}
 .user-info{margin-left:0;width:100%;justify-content:center;padding:8px 0 0 0;border-top:1px solid var(--border);margin-top:8px;}
 .container{margin:20px auto;padding:0 16px;}
 .card{padding:20px;border-radius:var(--radius-md);margin-bottom:20px;}
@@ -752,7 +743,7 @@ th,td{padding:10px 12px;}
 <h2>⏰ Points Expiry Notice Customization</h2>
 <p style="color:var(--text-muted);margin-bottom:18px;">Customize the points expiry notice displayed to employees on the Points page.</p>
 <div class="form-group"><label>Expiry Notice Title</label><input type="text" id="brand-expiry-title" placeholder="e.g. Points Expiry Notice"></div>
-<div class="form-group"><label>Expiry Notice Text</label><textarea id="brand-expiry-text" rows="8" placeholder="Enter custom expiry notice text..."></textarea>
+<div class="form-group"><label>Expiry Notice Text</label><textarea id="brand-expiry-text" rows="8" placeholder="Enter custom expiry notice text...&#10;&#10;You can describe which activities never expire and the expiry date for all other activities."></textarea>
 <small style="color:var(--text-muted);display:block;margin-top:6px;">Leave blank to use the default expiry notice. Use line breaks for readability.</small>
 </div>
 <button class="btn btn-primary btn-full" onclick="saveExpiryBranding()">💾 Save Expiry Notice</button>
@@ -761,6 +752,11 @@ th,td{padding:10px 12px;}
 <div id="tab-employee-points" class="tab-content">
 <div class="card">
 <h2>⭐ Employee Activity Points Management</h2>
+<div style="display:flex;gap:12px;margin-bottom:24px;border-bottom:2px solid var(--border);padding-bottom:0;">
+<button class="points-sub-tab active" onclick="switchPointsTab('employee-wise', this)" style="padding:12px 24px;background:transparent;border:none;border-bottom:3px solid var(--brand);cursor:pointer;font-weight:600;font-size:0.95rem;color:var(--brand);transition:all 0.3s;">Add Points – Employee Wise</button>
+<button class="points-sub-tab" onclick="switchPointsTab('activity-wise', this)" style="padding:12px 24px;background:transparent;border:none;border-bottom:3px solid transparent;cursor:pointer;font-weight:600;font-size:0.95rem;color:var(--text-muted);transition:all 0.3s;">Add Points – Activity Wise</button>
+</div>
+<div id="points-tab-employee-wise" class="points-sub-tab-content">
 <div style="background:#f8fafc;padding:24px;border-radius:var(--radius-md);margin-bottom:28px;border:1px solid var(--border);">
 <h3 style="margin-bottom:16px;">➕ Manual Entry - Award Points</h3>
 <div class="social-media-notice" id="social-media-notice">
@@ -778,15 +774,7 @@ th,td{padding:10px 12px;}
 </div>
 <div class="form-group autocomplete-container"><label>Employee Name *</label><input type="text" id="manual-emp-name" placeholder="Start typing employee name..." oninput="showEmployeeNameSuggestions(this.value)"><div class="autocomplete-list" id="emp-name-suggestions"></div></div>
 <div class="form-group autocomplete-container"><label>Employee ID *</label><input type="text" id="manual-emp-id" placeholder="Start typing employee ID..." oninput="showEmployeeIdSuggestions(this.value)"><div class="autocomplete-list" id="emp-id-suggestions"></div></div>
-<div class="form-group autocomplete-container"><label>Activity Name *</label><input type="text" id="manual-activity-name" placeholder="Start typing activity name (or 'Custom')..." oninput="showActivitySuggestions(this.value); updateManualPoints();"><div class="autocomplete-list" id="activity-suggestions"></div></div>
-<div class="custom-activity-section" id="custom-activity-section">
-<h3>✨ Custom Activity Details</h3>
-<div class="form-group"><label>Custom Activity Name *</label><input type="text" id="custom-activity-name" placeholder="e.g., Exceptional Guest Recovery"></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-<div class="form-group"><label>Custom Points *</label><input type="number" id="custom-activity-points" placeholder="Enter points" min="1" oninput="updateManualPoints()"></div>
-<div class="form-group"><label>Expiry Date *</label><input type="date" id="custom-activity-expiry"></div>
-</div>
-</div>
+<div class="form-group autocomplete-container"><label>Activity Name *</label><input type="text" id="manual-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestions(this.value); updateManualPoints();"><div class="autocomplete-list" id="activity-suggestions"></div></div>
 <div class="star-of-day-section" id="star-of-day-section">
 <h3>⭐ Star of the Day Details</h3>
 <div class="form-group">
@@ -814,6 +802,34 @@ th,td{padding:10px 12px;}
 <div class="form-group"><label>Total Points to Award *</label><input type="number" id="manual-points" placeholder="Auto-calculated" min="0" readonly style="background:var(--brand-50);font-weight:700;color:var(--brand-dark);"></div>
 <div class="form-group"><label>Remarks (Optional)</label><textarea id="manual-remarks" placeholder="Any additional notes..."></textarea></div>
 <button class="btn btn-success" onclick="addManualActivity()">➕ Add Activity & Award Points</button>
+</div>
+</div>
+<div id="points-tab-activity-wise" class="points-sub-tab-content" style="display:none;">
+<div style="background:#f8fafc;padding:24px;border-radius:var(--radius-md);margin-bottom:28px;border:1px solid var(--border);">
+<h3 style="margin-bottom:16px;">➕ Activity Wise Bulk Entry</h3>
+<p style="color:var(--text-muted);margin-bottom:16px;font-size:0.9rem;">Select a date and activity, then search and add employees one by one. All selected employees will receive the activity points in a single bulk save.</p>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+<div class="form-group"><label>Activity Date *</label><input type="date" id="bulk-activity-date"></div>
+<div class="form-group autocomplete-container">
+<label>Activity Name *</label>
+<input type="text" id="bulk-activity-name" placeholder="Start typing activity name..." oninput="showActivitySuggestionsBulk(this.value)">
+<div class="autocomplete-list" id="bulk-activity-suggestions"></div>
+</div>
+</div>
+<div class="form-group autocomplete-container">
+<label>Search Employee to Add</label>
+<input type="text" id="bulk-emp-search" placeholder="Type employee name or ID..." oninput="showEmployeeSuggestionsBulk(this.value)">
+<div class="autocomplete-list" id="bulk-emp-suggestions"></div>
+</div>
+<div id="selected-employees-list" style="margin-top:16px;padding:16px;background:#fff;border-radius:var(--radius);border:1px solid var(--border);">
+<h4 style="margin-bottom:10px;font-size:0.95rem;color:var(--text-muted);">Selected Employees (<span id="selected-emp-count">0</span>):</h4>
+<div id="selected-employees-container" style="display:flex;flex-wrap:wrap;gap:8px;">
+<small style="color:var(--text-muted);">No employees selected yet.</small>
+</div>
+</div>
+<div class="form-group" style="margin-top:16px;"><label>Remarks (Optional)</label><textarea id="bulk-activity-remarks" placeholder="Any additional notes for this bulk entry..."></textarea></div>
+<button class="btn btn-success" onclick="saveBulkActivityPoints()">➕ Save All Entries</button>
+</div>
 </div>
 <div style="background:#f8fafc;padding:24px;border-radius:var(--radius-md);margin-bottom:28px;border:1px solid var(--border);">
 <h3 style="margin-bottom:16px;">📤 Bulk Upload via Excel</h3>
@@ -1159,9 +1175,6 @@ document.getElementById('star-given-by').value = '';
 function isStarOfTheDay(activityName) {
 return activityName.toLowerCase().includes('star of the day');
 }
-function isCustomActivity(activityName) {
-return activityName.toLowerCase() === 'custom';
-}
 function loadData() {
 db.ref('loyalty/employees').on('value', snap => {
 const data = snap.val();
@@ -1213,13 +1226,13 @@ function handleBgUpload(e) { const file = e.target.files[0]; if(!file) return; c
 function applyBranding() {
 if(branding.hotelName) document.getElementById('app-hotel-name').innerText = branding.hotelName;
 if(branding.tagline) document.getElementById('app-tagline').innerText = branding.tagline;
-if(branding.logo) document.getElementById('app-logo').innerHTML = '<img src="' + branding.logo + '">';
+if(branding.logo) document.getElementById('app-logo').innerHTML = `<img src="${branding.logo}">`;
 if(branding.color) document.documentElement.style.setProperty('--brand', branding.color);
-if(branding.background) { document.body.style.backgroundImage = 'url(' + branding.background + ')'; document.body.classList.add('has-bg'); }
+if(branding.background) { document.body.style.backgroundImage = `url(${branding.background})`; document.body.classList.add('has-bg'); }
 const expiryTitle = document.getElementById('expiry-notice-title');
 const expiryText = document.getElementById('expiry-notice-text');
 if (expiryTitle) expiryTitle.innerText = branding.expiryTitle || 'Points Expiry Notice';
-if (expiryText) expiryText.innerText = branding.expiryText || expiryText.innerText;
+if (expiryText) expiryText.innerText = branding.expiryText || 'The points awarded for the following activities will never expire and will be carried forward: Host of the Month, Leader of the Quarter, Host of the Year, Leader of the Year, One Year Anniversary, Two Years Anniversary, Three Years Anniversary, Four Years Anniversary, Five Years Anniversary, Sustainability Hero – Nominee, Sustainability Hero – Winner, Group Winner (SS Brand), Bio Blitz Winner, Bio Blitz Runner-up. All other activities: Points awarded for any activity not listed above will expire on 31 December.';
 const bExpiryTitle = document.getElementById('brand-expiry-title');
 const bExpiryText = document.getElementById('brand-expiry-text');
 if (bExpiryTitle && !bExpiryTitle.dataset.loaded) { bExpiryTitle.value = branding.expiryTitle || ''; bExpiryTitle.dataset.loaded = '1'; }
@@ -1280,7 +1293,7 @@ const isAdminMode = isAdmin;
 if(isAdminMode) {
 ['nav-dashboard','nav-branding','nav-employee-points','nav-admin-activities','nav-admin-services','nav-employees','nav-vouchers','nav-approvals','nav-reports'].forEach(id => { document.getElementById(id).classList.remove('hidden'); });
 document.getElementById('nav-login').classList.remove('hidden');
-document.getElementById('nav-login').innerText = ' Employee Login';
+document.getElementById('nav-login').innerText = '👤 Employee Login';
 } else if(isLoggedIn) {
 ['nav-points','nav-history','nav-activities','nav-services','nav-available','nav-my-requests','nav-transactions'].forEach(id => { document.getElementById(id).classList.remove('hidden'); });
 document.getElementById('user-info').classList.remove('hidden');
@@ -1325,7 +1338,7 @@ return;
 }
 container.innerHTML = matches.map(e => {
 const statusBadge = e.accountStatus === 'Account Created' ? '<span style="color:var(--danger);font-size:0.75rem;"> (Account Already Created)</span>' : '';
-return '<div class="autocomplete-item" onclick="selectSignupEmployee(\'' + e.id + '\')"><strong>' + e.name + '</strong>' + statusBadge + '<small>ID: ' + e.employeeId + ' • ' + (e.department || 'N/A') + '</small></div>';
+return `<div class="autocomplete-item" onclick="selectSignupEmployee('${e.id}')"><strong>${e.name}</strong>${statusBadge}<small>ID: ${e.employeeId} • ${e.department || 'N/A'}</small></div>`;
 }).join('');
 container.classList.add('active');
 }
@@ -1433,7 +1446,7 @@ const container = document.getElementById('emp-name-suggestions');
 if(!query || query.length < 2) { container.classList.remove('active'); return; }
 const matches = employees.filter(e => e.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
 if(matches.length === 0) { container.classList.remove('active'); return; }
-container.innerHTML = matches.map(e => '<div class="autocomplete-item" onclick="selectEmployeeByName(\'' + e.id + '\')"><strong>' + e.name + '</strong><small>ID: ' + e.employeeId + ' • ' + (e.department || 'N/A') + '</small></div>').join('');
+container.innerHTML = matches.map(e => `<div class="autocomplete-item" onclick="selectEmployeeByName('${e.id}')"><strong>${e.name}</strong><small>ID: ${e.employeeId} • ${e.department || 'N/A'}</small></div>`).join('');
 container.classList.add('active');
 }
 function showEmployeeIdSuggestions(query) {
@@ -1441,22 +1454,16 @@ const container = document.getElementById('emp-id-suggestions');
 if(!query || query.length < 2) { container.classList.remove('active'); return; }
 const matches = employees.filter(e => e.employeeId.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
 if(matches.length === 0) { container.classList.remove('active'); return; }
-container.innerHTML = matches.map(e => '<div class="autocomplete-item" onclick="selectEmployeeById(\'' + e.id + '\')"><strong>' + e.employeeId + '</strong><small>' + e.name + ' • ' + (e.department || 'N/A') + '</small></div>').join('');
+container.innerHTML = matches.map(e => `<div class="autocomplete-item" onclick="selectEmployeeById('${e.id}')"><strong>${e.employeeId}</strong><small>${e.name} • ${e.department || 'N/A'}</small></div>`).join('');
 container.classList.add('active');
 }
 function showActivitySuggestions(query) {
 const container = document.getElementById('activity-suggestions');
 if(!query || query.length < 2) { container.classList.remove('active'); return; }
 const matches = activities.filter(a => a.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
-let html = '<div class="autocomplete-item" onclick="selectCustomActivityOption()"><strong>✨ Custom Activity</strong><small>Enter custom name, points & expiry</small></div>';
-html += matches.map(a => '<div class="autocomplete-item" onclick="selectActivity(\'' + a.id + '\')"><strong>' + a.name + '</strong><small>' + a.points + ' points • ' + (a.category || 'General') + '</small></div>').join('');
-container.innerHTML = html;
+if(matches.length === 0) { container.classList.remove('active'); return; }
+container.innerHTML = matches.map(a => `<div class="autocomplete-item" onclick="selectActivity('${a.id}')"><strong>${a.name}</strong><small>${a.points} points • ${a.category || 'General'}</small></div>`).join('');
 container.classList.add('active');
-}
-function selectCustomActivityOption() {
-document.getElementById('manual-activity-name').value = 'Custom';
-document.getElementById('activity-suggestions').classList.remove('active');
-updateManualPoints();
 }
 function selectEmployeeByName(empId) { const emp = employees.find(e => e.id === empId); if(!emp) return; document.getElementById('manual-emp-name').value = emp.name; document.getElementById('manual-emp-id').value = emp.employeeId; document.getElementById('emp-name-suggestions').classList.remove('active'); }
 function selectEmployeeById(empId) { const emp = employees.find(e => e.id === empId); if(!emp) return; document.getElementById('manual-emp-id').value = emp.employeeId; document.getElementById('manual-emp-name').value = emp.name; document.getElementById('emp-id-suggestions').classList.remove('active'); }
@@ -1474,18 +1481,7 @@ const qty = parseInt(document.getElementById('manual-quantity').value) || 1;
 const notice = document.getElementById('social-media-notice');
 const calculation = document.getElementById('social-media-calculation');
 const starSection = document.getElementById('star-of-day-section');
-const customSection = document.getElementById('custom-activity-section');
 const isSocialMedia = actName.toLowerCase().includes('social media') || actName.toLowerCase().includes('mention');
-if (isCustomActivity(actName)) {
-customSection.classList.add('visible');
-starSection.classList.remove('visible');
-notice.classList.remove('visible');
-const customPts = parseInt(document.getElementById('custom-activity-points').value) || 0;
-document.getElementById('manual-points').value = customPts > 0 ? customPts * qty : '';
-return;
-} else {
-customSection.classList.remove('visible');
-}
 if (isStarOfTheDay(actName)) {
 starSection.classList.add('visible');
 } else {
@@ -1496,7 +1492,7 @@ notice.classList.add('visible');
 const basePoints = 5;
 const totalPoints = basePoints * qty;
 document.getElementById('manual-points').value = totalPoints;
-calculation.innerText = qty + ' mention' + (qty > 1 ? 's' : '') + ' × 5 points = ' + totalPoints + ' points';
+calculation.innerText = `${qty} mention${qty > 1 ? 's' : ''} × 5 points = ${totalPoints} points`;
 } else {
 notice.classList.remove('visible');
 const activity = activities.find(a => a.name.toLowerCase() === actName.toLowerCase());
@@ -1511,20 +1507,9 @@ function addManualActivity() {
 const activityDate = document.getElementById('manual-activity-date').value;
 const empName = document.getElementById('manual-emp-name').value.trim();
 const empId = document.getElementById('manual-emp-id').value.trim();
-let activityName = document.getElementById('manual-activity-name').value.trim();
-let points = parseInt(document.getElementById('manual-points').value);
+const activityName = document.getElementById('manual-activity-name').value.trim();
+const points = parseInt(document.getElementById('manual-points').value);
 const remarks = document.getElementById('manual-remarks').value.trim();
-let customExpiry = null;
-if (isCustomActivity(activityName)) {
-const customName = document.getElementById('custom-activity-name').value.trim();
-customExpiry = document.getElementById('custom-activity-expiry').value;
-const customPts = parseInt(document.getElementById('custom-activity-points').value) || 0;
-if (!customName) return showAlert('Please enter a Custom Activity Name.', 'error');
-if (!customExpiry) return showAlert('Please select an Expiry Date for the Custom Activity.', 'error');
-if (!customPts || customPts <= 0) return showAlert('Please enter valid Custom Points.', 'error');
-activityName = customName;
-points = customPts * (parseInt(document.getElementById('manual-quantity').value) || 1);
-}
 if(!activityDate || !empName || !empId || !activityName || !points) return showAlert('Please fill all required fields', 'error');
 const isStar = isStarOfTheDay(activityName);
 let starGivenBy = '';
@@ -1538,20 +1523,35 @@ const dateObj = new Date(activityDate);
 const month = dateObj.getMonth() + 1;
 const year = dateObj.getFullYear();
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero','group winner','bio blitz'];
-const neverExpires = customExpiry ? false : NEVER_EXPIRE_ACTIVITIES.some(a => activityName.toLowerCase().includes(a));
-const activityRecord = { employeeId: empId, employeeName: empName, employeeDept: emp.department || '', activityName: activityName, points: points, activityDate: activityDate, month: month, monthName: monthNames[month - 1], year: year, remarks: remarks, addedBy: 'admin', createdAt: Date.now(), neverExpires: neverExpires };
-if (customExpiry) activityRecord.expiryDate = customExpiry;
+const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero – nominee','sustainability hero – winner','group winner (ss brand)','bio blitz winner','bio blitz runner-up'];
+const neverExpires = NEVER_EXPIRE_ACTIVITIES.some(a => activityName.toLowerCase().includes(a));
+const activityRecord = {
+employeeId: empId,
+employeeName: empName,
+employeeDept: emp.department || '',
+activityName: activityName,
+points: points,
+activityDate: activityDate,
+month: month,
+monthName: monthNames[month - 1],
+year: year,
+remarks: remarks,
+addedBy: 'admin',
+createdAt: Date.now(),
+neverExpires: neverExpires
+};
 if (isStar) {
 activityRecord.starGivenBy = starGivenBy;
-if (tempStarPhoto) activityRecord.starPhoto = tempStarPhoto;
+if (tempStarPhoto) {
+activityRecord.starPhoto = tempStarPhoto;
+}
 }
 db.ref('loyalty/employeeActivities').push(activityRecord).then(() => {
 const newPoints = (emp.points || 0) + points;
 const newTotalEarned = (emp.totalEarned || 0) + points;
 db.ref('loyalty/employees/' + emp.id).update({ points: newPoints, totalEarned: newTotalEarned });
 db.ref('loyalty/transactions').push({ employeeId: empId, employeeName: empName, type: 'earn', activityName: activityName, points: points, runningBalance: newPoints, addedBy: 'admin', timestamp: Date.now() });
-showAlert('Successfully awarded ' + points + ' points to ' + empName + '!', 'success');
+showAlert(`Successfully awarded ${points} points to ${empName}!`, 'success');
 document.getElementById('manual-activity-date').value = '';
 document.getElementById('manual-emp-name').value = '';
 document.getElementById('manual-emp-id').value = '';
@@ -1559,12 +1559,8 @@ document.getElementById('manual-activity-name').value = '';
 document.getElementById('manual-points').value = '';
 document.getElementById('manual-quantity').value = '1';
 document.getElementById('manual-remarks').value = '';
-document.getElementById('custom-activity-name').value = '';
-document.getElementById('custom-activity-points').value = '';
-document.getElementById('custom-activity-expiry').value = '';
 document.getElementById('social-media-notice').classList.remove('visible');
 document.getElementById('star-of-day-section').classList.remove('visible');
-document.getElementById('custom-activity-section').classList.remove('visible');
 resetStarPhotoManager();
 }).catch(err => showAlert('Error: ' + err.message, 'error'));
 }
@@ -1612,7 +1608,7 @@ if(errors.length > 0) { results.push({row: index + 2, status: 'error', errors: e
 else {
 const dateObj = new Date(activityDate); const month = dateObj.getMonth() + 1; const year = dateObj.getFullYear();
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero','group winner','bio blitz'];
+const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero – nominee','sustainability hero – winner','group winner (ss brand)','bio blitz winner','bio blitz runner-up'];
 const neverExpires = NEVER_EXPIRE_ACTIVITIES.some(a => String(activityName).toLowerCase().includes(a));
 const activityRecord = { employeeId: String(empId), employeeName: String(empName), employeeDept: emp.department || '', activityName: String(activityName), points: points, activityDate: String(activityDate), month: month, monthName: monthNames[month - 1], year: year, remarks: String(remarks), addedBy: 'admin-bulk', createdAt: Date.now(), neverExpires: neverExpires };
 db.ref('loyalty/employeeActivities').push(activityRecord);
@@ -1622,9 +1618,9 @@ db.ref('loyalty/transactions').push({ employeeId: String(empId), employeeName: S
 results.push({row: index + 2, status: 'success', data: row}); successCount++;
 }
 });
-const resultsHtml = '<div style="padding:15px;background:#f8fafc;border-radius:8px;margin-top:15px;border:1px solid var(--border);"><h4 style="margin-bottom:10px;">Upload Results:</h4><p style="color:var(--success);">✅ Successfully processed: ' + successCount + ' records</p><p style="color:var(--danger);">❌ Errors: ' + errorCount + ' records</p>' + (errorCount > 0 ? '<p style="color:var(--warning);margin-top:10px;">Please correct the errors and re-upload.</p>' : '') + '</div>';
+const resultsHtml = `<div style="padding:15px;background:#f8fafc;border-radius:8px;margin-top:15px;border:1px solid var(--border);"><h4 style="margin-bottom:10px;">Upload Results:</h4><p style="color:var(--success);">✅ Successfully processed: ${successCount} records</p><p style="color:var(--danger);">❌ Errors: ${errorCount} records</p>${errorCount > 0 ? '<p style="color:var(--warning);margin-top:10px;">Please correct the errors and re-upload.</p>' : ''}</div>`;
 document.getElementById('bulk-upload-results').innerHTML = resultsHtml;
-showAlert('Bulk upload complete! ' + successCount + ' successful, ' + errorCount + ' errors.', errorCount > 0 ? 'warning' : 'success');
+showAlert(`Bulk upload complete! ${successCount} successful, ${errorCount} errors.`, errorCount > 0 ? 'warning' : 'success');
 } catch(err) { showAlert('Error reading file: ' + err.message, 'error'); }
 };
 reader.readAsArrayBuffer(file); e.target.value = '';
@@ -1683,8 +1679,7 @@ filtered.sort((a,b) => b.createdAt - a.createdAt);
 tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No activity records found</td></tr>' : filtered.map(r => {
 const starBadge = isStarOfTheDay(r.activityName) ? ' ⭐' : '';
 const neverExpireBadge = r.neverExpires ? '<span style="color:var(--success);font-size:0.7rem;font-weight:700;"> ∞ No Expiry</span>' : '';
-const customExpireBadge = (!r.neverExpires && r.expiryDate) ? '<span style="color:var(--danger-dark);font-size:0.7rem;font-weight:700;"> Exp: ' + new Date(r.expiryDate).toLocaleDateString() + '</span>' : '';
-return '<tr><td>' + (r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A') + '</td><td><strong>' + r.employeeName + '</strong><br><small>' + r.employeeId + '</small></td><td>' + r.activityName + starBadge + neverExpireBadge + customExpireBadge + (r.starGivenBy ? '<br><small style="color:var(--gold-dark);">Given by: ' + r.starGivenBy + '</small>' : '') + '</td><td style="color:var(--success-dark);font-weight:700;">+' + r.points + '</td><td>' + (r.monthName || '') + ' ' + (r.year || '') + '</td><td>' + (r.remarks || '-') + '</td><td><button class="btn btn-outline btn-sm" onclick="editActivityRecord(\'' + r.id + '\')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord(\'' + r.id + '\')">🗑️</button></td></tr>';
+return `<tr><td>${r.activityDate ? new Date(r.activityDate).toLocaleDateString() : 'N/A'}</td><td><strong>${r.employeeName}</strong><br><small>${r.employeeId}</small></td><td>${r.activityName}${starBadge}${neverExpireBadge}${r.starGivenBy ? '<br><small style="color:var(--gold-dark);">Given by: ' + r.starGivenBy + '</small>' : ''}</td><td style="color:var(--success-dark);font-weight:700;">+${r.points}</td><td>${r.monthName || ''} ${r.year || ''}</td><td>${r.remarks || '-'}</td><td><button class="btn btn-outline btn-sm" onclick="editActivityRecord('${r.id}')">✏️</button><button class="btn btn-danger btn-sm" onclick="deleteActivityRecord('${r.id}')">🗑️</button></td></tr>`;
 }).join('');
 }
 function downloadActivityRecordsExcel() {
@@ -1704,16 +1699,15 @@ const exportData = filtered.map(r => ({
 'Employee ID': r.employeeId,
 'Activity': r.activityName,
 'Points': r.points,
-'Month/Year': (r.monthName || '') + ' ' + (r.year || ''),
+'Month/Year': `${r.monthName || ''} ${r.year || ''}`,
 'Never Expires': r.neverExpires ? 'Yes' : 'No',
-'Expiry Date': r.expiryDate ? new Date(r.expiryDate).toLocaleDateString() : '-',
 'Given By (Star)': r.starGivenBy || '-',
 'Remarks': r.remarks || '-'
 }));
 const ws = XLSX.utils.json_to_sheet(exportData);
 const wb = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(wb, ws, "Activity Records");
-const fileName = 'Activity-Records-' + (monthFilter !== '' ? monthFilter : 'All') + '-' + (yearFilter !== '' ? yearFilter : 'All') + '.xlsx';
+const fileName = `Activity-Records-${monthFilter !== '' ? monthFilter : 'All'}-${yearFilter !== '' ? yearFilter : 'All'}.xlsx`;
 XLSX.writeFile(wb, fileName);
 showAlert('Activity records downloaded successfully!', 'success');
 }
@@ -1750,7 +1744,7 @@ const dateObj = new Date(activityDate);
 const month = dateObj.getMonth() + 1;
 const year = dateObj.getFullYear();
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero','group winner','bio blitz'];
+const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero – nominee','sustainability hero – winner','group winner (ss brand)','bio blitz winner','bio blitz runner-up'];
 const neverExpires = NEVER_EXPIRE_ACTIVITIES.some(a => activityName.toLowerCase().includes(a));
 const updatedRecord = {
 employeeId: empId,
@@ -1799,7 +1793,7 @@ const newTotalEarned = Math.max(0, (emp.totalEarned || 0) - record.points);
 db.ref('loyalty/employees/' + emp.id).update({ points: newPoints, totalEarned: newTotalEarned }).then(() => {
 db.ref('loyalty/transactions').push({ employeeId: record.employeeId, employeeName: record.employeeName, type: 'reverse', activityName: record.activityName + ' (Reversed)', points: -record.points, runningBalance: newPoints, addedBy: 'admin', timestamp: Date.now() }).then(() => {
 db.ref('loyalty/employeeActivities/' + recordId).remove().then(() => {
-showAlert('Activity deleted! ' + record.points + ' points reversed from ' + record.employeeName + '.', 'success');
+showAlert(`Activity deleted! ${record.points} points reversed from ${record.employeeName}.`, 'success');
 });
 });
 }).catch(err => { showAlert('Error: ' + err.message, 'error'); });
@@ -1812,13 +1806,12 @@ if(monthFilter) myActivities = myActivities.filter(a => a.month === parseInt(mon
 if(yearFilter) myActivities = myActivities.filter(a => a.year === parseInt(yearFilter));
 myActivities.sort((a,b) => b.createdAt - a.createdAt);
 const monthStats = {};
-myActivities.forEach(a => { const key = (a.monthName || '') + ' ' + (a.year || ''); if(!monthStats[key]) monthStats[key] = {count:0, points:0}; monthStats[key].count++; monthStats[key].points += a.points; });
-document.getElementById('activity-history-stats').innerHTML = Object.entries(monthStats).map(([month,stats]) => '<div style="background:linear-gradient(135deg,var(--brand),var(--brand-light));color:#fff;padding:16px;border-radius:var(--radius-md);text-align:center;box-shadow:var(--shadow);"><div style="font-size:1.6rem;font-weight:800;font-family:\'Plus Jakarta Sans\',sans-serif;">' + stats.points + ' pts</div><div style="font-size:0.875rem;opacity:0.95;margin-top:2px;">' + month + '</div><div style="font-size:0.75rem;opacity:0.85;margin-top:2px;">' + stats.count + ' activities</div></div>').join('') || '<p style="color:var(--text-muted);">No activity history yet</p>';
+myActivities.forEach(a => { const key = `${a.monthName || ''} ${a.year || ''}`; if(!monthStats[key]) monthStats[key] = {count:0, points:0}; monthStats[key].count++; monthStats[key].points += a.points; });
+document.getElementById('activity-history-stats').innerHTML = Object.entries(monthStats).map(([month,stats]) => `<div style="background:linear-gradient(135deg,var(--brand),var(--brand-light));color:#fff;padding:16px;border-radius:var(--radius-md);text-align:center;box-shadow:var(--shadow);"><div style="font-size:1.6rem;font-weight:800;font-family:'Plus Jakarta Sans',sans-serif;">${stats.points} pts</div><div style="font-size:0.875rem;opacity:0.95;margin-top:2px;">${month}</div><div style="font-size:0.75rem;opacity:0.85;margin-top:2px;">${stats.count} activities</div></div>`).join('') || '<p style="color:var(--text-muted);">No activity history yet</p>';
 document.getElementById('activity-history-list').innerHTML = myActivities.length === 0 ? '<p style="text-align:center;padding:30px;color:var(--text-muted);">No activities attended yet.</p>' : myActivities.map(a => {
 const neverExpireTag = a.neverExpires ? '<span style="color:var(--success);font-weight:700;font-size:0.75rem;"> ∞ Never Expires</span>' : '';
-const customExpireTag = (!a.neverExpires && a.expiryDate) ? '<span style="color:var(--danger-dark);font-weight:700;font-size:0.75rem;"> • Expires: ' + new Date(a.expiryDate).toLocaleDateString() + '</span>' : '';
-const starTag = a.starGivenBy ? '<small>⭐ Given by: ' + a.starGivenBy + '</small>' : '';
-return '<div class="transaction-item earn"><div class="transaction-info"><strong>🎯 ' + a.activityName + neverExpireTag + customExpireTag + '</strong><small>📅 ' + (a.activityDate ? new Date(a.activityDate).toLocaleDateString() : 'N/A') + ' • 📆 ' + (a.monthName || '') + ' ' + (a.year || '') + '</small>' + starTag + (a.remarks ? '<small>📝 ' + a.remarks + '</small>' : '') + '</div><div class="transaction-points earn">+' + a.points + ' pts</div></div>';
+const starTag = a.starGivenBy ? `<small>⭐ Given by: ${a.starGivenBy}</small>` : '';
+return `<div class="transaction-item earn"><div class="transaction-info"><strong>🎯 ${a.activityName}${neverExpireTag}</strong><small>📅 ${a.activityDate ? new Date(a.activityDate).toLocaleDateString() : 'N/A'} • 📆 ${a.monthName || ''} ${a.year || ''}</small>${starTag}${a.remarks ? `<small>📝 ${a.remarks}</small>` : ''}</div><div class="transaction-points earn">+${a.points} pts</div></div>`;
 }).join('');
 }
 function renderEmployeeTransactions() {
@@ -1829,41 +1822,41 @@ if(monthFilter) myTrans = myTrans.filter(t => { const d = new Date(t.timestamp);
 if(yearFilter) myTrans = myTrans.filter(t => { const d = new Date(t.timestamp); return d.getFullYear() === parseInt(yearFilter); });
 myTrans.sort((a,b) => b.timestamp - a.timestamp);
 const tbody = document.getElementById('employee-transactions-tbody');
-tbody.innerHTML = myTrans.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:#94a3b8;">No transactions yet</td></tr>' : myTrans.map(t => { const typeIcon = t.type === 'earn' ? '📈' : t.type === 'spend' ? '📉' : t.type === 'reverse' ? '↩️' : '↩️'; const typeClass = t.type === 'earn' ? 'earn' : t.type === 'spend' ? 'spend' : t.type === 'reverse' ? 'cancel' : 'cancel'; const pointsDisplay = t.type === 'earn' ? '+' + t.points : t.type === 'spend' ? '-' + t.points : t.type === 'reverse' ? '-' + Math.abs(t.points) + ' (Reversed)' : '+' + t.points + ' (refunded)'; return '<tr><td>' + new Date(t.timestamp).toLocaleDateString() + '</td><td><span class="transaction-points ' + typeClass + '">' + typeIcon + ' ' + t.type.toUpperCase() + '</span></td><td><strong>' + (t.activityName || t.serviceName || 'N/A') + '</strong><br><small>' + (t.addedBy ? 'By: ' + t.addedBy : '') + '</small></td><td class="transaction-points ' + typeClass + '">' + pointsDisplay + '</td><td><strong>' + (t.runningBalance || 0) + '</strong></td></tr>'; }).join('');
+tbody.innerHTML = myTrans.length === 0 ? '<tr><td colspan="5" style="text-align:center;color:#94a3b8;">No transactions yet</td></tr>' : myTrans.map(t => { const typeIcon = t.type === 'earn' ? '📈' : t.type === 'spend' ? '📉' : t.type === 'reverse' ? '↩️' : '↩️'; const typeClass = t.type === 'earn' ? 'earn' : t.type === 'spend' ? 'spend' : t.type === 'reverse' ? 'cancel' : 'cancel'; const pointsDisplay = t.type === 'earn' ? `+${t.points}` : t.type === 'spend' ? `-${t.points}` : t.type === 'reverse' ? `-${Math.abs(t.points)} (Reversed)` : `+${t.points} (refunded)`; return `<tr><td>${new Date(t.timestamp).toLocaleDateString()}</td><td><span class="transaction-points ${typeClass}">${typeIcon} ${t.type.toUpperCase()}</span></td><td><strong>${t.activityName || t.serviceName || 'N/A'}</strong><br><small>${t.addedBy ? 'By: ' + t.addedBy : ''}</small></td><td class="transaction-points ${typeClass}">${pointsDisplay}</td><td><strong>${t.runningBalance || 0}</strong></td></tr>`}).join('');
 }
 function renderEmployeeActivities() {
 const container = document.getElementById('employee-activities-list'); if(!container) return;
 if(activities.length === 0) { container.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);">No activities available yet.</p>'; return; }
-const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero','group winner','bio blitz'];
+const NEVER_EXPIRE_ACTIVITIES = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero – nominee','sustainability hero – winner','group winner (ss brand)','bio blitz winner','bio blitz runner-up'];
 container.innerHTML = activities.map(a => {
 let expiryTag = '';
 if (a.expiryType === 'never' || NEVER_EXPIRE_ACTIVITIES.some(ne => a.name.toLowerCase().includes(ne))) {
 expiryTag = '<span style="display:inline-block;margin-top:6px;padding:3px 8px;background:var(--success-light);color:#065f46;border-radius:8px;font-size:0.7rem;font-weight:700;">∞ Points Never Expire</span>';
 } else if (a.expiryType === 'date' && a.expiryDate) {
-expiryTag = '<span style="display:inline-block;margin-top:6px;padding:3px 8px;background:var(--danger-light);color:#92400e;border-radius:8px;font-size:0.7rem;font-weight:700;">Expires: ' + new Date(a.expiryDate).toLocaleDateString() + '</span>';
+expiryTag = `<span style="display:inline-block;margin-top:6px;padding:3px 8px;background:var(--danger-light);color:#92400e;border-radius:8px;font-size:0.7rem;font-weight:700;">Expires: ${new Date(a.expiryDate).toLocaleDateString()}</span>`;
 } else {
 expiryTag = '<span style="display:inline-block;margin-top:6px;padding:3px 8px;background:var(--warning-light);color:#92400e;border-radius:8px;font-size:0.7rem;font-weight:700;">Expires 31 Dec</span>';
 }
-return '<div class="activity-card"><div class="activity-header"><div class="activity-name">' + a.name + '</div><div class="activity-points">+' + a.points + ' pts</div></div>' + (a.category ? '<div class="activity-category">' + a.category + '</div>' : '') + (a.description ? '<div class="activity-desc">' + a.description + '</div>' : '') + expiryTag + '</div>';
+return `<div class="activity-card"><div class="activity-header"><div class="activity-name">${a.name}</div><div class="activity-points">+${a.points} pts</div></div>${a.category ? `<div class="activity-category">${a.category}</div>` : ''}${a.description ? `<div class="activity-desc">${a.description}</div>` : ''}${expiryTag}</div>`;
 }).join('');
 }
 function renderAllServices() {
 if(!currentUser) return;
 const balance = currentUser.points || 0;
-document.getElementById('all-services-list').innerHTML = services.length === 0 ? '<p style="text-align:center;padding:40px;color:var(--text-muted);grid-column:1/-1;">No services available yet</p>' : services.map(s => { const canAfford = balance >= s.points; return '<div class="service-card ' + (canAfford ? 'affordable' : '') + '" onclick="' + (canAfford ? "openRedeem('" + s.id + "')" : '') + '" style="' + (canAfford ? '' : 'opacity:0.6;') + '"><div class="service-img">' + (s.image ? '<img src="' + s.image + '">' : '🎁') + '</div><div class="service-body"><span class="category">' + (s.category || 'General') + '</span><h3>' + s.name + '</h3><div class="points">-' + s.points + ' pts</div><p class="desc">' + (s.description || 'No description') + '</p>' + (canAfford ? '<button class="btn btn-warning btn-full">🎁 Redeem Now</button>' : '<button class="btn btn-outline btn-full" disabled>🔒 Need ' + (s.points - balance) + ' more pts</button>') + '</div></div>'; }).join('');
+document.getElementById('all-services-list').innerHTML = services.length === 0 ? '<p style="text-align:center;padding:40px;color:var(--text-muted);grid-column:1/-1;">No services available yet</p>' : services.map(s => { const canAfford = balance >= s.points; return `<div class="service-card ${canAfford ? 'affordable' : ''}" onclick="${canAfford ? `openRedeem('${s.id}')` : ''}" style="${canAfford ? '' : 'opacity:0.6;'}"><div class="service-img">${s.image ? `<img src="${s.image}">` : '🎁'}</div><div class="service-body"><span class="category">${s.category || 'General'}</span><h3>${s.name}</h3><div class="points">-${s.points} pts</div><p class="desc">${s.description || 'No description'}</p>${canAfford ? '<button class="btn btn-warning btn-full">🎁 Redeem Now</button>' : '<button class="btn btn-outline btn-full" disabled>🔒 Need ' + (s.points - balance) + ' more pts</button>'}</div></div>`; }).join('');
 }
 function renderAvailableServices() {
 if(!currentUser) return;
 const balance = currentUser.points || 0;
 const available = services.filter(s => balance >= s.points);
-document.getElementById('available-services-list').innerHTML = available.length === 0 ? '<p style="text-align:center;padding:40px;color:var(--text-muted);grid-column:1/-1;">You don\'t have enough points for any service yet.</p>' : available.map(s => '<div class="service-card affordable" onclick="openRedeem(\'' + s.id + '\')"><div class="service-img">' + (s.image ? '<img src="' + s.image + '">' : '🎁') + '</div><div class="service-body"><span class="category">' + (s.category || 'General') + '</span><h3>' + s.name + '</h3><div class="points">-' + s.points + ' pts</div><p class="desc">' + (s.description || 'No description') + '</p><button class="btn btn-warning btn-full">🎁 Redeem Now</button></div></div>').join('');
+document.getElementById('available-services-list').innerHTML = available.length === 0 ? '<p style="text-align:center;padding:40px;color:var(--text-muted);grid-column:1/-1;">You don\'t have enough points for any service yet.</p>' : available.map(s => `<div class="service-card affordable" onclick="openRedeem('${s.id}')"><div class="service-img">${s.image ? `<img src="${s.image}">` : '🎁'}</div><div class="service-body"><span class="category">${s.category || 'General'}</span><h3>${s.name}</h3><div class="points">-${s.points} pts</div><p class="desc">${s.description || 'No description'}</p><button class="btn btn-warning btn-full">🎁 Redeem Now</button></div></div>`).join('');
 }
 function openRedeem(serviceId) {
 const service = services.find(s => s.id === serviceId); if(!service) return;
 if((currentUser.points || 0) < service.points) return showAlert('Not enough points', 'error');
 pendingRedeem = service;
 const expiryDate = new Date(); expiryDate.setMonth(expiryDate.getMonth() + 1);
-document.getElementById('redeem-details').innerHTML = '<div style="padding:20px;background:#f8fafc;border-radius:12px;border:1px solid var(--border);"><h3 style="color:var(--brand);margin-bottom:10px;">' + service.name + '</h3><p style="color:var(--text-muted);margin-bottom:15px;">' + (service.description || '') + '</p><div style="display:flex;justify-content:space-between;padding:12px;background:#fff;border-radius:8px;margin-bottom:10px;border:1px solid var(--border);"><span>Points Required:</span><strong style="color:var(--danger);">-' + service.points + ' pts</strong></div><div style="display:flex;justify-content:space-between;padding:12px;background:#fff;border-radius:8px;margin-bottom:10px;border:1px solid var(--border);"><span>Your Balance After:</span><strong style="color:var(--success);">' + (currentUser.points - service.points) + ' pts</strong></div><div style="display:flex;justify-content:space-between;padding:12px;background:#fff;border-radius:8px;border:1px solid var(--border);"><span>Voucher Valid Until:</span><strong>' + expiryDate.toLocaleDateString() + '</strong></div></div>';
+document.getElementById('redeem-details').innerHTML = `<div style="padding:20px;background:#f8fafc;border-radius:12px;border:1px solid var(--border);"><h3 style="color:var(--brand);margin-bottom:10px;">${service.name}</h3><p style="color:var(--text-muted);margin-bottom:15px;">${service.description || ''}</p><div style="display:flex;justify-content:space-between;padding:12px;background:#fff;border-radius:8px;margin-bottom:10px;border:1px solid var(--border);"><span>Points Required:</span><strong style="color:var(--danger);">-${service.points} pts</strong></div><div style="display:flex;justify-content:space-between;padding:12px;background:#fff;border-radius:8px;margin-bottom:10px;border:1px solid var(--border);"><span>Your Balance After:</span><strong style="color:var(--success);">${currentUser.points - service.points} pts</strong></div><div style="display:flex;justify-content:space-between;padding:12px;background:#fff;border-radius:8px;border:1px solid var(--border);"><span>Voucher Valid Until:</span><strong>${expiryDate.toLocaleDateString()}</strong></div></div>`;
 document.getElementById('redeem-modal').classList.add('active');
 }
 function confirmRedeem() {
@@ -1877,7 +1870,7 @@ if(!currentUser) return;
 const myRequests = rewardRequests.filter(r => r.employeeId === currentUser.employeeId).sort((a,b) => b.requestedAt - a.requestedAt);
 const container = document.getElementById('my-requests-list');
 if(myRequests.length === 0) { container.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);">No reward requests yet.</p>'; return; }
-container.innerHTML = myRequests.map(r => { const statusClass = 'status-' + r.status; const canDownload = r.status === 'approved' || r.status === 'generated'; const canCancel = r.status === 'pending'; return '<div class="item-row" style="padding:18px 20px;"><div class="item-info"><strong>' + r.serviceName + '</strong><small>' + new Date(r.requestedAt).toLocaleDateString() + ' • ' + r.points + ' points</small><small style="color:' + (r.status === 'approved' ? 'var(--success)' : r.status === 'rejected' ? 'var(--danger)' : 'var(--warning)') + ';">Status: ' + r.status.toUpperCase() + '</small>' + (r.rejectedReason ? '<small style="color:var(--danger);">Reason: ' + r.rejectedReason + '</small>' : '') + '</div><div class="item-actions">' + (canDownload ? '<button class="btn btn-primary btn-sm" onclick="viewApprovedVoucher(\'' + r.id + '\')">🎟️ View Voucher</button>' : '') + (canCancel ? '<button class="btn btn-danger btn-sm" onclick="cancelRequest(\'' + r.id + '\')">❌ Cancel</button>' : '') + '</div></div>'; }).join('');
+container.innerHTML = myRequests.map(r => { const statusClass = `status-${r.status}`; const canDownload = r.status === 'approved' || r.status === 'generated'; const canCancel = r.status === 'pending'; return `<div class="item-row" style="padding:18px 20px;"><div class="item-info"><strong>${r.serviceName}</strong><small>${new Date(r.requestedAt).toLocaleDateString()} • ${r.points} points</small><small style="color:${r.status === 'approved' ? 'var(--success)' : r.status === 'rejected' ? 'var(--danger)' : 'var(--warning)'};">Status: ${r.status.toUpperCase()}</small>${r.rejectedReason ? `<small style="color:var(--danger);">Reason: ${r.rejectedReason}</small>` : ''}</div><div class="item-actions">${canDownload ? `<button class="btn btn-primary btn-sm" onclick="viewApprovedVoucher('${r.id}')">🎟️ View Voucher</button>` : ''}${canCancel ? `<button class="btn btn-danger btn-sm" onclick="cancelRequest('${r.id}')">❌ Cancel</button>` : ''}</div></div>`}).join('');
 }
 function cancelRequest(requestId) { if(!confirm('Cancel this reward request?')) return; db.ref('loyalty/rewardRequests/' + requestId).update({status: 'cancelled', cancelledAt: Date.now()}).then(() => { showAlert('Request cancelled', 'success'); }); }
 function viewApprovedVoucher(requestId) {
@@ -1925,9 +1918,9 @@ let expiryTag = '';
 if (a.expiryType === 'never') {
 expiryTag = '<span style="display:inline-block;padding:2px 8px;background:var(--success-light);color:#065f46;border-radius:8px;font-size:0.7rem;font-weight:700;margin-left:6px;">∞ Never Expires</span>';
 } else if (a.expiryType === 'date' && a.expiryDate) {
-expiryTag = '<span style="display:inline-block;padding:2px 8px;background:var(--danger-light);color:#991b1b;border-radius:8px;font-size:0.7rem;font-weight:700;margin-left:6px;">Expires: ' + new Date(a.expiryDate).toLocaleDateString() + '</span>';
+expiryTag = `<span style="display:inline-block;padding:2px 8px;background:var(--danger-light);color:#991b1b;border-radius:8px;font-size:0.7rem;font-weight:700;margin-left:6px;">Expires: ${new Date(a.expiryDate).toLocaleDateString()}</span>`;
 }
-return '<div class="item-row"><div class="item-info"><strong>' + a.name + expiryTag + '</strong><small>' + (a.category || 'General') + ' • ' + a.points + ' points</small>' + (a.description ? '<small>' + a.description + '</small>' : '') + '</div><div class="item-points">+' + a.points + '</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editActivity(\'' + a.id + '\')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteActivity(\'' + a.id + '\')">🗑️ Delete</button></div></div>';
+return `<div class="item-row"><div class="item-info"><strong>${a.name}${expiryTag}</strong><small>${a.category || 'General'} • ${a.points} points</small>${a.description ? `<small>${a.description}</small>` : ''}</div><div class="item-points">+${a.points}</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editActivity('${a.id}')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteActivity('${a.id}')">🗑️ Delete</button></div></div>`;
 }).join('');
 }
 function showAddActivityModal() {
@@ -1943,7 +1936,21 @@ document.getElementById('activity-expiry-date').value = '';
 document.getElementById('activity-expiry-date-group').style.display = 'none';
 document.getElementById('activity-modal').classList.add('active');
 }
-function editActivity(activityId) { const activity = activities.find(a => a.id === activityId); if(!activity) return showAlert('Activity not found', 'error'); document.getElementById('activity-modal-title').innerText = 'Edit Activity'; document.getElementById('activity-edit-id').value = activityId; document.getElementById('activity-name').value = activity.name || ''; document.getElementById('activity-category').value = activity.category || ''; document.getElementById('activity-points').value = activity.points || 0; document.getElementById('activity-desc').value = activity.description || ''; document.getElementById('activity-image').value = activity.image || ''; document.getElementById('activity-expiry-type').value = activity.expiryType || 'never'; document.getElementById('activity-expiry-date').value = activity.expiryDate || ''; document.getElementById('activity-expiry-date-group').style.display = activity.expiryType === 'date' ? 'block' : 'none'; document.getElementById('activity-modal').classList.add('active'); }
+function editActivity(activityId) {
+const activity = activities.find(a => a.id === activityId);
+if(!activity) return showAlert('Activity not found', 'error');
+document.getElementById('activity-modal-title').innerText = 'Edit Activity';
+document.getElementById('activity-edit-id').value = activityId;
+document.getElementById('activity-name').value = activity.name || '';
+document.getElementById('activity-category').value = activity.category || '';
+document.getElementById('activity-points').value = activity.points || 0;
+document.getElementById('activity-desc').value = activity.description || '';
+document.getElementById('activity-image').value = activity.image || '';
+document.getElementById('activity-expiry-type').value = activity.expiryType || 'never';
+document.getElementById('activity-expiry-date').value = activity.expiryDate || '';
+document.getElementById('activity-expiry-date-group').style.display = activity.expiryType === 'date' ? 'block' : 'none';
+document.getElementById('activity-modal').classList.add('active');
+}
 function toggleExpiryDate() {
 const expiryType = document.getElementById('activity-expiry-type').value;
 document.getElementById('activity-expiry-date-group').style.display = expiryType === 'date' ? 'block' : 'none';
@@ -1964,8 +1971,18 @@ updatedAt: Date.now()
 };
 if(!activity.name || !activity.points) return showAlert('Please fill required fields', 'error');
 if(expiryType === 'date' && !expiryDate) return showAlert('Please select an expiry date', 'error');
-if(editId) { db.ref('loyalty/activities/' + editId).update(activity).then(() => { showAlert('Activity updated!', 'success'); closeModal('activity-modal'); }); }
-else { activity.createdAt = Date.now(); db.ref('loyalty/activities').push(activity).then(() => { showAlert('Activity added!', 'success'); closeModal('activity-modal'); }); }
+if(editId) {
+db.ref('loyalty/activities/' + editId).update(activity).then(() => {
+showAlert('Activity updated!', 'success');
+closeModal('activity-modal');
+});
+} else {
+activity.createdAt = Date.now();
+db.ref('loyalty/activities').push(activity).then(() => {
+showAlert('Activity added!', 'success');
+closeModal('activity-modal');
+});
+}
 }
 function deleteActivity(activityId) { if(!confirm('Delete this activity?')) return; db.ref('loyalty/activities/' + activityId).remove().then(() => showAlert('Activity deleted', 'success')); }
 function downloadActivityTemplate() { const ws = XLSX.utils.aoa_to_sheet([['Name', 'Category', 'Points', 'Description', 'ImageURL'], ['Team Building', 'Team Event', '100', 'Annual event', '']]); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, 'Activities'); XLSX.writeFile(wb, 'activities-template.xlsx'); }
@@ -1976,12 +1993,12 @@ reader.onload = function(e) {
 const data = new Uint8Array(e.target.result); const workbook = XLSX.read(data, {type: 'array'}); const firstSheet = workbook.Sheets[workbook.SheetNames[0]]; const jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
 let count = 0;
 jsonData.slice(1).forEach(row => { if(row[0] && row[2]) { db.ref('loyalty/activities').push({name: row[0], category: row[1] || '', points: parseInt(row[2]) || 0, description: row[3] || '', image: row[4] || '', expiryType: 'never', expiryDate: null, createdAt: Date.now()}); count++; } });
-showAlert(count + ' activities uploaded!', 'success'); input.value = '';
+showAlert(`${count} activities uploaded!`, 'success'); input.value = '';
 };
 reader.readAsArrayBuffer(file);
 }
 function renderServices() {
-document.getElementById('services-list').innerHTML = services.length === 0 ? '<p style="color:var(--text-muted);text-align:center;padding:20px;">No services yet</p>' : services.map(s => '<div class="item-row"><div class="item-info"><strong>' + s.name + '</strong><small>' + (s.category || 'General') + ' • ' + s.points + ' points</small>' + (s.description ? '<small>' + s.description + '</small>' : '') + '</div>' + (s.image ? '<img src="' + s.image + '" style="width:56px;height:56px;object-fit:cover;border-radius:10px;flex-shrink:0;">' : '') + '<div class="item-points">-' + s.points + '</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editService(\'' + s.id + '\')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteService(\'' + s.id + '\')">🗑️ Delete</button></div></div>').join('');
+document.getElementById('services-list').innerHTML = services.length === 0 ? '<p style="color:var(--text-muted);text-align:center;padding:20px;">No services yet</p>' : services.map(s => `<div class="item-row"><div class="item-info"><strong>${s.name}</strong><small>${s.category || 'General'} • ${s.points} points</small>${s.description ? `<small>${s.description}</small>` : ''}</div>${s.image ? `<img src="${s.image}" style="width:56px;height:56px;object-fit:cover;border-radius:10px;flex-shrink:0;">` : ''}<div class="item-points">-${s.points}</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editService('${s.id}')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteService('${s.id}')">🗑️ Delete</button></div></div>`).join('');
 }
 function showAddServiceModal() {
 document.getElementById('service-modal-title').innerText = 'Add Service';
@@ -2024,7 +2041,7 @@ reader.onload = function(e) {
 const data = new Uint8Array(e.target.result); const workbook = XLSX.read(data, {type: 'array'}); const firstSheet = workbook.Sheets[workbook.SheetNames[0]]; const jsonData = XLSX.utils.sheet_to_json(firstSheet, {header: 1});
 let count = 0;
 jsonData.slice(1).forEach(row => { if(row[0] && row[2]) { db.ref('loyalty/services').push({name: row[0], category: row[1] || '', points: parseInt(row[2]) || 0, description: row[3] || '', image: row[4] || '', createdAt: Date.now()}); count++; } });
-showAlert(count + ' services uploaded!', 'success'); input.value = '';
+showAlert(`${count} services uploaded!`, 'success'); input.value = '';
 };
 reader.readAsArrayBuffer(file);
 }
@@ -2044,7 +2061,7 @@ document.getElementById('employees-list').innerHTML = filtered.length === 0 ? '<
 const status = e.accountStatus === 'Account Created' ? 'Account Created' : 'Pending';
 const badgeClass = status === 'Account Created' ? 'status-account-created' : 'status-pending-account';
 const icon = status === 'Account Created' ? '✅' : '⏳';
-return '<div class="item-row"><div class="item-info"><strong>' + e.name + '</strong><small>' + e.employeeId + ' • ' + (e.department || 'N/A') + '</small><div style="margin-top: 8px;"><span class="' + badgeClass + '">' + icon + ' ' + status + '</span>' + (e.lastLogin ? '<small style="margin-left:10px; color:var(--text-muted);">Last Login: ' + new Date(e.lastLogin).toLocaleDateString() + '</small>' : '') + '</div></div><div class="item-points">' + (e.points || 0) + ' pts</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editEmployee(\'' + e.id + '\')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteEmployee(\'' + e.id + '\')">🗑️ Delete</button></div></div>';
+return `<div class="item-row"><div class="item-info"><strong>${e.name}</strong><small>${e.employeeId} • ${e.department || 'N/A'}</small><div style="margin-top: 8px;"><span class="${badgeClass}">${icon} ${status}</span>${e.lastLogin ? `<small style="margin-left:10px; color:var(--text-muted);">Last Login: ${new Date(e.lastLogin).toLocaleDateString()}</small>` : ''}</div></div><div class="item-points">${e.points || 0} pts</div><div class="item-actions"><button class="btn btn-outline btn-sm" onclick="editEmployee('${e.id}')">✏️ Edit</button><button class="btn btn-danger btn-sm" onclick="deleteEmployee('${e.id}')">🗑️ Delete</button></div></div>`;
 }).join('');
 }
 function showAddEmployeeModal() { document.getElementById('employee-modal-title').innerText = 'Add Employee Manually'; document.getElementById('employee-edit-id').value = ''; document.getElementById('employee-empid').value = ''; document.getElementById('employee-name').value = ''; document.getElementById('employee-dept').value = ''; document.getElementById('employee-points').value = '0'; document.getElementById('employee-modal').classList.add('active'); }
@@ -2084,7 +2101,7 @@ accountStatus: 'Pending'
 count++;
 }
 });
-showAlert(count + ' employees uploaded!', 'success'); input.value = '';
+showAlert(`${count} employees uploaded!`, 'success'); input.value = '';
 };
 reader.readAsArrayBuffer(file);
 }
@@ -2092,7 +2109,9 @@ function renderVouchers() {
 const tbody = document.getElementById('vouchers-tbody'); if(!tbody) return;
 const monthFilter = document.getElementById('voucher-month-filter')?.value;
 const yearFilter = document.getElementById('voucher-year-filter')?.value;
+
 let filtered = [...vouchers];
+
 if(monthFilter !== '' && monthFilter !== undefined) {
 filtered = filtered.filter(v => {
 const d = new Date(v.issueDate);
@@ -2105,13 +2124,18 @@ const d = new Date(v.issueDate);
 return d.getFullYear() === parseInt(yearFilter);
 });
 }
+
 filtered.sort((a,b) => b.issueDate - a.issueDate);
-tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No vouchers found</td></tr>' : filtered.map(v => '<tr><td><strong>' + v.serialNo + '</strong></td><td>' + v.employeeName + '<br><small>' + (v.employeeDept || '-') + '</small></td><td>' + v.serviceName + '<br><small>' + (v.serviceCategory || 'General') + '</small></td><td>' + v.points + '</td><td>' + new Date(v.issueDate).toLocaleDateString() + '</td><td>' + new Date(v.expiryDate).toLocaleDateString() + '</td><td><button class="btn btn-outline btn-sm" onclick="viewVoucher(\'' + v.id + '\')">👁️ View</button>' + (v.status !== 'used' && v.status !== 'cancelled' ? '<button class="btn btn-warning btn-sm" onclick="cancelVoucher(\'' + v.id + '\')">❌ Cancel</button>' : '') + (v.status !== 'used' ? '<button class="btn btn-danger btn-sm" onclick="deleteVoucher(\'' + v.id + '\')">🗑️ Delete</button>' : '-') + '</td></tr>').join('');
+
+tbody.innerHTML = filtered.length === 0 ? '<tr><td colspan="7" style="text-align:center;color:#94a3b8;">No vouchers found</td></tr>' : filtered.map(v => `<tr><td><strong>${v.serialNo}</strong></td><td>${v.employeeName}<br><small>${v.employeeDept || '-'}</small></td><td>${v.serviceName}<br><small>${v.serviceCategory || 'General'}</small></td><td>${v.points}</td><td>${new Date(v.issueDate).toLocaleDateString()}</td><td>${new Date(v.expiryDate).toLocaleDateString()}</td><td><button class="btn btn-outline btn-sm" onclick="viewVoucher('${v.id}')">👁️ View</button>${v.status !== 'used' && v.status !== 'cancelled' ? `<button class="btn btn-warning btn-sm" onclick="cancelVoucher('${v.id}')">❌ Cancel</button>` : ''}${v.status !== 'used' ? `<button class="btn btn-danger btn-sm" onclick="deleteVoucher('${v.id}')">🗑️ Delete</button>` : '-'}</td></tr>`).join('');
 }
+
 function downloadVouchersExcel() {
 const monthFilter = document.getElementById('voucher-month-filter')?.value;
 const yearFilter = document.getElementById('voucher-year-filter')?.value;
+
 let filtered = [...vouchers];
+
 if(monthFilter !== '' && monthFilter !== undefined) {
 filtered = filtered.filter(v => {
 const d = new Date(v.issueDate);
@@ -2124,11 +2148,14 @@ const d = new Date(v.issueDate);
 return d.getFullYear() === parseInt(yearFilter);
 });
 }
+
 filtered.sort((a,b) => b.issueDate - a.issueDate);
+
 if (filtered.length === 0) {
 showAlert('No voucher data matches the selected filters', 'warning');
 return;
 }
+
 const exportData = filtered.map(v => ({
 'Serial No': v.serialNo,
 'Employee Name': v.employeeName,
@@ -2140,19 +2167,23 @@ const exportData = filtered.map(v => ({
 'Expiry Date': new Date(v.expiryDate).toLocaleDateString(),
 'Status': v.status || 'generated'
 }));
+
 const ws = XLSX.utils.json_to_sheet(exportData);
 const wb = XLSX.utils.book_new();
 XLSX.utils.book_append_sheet(wb, ws, "Vouchers");
+
 const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 const monthStr = monthFilter !== '' && monthFilter !== undefined ? monthNames[parseInt(monthFilter)] : 'All';
 const yearStr = yearFilter !== '' && yearFilter !== undefined ? yearFilter : 'All';
-const fileName = 'Vouchers-Report-' + monthStr + '-' + yearStr + '.xlsx';
+
+const fileName = `Vouchers-Report-${monthStr}-${yearStr}.xlsx`;
 XLSX.writeFile(wb, fileName);
 showAlert('Voucher report downloaded successfully!', 'success');
 }
+
 function cancelVoucher(voucherId) {
 const voucher = vouchers.find(v => v.id === voucherId); if(!voucher) return showAlert('Voucher not found', 'error');
-if(!confirm('Cancel voucher ' + voucher.serialNo + '? ' + voucher.points + ' points will be refunded.')) return;
+if(!confirm(`Cancel voucher ${voucher.serialNo}? ${voucher.points} points will be refunded.`)) return;
 db.ref('loyalty/vouchers/' + voucherId).update({status: 'cancelled', cancelledAt: Date.now()});
 const emp = employees.find(e => e.employeeId === voucher.employeeId);
 if(emp) {
@@ -2160,19 +2191,19 @@ const newPoints = (emp.points || 0) + voucher.points; const newTotalSpent = Math
 db.ref('loyalty/employees/' + emp.id).update({points: newPoints, totalSpent: newTotalSpent});
 db.ref('loyalty/transactions').push({ employeeId: voucher.employeeId, employeeName: voucher.employeeName, type: 'cancel', serviceName: voucher.serviceName + ' (Cancelled)', points: voucher.points, runningBalance: newPoints, addedBy: 'admin', timestamp: Date.now() });
 }
-showAlert('Voucher cancelled! ' + voucher.points + ' points refunded.', 'success');
+showAlert(`Voucher cancelled! ${voucher.points} points refunded.`, 'success');
 }
 function deleteVoucher(voucherId) {
 const voucher = vouchers.find(v => v.id === voucherId);
 if(!voucher) return showAlert('Voucher not found', 'error');
-if(!confirm('Permanently delete voucher ' + voucher.serialNo + '? Note: This will NOT refund points. Use Cancel if you want to refund points to the employee.')) return;
+if(!confirm(`Permanently delete voucher ${voucher.serialNo}?\nNote: This will NOT refund points. Use 'Cancel' if you want to refund points to the employee.`)) return;
 db.ref('loyalty/vouchers/' + voucherId).remove().then(() => showAlert('Voucher deleted permanently', 'success'));
 }
 function viewVoucher(voucherId) { const voucher = vouchers.find(v => v.id === voucherId); if(!voucher) return showAlert('Voucher not found', 'error'); currentVoucher = {...voucher, hotelName: branding.hotelName || 'Host Loyalty Program', hotelLogo: branding.logo || ''}; showVoucher(currentVoucher); }
 function showVoucher(v) {
 const issueDate = new Date(v.issueDate).toLocaleDateString(); const expiryDate = new Date(v.expiryDate).toLocaleDateString();
 const emp = employees.find(e => e.employeeId === v.employeeId); const remainingPoints = emp ? (emp.points || 0) : 0;
-document.getElementById('voucher-content').innerHTML = '<div class="voucher-preview"><div class="voucher-serial">Serial: ' + v.serialNo + '</div><div class="voucher-header"><div class="voucher-logo">' + (v.hotelLogo ? '<img src="' + v.hotelLogo + '">' : '') + '</div><h2 style="color:#78350f;margin:10px 0 5px;">' + (v.hotelName || 'Host Loyalty Program') + '</h2><p style="color:#92400e;font-size:0.9rem;">Service Redemption Voucher</p></div><div class="voucher-details"><div class="voucher-detail"><label>Employee Name</label><br><strong>' + v.employeeName + '</strong></div><div class="voucher-detail"><label>Department</label><br><strong>' + (v.employeeDept || '-') + '</strong></div><div class="voucher-detail"><label>Service Availed</label><br><strong>' + v.serviceName + '</strong></div><div class="voucher-detail"><label>Category</label><br><strong>' + (v.serviceCategory || 'General') + '</strong></div><div class="voucher-detail"><label>Issue Date</label><br><strong>' + issueDate + '</strong></div><div class="voucher-detail"><label>Expiry Date</label><br><strong style="color:#dc2626;">' + expiryDate + '</strong></div><div class="voucher-detail"><label>Points Redeemed</label><br><strong>' + v.points + ' pts</strong></div><div class="voucher-detail"><label>Remaining Balance</label><br><strong style="color:var(--success);">' + remainingPoints + ' pts</strong></div></div><div class="voucher-signature"><div class="line"></div><div style="color:#78350f;font-size:0.9rem;">Director HR Signature</div></div></div><p style="text-align:center;color:var(--text-muted);font-size:0.85rem;">This voucher is valid for 1 month from issue date.</p>';
+document.getElementById('voucher-content').innerHTML = `<div class="voucher-preview"><div class="voucher-serial">Serial: ${v.serialNo}</div><div class="voucher-header"><div class="voucher-logo">${v.hotelLogo ? `<img src="${v.hotelLogo}">` : ''}</div><h2 style="color:#78350f;margin:10px 0 5px;">${v.hotelName || 'Host Loyalty Program'}</h2><p style="color:#92400e;font-size:0.9rem;">Service Redemption Voucher</p></div><div class="voucher-details"><div class="voucher-detail"><label>Employee Name</label><br><strong>${v.employeeName}</strong></div><div class="voucher-detail"><label>Department</label><br><strong>${v.employeeDept || '-'}</strong></div><div class="voucher-detail"><label>Service Availed</label><br><strong>${v.serviceName}</strong></div><div class="voucher-detail"><label>Category</label><br><strong>${v.serviceCategory || 'General'}</strong></div><div class="voucher-detail"><label>Issue Date</label><br><strong>${issueDate}</strong></div><div class="voucher-detail"><label>Expiry Date</label><br><strong style="color:#dc2626;">${expiryDate}</strong></div><div class="voucher-detail"><label>Points Redeemed</label><br><strong>${v.points} pts</strong></div><div class="voucher-detail"><label>Remaining Balance</label><br><strong style="color:var(--success);">${remainingPoints} pts</strong></div></div><div class="voucher-signature"><div class="line"></div><div style="color:#78350f;font-size:0.9rem;">Director HR Signature</div></div></div><p style="text-align:center;color:var(--text-muted);font-size:0.85rem;">This voucher is valid for 1 month from issue date.</p>`;
 document.getElementById('ticket-modal').classList.add('active');
 }
 function downloadVoucherPDF() {
@@ -2185,11 +2216,11 @@ doc.setTextColor(0, 0, 0); doc.setFontSize(10); doc.text('Serial No: ' + v.seria
 const details = [['Employee Name:', v.employeeName], ['Department:', v.employeeDept || '-'], ['Service Availed:', v.serviceName], ['Category:', v.serviceCategory || 'General'], ['Points Redeemed:', v.points + ' pts'], ['Remaining Balance:', remainingPoints + ' pts'], ['Issue Date:', issueDate], ['Expiry Date:', expiryDate]];
 details.forEach(([label, value]) => { doc.setFont(undefined, 'bold'); doc.setTextColor(15, 118, 110); doc.text(label, 20, y); doc.setFont(undefined, 'normal'); doc.setTextColor(0, 0, 0); doc.text(String(value), 80, y); y += 15; });
 doc.setDrawColor(0, 0, 0); doc.line(120, 240, 190, 240); doc.setFontSize(10); doc.text('Director HR Signature', 155, 248, {align: 'center'}); doc.setFontSize(9); doc.setTextColor(100, 100, 100); doc.text('This voucher is valid for 1 month from issue date.', 105, 270, {align: 'center'});
-doc.save('Voucher_' + v.serialNo + '.pdf'); showAlert('Voucher PDF downloaded!', 'success');
+doc.save(`Voucher_${v.serialNo}.pdf`); showAlert('Voucher PDF downloaded!', 'success');
 }
 function renderApprovals() {
 const pending = rewardRequests.filter(r => r.status === 'pending').sort((a,b) => a.requestedAt - b.requestedAt);
-document.getElementById('approvals-list').innerHTML = pending.length === 0 ? '<p style="text-align:center;padding:30px;color:var(--text-muted);">No pending approvals</p>' : pending.map(r => '<div class="item-row" style="padding:18px 20px;"><div class="item-info"><strong>' + r.employeeName + '</strong><small>' + r.employeeDept + ' • Requested: ' + new Date(r.requestedAt).toLocaleString() + '</small><small>Service: ' + r.serviceName + ' • ' + r.points + ' points</small></div><div class="item-actions"><button class="btn btn-success btn-sm" onclick="approveRequest(\'' + r.id + '\')">✅ Approve</button><button class="btn btn-danger btn-sm" onclick="rejectRequest(\'' + r.id + '\')">❌ Reject</button></div></div>').join('');
+document.getElementById('approvals-list').innerHTML = pending.length === 0 ? '<p style="text-align:center;padding:30px;color:var(--text-muted);">No pending approvals</p>' : pending.map(r => `<div class="item-row" style="padding:18px 20px;"><div class="item-info"><strong>${r.employeeName}</strong><small>${r.employeeDept} • Requested: ${new Date(r.requestedAt).toLocaleString()}</small><small>Service: ${r.serviceName} • ${r.points} points</small></div><div class="item-actions"><button class="btn btn-success btn-sm" onclick="approveRequest('${r.id}')">✅ Approve</button><button class="btn btn-danger btn-sm" onclick="rejectRequest('${r.id}')">❌ Reject</button></div></div>`).join('');
 }
 function approveRequest(requestId) {
 const request = rewardRequests.find(r => r.id === requestId); if(!request) return;
@@ -2199,20 +2230,20 @@ const voucherId = db.ref('loyalty/vouchers').push().key; db.ref('loyalty/voucher
 db.ref('loyalty/rewardRequests/' + requestId).update({status: 'approved', approvedAt: Date.now(), voucherId: voucherId});
 const emp = employees.find(e => e.employeeId === request.employeeId);
 if(emp) { const newPoints = Math.max(0, (emp.points || 0) - request.points); const newTotalSpent = (emp.totalSpent || 0) + request.points; db.ref('loyalty/employees/' + emp.id).update({points: newPoints, totalSpent: newTotalSpent}); db.ref('loyalty/transactions').push({ employeeId: request.employeeId, employeeName: request.employeeName, type: 'spend', serviceName: request.serviceName, points: request.points, runningBalance: newPoints, addedBy: 'admin-approval', timestamp: Date.now() }); }
-showAlert('Request approved! Voucher ' + serialNo + ' generated.', 'success');
+showAlert(`Request approved! Voucher ${serialNo} generated.`, 'success');
 }
 function rejectRequest(requestId) { const reason = prompt('Enter rejection reason:'); if(!reason) return; db.ref('loyalty/rewardRequests/' + requestId).update({status: 'rejected', rejectedAt: Date.now(), rejectedReason: reason}).then(() => { showAlert('Request rejected', 'success'); }); }
 function showApplyBehalfModal() {
-const empSelect = document.getElementById('behalf-employee-select'); empSelect.innerHTML = employees.sort((a,b) => a.name.localeCompare(b.name)).map(e => '<option value="' + e.id + '" data-points="' + (e.points || 0) + '">' + e.name + ' (' + e.employeeId + ') - ' + (e.points || 0) + ' pts</option>').join('');
-const serviceSelect = document.getElementById('behalf-service-select'); serviceSelect.innerHTML = services.sort((a,b) => a.name.localeCompare(b.name)).map(s => '<option value="' + s.id + '" data-points="' + s.points + '">' + s.name + ' - ' + s.points + ' pts</option>').join('');
+const empSelect = document.getElementById('behalf-employee-select'); empSelect.innerHTML = employees.sort((a,b) => a.name.localeCompare(b.name)).map(e => `<option value="${e.id}" data-points="${e.points || 0}">${e.name} (${e.employeeId}) - ${e.points || 0} pts</option>`).join('');
+const serviceSelect = document.getElementById('behalf-service-select'); serviceSelect.innerHTML = services.sort((a,b) => a.name.localeCompare(b.name)).map(s => `<option value="${s.id}" data-points="${s.points}">${s.name} - ${s.points} pts</option>`).join('');
 document.getElementById('behalf-service-details').style.display = 'none'; document.getElementById('apply-behalf-modal').classList.add('active');
-serviceSelect.onchange = function() { const selectedOption = this.options[this.selectedIndex]; document.getElementById('behalf-service-details').innerHTML = '<p><strong>Service:</strong> ' + selectedOption.text + '</p><p><strong>Points Required:</strong> ' + selectedOption.dataset.points + '</p>'; document.getElementById('behalf-service-details').style.display = 'block'; };
+serviceSelect.onchange = function() { const selectedOption = this.options[this.selectedIndex]; document.getElementById('behalf-service-details').innerHTML = `<p><strong>Service:</strong> ${selectedOption.text}</p><p><strong>Points Required:</strong> ${selectedOption.dataset.points}</p>`; document.getElementById('behalf-service-details').style.display = 'block'; };
 }
 function confirmApplyBehalf() {
 const empId = document.getElementById('behalf-employee-select').value; const serviceId = document.getElementById('behalf-service-select').value;
 const employee = employees.find(e => e.id === empId); const service = services.find(s => s.id === serviceId);
 if(!employee || !service) return showAlert('Invalid selection', 'error');
-if((employee.points || 0) < service.points) return showAlert(employee.name + ' has insufficient points', 'error');
+if((employee.points || 0) < service.points) return showAlert(`${employee.name} has insufficient points`, 'error');
 const request = { employeeId: employee.employeeId, employeeName: employee.name, employeeDept: employee.department, serviceId: service.id, serviceName: service.name, serviceCategory: service.category, points: service.points, status: 'approved', requestedAt: Date.now(), approvedAt: Date.now(), appliedBy: 'admin' };
 const requestId = db.ref('loyalty/rewardRequests').push().key; db.ref('loyalty/rewardRequests/' + requestId).set(request);
 const issueDate = Date.now(); const expiryDate = new Date(); expiryDate.setMonth(expiryDate.getMonth() + 1); const serialNo = 'VOU-' + Date.now().toString().slice(-8);
@@ -2221,32 +2252,163 @@ const voucherId = db.ref('loyalty/vouchers').push().key; db.ref('loyalty/voucher
 const newPoints = Math.max(0, (employee.points || 0) - service.points); const newTotalSpent = (employee.totalSpent || 0) + service.points;
 db.ref('loyalty/employees/' + employee.id).update({points: newPoints, totalSpent: newTotalSpent});
 db.ref('loyalty/transactions').push({ employeeId: employee.employeeId, employeeName: employee.name, type: 'spend', serviceName: service.name, points: service.points, runningBalance: newPoints, addedBy: 'admin-on-behalf', timestamp: Date.now() });
-showAlert('Voucher ' + serialNo + ' generated for ' + employee.name + '!', 'success'); closeModal('apply-behalf-modal');
+showAlert(`Voucher ${serialNo} generated for ${employee.name}!`, 'success'); closeModal('apply-behalf-modal');
 }
-function renderReports() { const monthTabs = document.getElementById('report-month-tabs'); const months = getUniqueMonths(transactions); monthTabs.innerHTML = months.map((m, i) => '<button class="month-tab ' + (i === 0 ? 'active' : '') + '" onclick="switchReportMonth(\'' + m + '\', this)">' + m + '</button>').join(''); if(months.length > 0) loadReportData(months[0]); }
+function renderReports() { const monthTabs = document.getElementById('report-month-tabs'); const months = getUniqueMonths(transactions); monthTabs.innerHTML = months.map((m, i) => `<button class="month-tab ${i === 0 ? 'active' : ''}" onclick="switchReportMonth('${m}', this)">${m}</button>`).join(''); if(months.length > 0) loadReportData(months[0]); }
 function getUniqueMonths(transactions) { const months = new Set(); transactions.forEach(t => { const d = new Date(t.timestamp); months.add(d.toLocaleString('default', {month: 'long', year: 'numeric'})); }); return Array.from(months).reverse(); }
 function switchReportMonth(month, btn) { document.querySelectorAll('#report-month-tabs .month-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active'); loadReportData(month); }
 function loadReportData(month) {
 const monthTrans = transactions.filter(t => { const d = new Date(t.timestamp); return d.toLocaleString('default', {month: 'long', year: 'numeric'}) === month; });
 const earned = monthTrans.filter(t => t.type === 'earn'); const spent = monthTrans.filter(t => t.type === 'spend'); const cancelled = monthTrans.filter(t => t.type === 'cancel' || t.type === 'reverse');
-document.getElementById('report-activities').innerHTML = earned.length === 0 ? '<p style="color:var(--text-muted);">No activities this month</p>' : earned.map(t => '<div class="item-row" style="padding:12px 16px;"><div class="item-info"><strong>' + t.employeeName + '</strong><small>' + t.activityName + ' • ' + new Date(t.timestamp).toLocaleDateString() + '</small></div><div class="item-points" style="color:var(--success-dark);">+' + t.points + '</div></div>').join('');
-document.getElementById('report-services').innerHTML = (spent.length + cancelled.length) === 0 ? '<p style="color:var(--text-muted);">No services this month</p>' : [...spent.map(t => '<div class="item-row" style="padding:12px 16px;"><div class="item-info"><strong>' + t.employeeName + '</strong><small>' + t.serviceName + ' • ' + new Date(t.timestamp).toLocaleDateString() + '</small></div><div class="item-points" style="color:var(--danger-dark);">-' + t.points + '</div></div>'), ...cancelled.map(t => '<div class="item-row" style="padding:12px 16px;background:var(--warning-light);"><div class="item-info"><strong>' + t.employeeName + (t.type === 'reverse' ? ' (Points Reversed)' : ' (Cancelled)') + '</strong><small>' + (t.activityName || t.serviceName) + ' • ' + new Date(t.timestamp).toLocaleDateString() + '</small></div><div class="item-points" style="color:var(--gold-dark);">' + (t.type === 'reverse' ? '-' : '+') + Math.abs(t.points) + (t.type === 'reverse' ? ' (Reversed)' : ' (refunded)') + '</div></div>')].join('');
-document.getElementById('report-employees-tbody').innerHTML = employees.map(e => { const empEarned = earned.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0); const empSpent = spent.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0); return '<tr><td><strong>' + e.name + '</strong></td><td>' + (e.department || '-') + '</td><td style="color:var(--success-dark);">+' + empEarned + '</td><td style="color:var(--danger-dark);">-' + empSpent + '</td><td><strong style="color:var(--gold-dark);">' + (e.points || 0) + '</strong></td></tr>'; }).join('');
+document.getElementById('report-activities').innerHTML = earned.length === 0 ? '<p style="color:var(--text-muted);">No activities this month</p>' : earned.map(t => `<div class="item-row" style="padding:12px 16px;"><div class="item-info"><strong>${t.employeeName}</strong><small>${t.activityName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--success-dark);">+${t.points}</div></div>`).join('');
+document.getElementById('report-services').innerHTML = (spent.length + cancelled.length) === 0 ? '<p style="color:var(--text-muted);">No services this month</p>' : [...spent.map(t => `<div class="item-row" style="padding:12px 16px;"><div class="item-info"><strong>${t.employeeName}</strong><small>${t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--danger-dark);">-${t.points}</div></div>`), ...cancelled.map(t => `<div class="item-row" style="padding:12px 16px;background:var(--warning-light);"><div class="item-info"><strong>${t.employeeName} ${t.type === 'reverse' ? '(Points Reversed)' : '(Cancelled)'}</strong><small>${t.activityName || t.serviceName} • ${new Date(t.timestamp).toLocaleDateString()}</small></div><div class="item-points" style="color:var(--gold-dark);">${t.type === 'reverse' ? '-' : '+'}${Math.abs(t.points)} ${t.type === 'reverse' ? '(Reversed)' : '(refunded)'}</div></div>`)].join('');
+document.getElementById('report-employees-tbody').innerHTML = employees.map(e => { const empEarned = earned.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0); const empSpent = spent.filter(t => t.employeeId === e.employeeId).reduce((s, t) => s + t.points, 0); return `<tr><td><strong>${e.name}</strong></td><td>${e.department || '-'}</td><td style="color:var(--success-dark);">+${empEarned}</td><td style="color:var(--danger-dark);">-${empSpent}</td><td><strong style="color:var(--gold-dark);">${e.points || 0}</strong></td></tr>`; }).join('');
 }
-// FIXED: CSV now uses \n escape sequences instead of literal line breaks (this was breaking the whole script)
-function downloadReport() {
-let csv = 'Employee,Department,Points Earned,Points Spent,Current Balance\n';
-employees.forEach(e => {
-csv += '"' + e.name + '","' + (e.department || '') + '",' + (e.totalEarned || 0) + ',' + (e.totalSpent || 0) + ',' + (e.points || 0) + '\n';
-});
-const blob = new Blob([csv], {type: 'text/csv'});
-const a = document.createElement('a');
-a.href = URL.createObjectURL(blob);
-a.download = 'loyalty-report-' + new Date().toISOString().slice(0, 10) + '.csv';
-a.click();
-showAlert('Report downloaded!', 'success');
-}
+function downloadReport() { let csv = 'Employee,Department,Points Earned,Points Spent,Current Balance\n'; employees.forEach(e => { csv += `"${e.name}","${e.department || ''}",${e.totalEarned || 0},${e.totalSpent || 0},${e.points || 0}\n`; }); const blob = new Blob([csv], {type: 'text/csv'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `loyalty-report-${new Date().toISOString().slice(0, 10)}.csv`; a.click(); }
 function showAlert(msg, type) { const el = document.getElementById('alert-' + type); el.innerText = msg; el.style.display = 'block'; setTimeout(() => el.style.display = 'none', 3500); }
+// ============ ACTIVITY WISE BULK POINTS ============
+function switchPointsTab(tab, btn) {
+document.querySelectorAll('.points-sub-tab-content').forEach(el => el.style.display = 'none');
+document.getElementById('points-tab-' + tab).style.display = 'block';
+document.querySelectorAll('.points-sub-tab').forEach(b => {
+b.style.color = 'var(--text-muted)';
+b.style.borderBottom = '3px solid transparent';
+});
+btn.style.color = 'var(--brand)';
+btn.style.borderBottom = '3px solid var(--brand)';
+}
+function showActivitySuggestionsBulk(query) {
+const container = document.getElementById('bulk-activity-suggestions');
+if(!query || query.length < 2) { container.classList.remove('active'); return; }
+const matches = activities.filter(a => a.name.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
+if(matches.length === 0) { container.classList.remove('active'); return; }
+container.innerHTML = matches.map(a => `<div class="autocomplete-item" onclick="selectBulkActivity('${a.id}')"><strong>${a.name}</strong><small>${a.points} points</small></div>`).join('');
+container.classList.add('active');
+}
+function selectBulkActivity(activityId) {
+const activity = activities.find(a => a.id === activityId);
+if(!activity) return;
+document.getElementById('bulk-activity-name').value = activity.name;
+document.getElementById('bulk-activity-suggestions').classList.remove('active');
+}
+function showEmployeeSuggestionsBulk(query) {
+const container = document.getElementById('bulk-emp-suggestions');
+if(!query || query.length < 2) { container.classList.remove('active'); return; }
+const matches = employees.filter(e => e.name.toLowerCase().includes(query.toLowerCase()) || e.employeeId.toLowerCase().includes(query.toLowerCase())).slice(0, 5);
+if(matches.length === 0) { container.classList.remove('active'); return; }
+container.innerHTML = matches.map(e => `<div class="autocomplete-item" onclick="addEmployeeToBulkList('${e.id}')"><strong>${e.name}</strong><small>ID: ${e.employeeId}</small></div>`).join('');
+container.classList.add('active');
+}
+function addEmployeeToBulkList(empId) {
+const emp = employees.find(e => e.id === empId);
+if(!emp) return;
+if(bulkSelectedEmployees.some(e => e.id === empId)) {
+showAlert('Employee already added to the list', 'warning');
+return;
+}
+bulkSelectedEmployees.push({id: emp.id, employeeId: emp.employeeId, name: emp.name, department: emp.department || ''});
+renderBulkSelectedEmployees();
+document.getElementById('bulk-emp-search').value = '';
+document.getElementById('bulk-emp-suggestions').classList.remove('active');
+}
+function removeEmployeeFromBulkList(empId) {
+bulkSelectedEmployees = bulkSelectedEmployees.filter(e => e.id !== empId);
+renderBulkSelectedEmployees();
+}
+function renderBulkSelectedEmployees() {
+const container = document.getElementById('selected-employees-container');
+const countSpan = document.getElementById('selected-emp-count');
+countSpan.innerText = bulkSelectedEmployees.length;
+if(bulkSelectedEmployees.length === 0) {
+container.innerHTML = '<small style="color:var(--text-muted);">No employees selected yet.</small>';
+return;
+}
+container.innerHTML = bulkSelectedEmployees.map(emp => `
+<div style="display:inline-flex;align-items:center;gap:8px;background:var(--brand-50);border:1px solid var(--brand);padding:6px 12px;border-radius:20px;font-size:0.85rem;">
+<strong>${emp.name}</strong>
+<span style="color:var(--text-muted);font-size:0.75rem;">(${emp.employeeId})</span>
+<button onclick="removeEmployeeFromBulkList('${emp.id}')" style="background:none;border:none;color:var(--danger);cursor:pointer;font-weight:bold;font-size:1rem;line-height:1;padding:0 4px;">&times;</button>
+</div>
+`).join('');
+}
+function saveBulkActivityPoints() {
+const activityDate = document.getElementById('bulk-activity-date').value;
+const activityName = document.getElementById('bulk-activity-name').value.trim();
+const remarks = document.getElementById('bulk-activity-remarks').value.trim();
+if(!activityDate || !activityName) return showAlert('Please select date and activity', 'error');
+if(bulkSelectedEmployees.length === 0) return showAlert('Please add at least one employee', 'error');
+const activity = activities.find(a => a.name.toLowerCase() === activityName.toLowerCase());
+if(!activity) return showAlert('Activity not found. Please select from suggestions.', 'error');
+const points = activity.points;
+const dateObj = new Date(activityDate);
+const month = dateObj.getMonth() + 1;
+const year = dateObj.getFullYear();
+const monthNames = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const neverExpiresList = ['host of the month','leader of the quarter','host of the year','leader of the year','one year anniversary','two years anniversary','three years anniversary','four years anniversary','five years anniversary','sustainability hero – nominee','sustainability hero – winner','group winner (ss brand)','bio blitz winner','bio blitz runner-up'];
+const neverExpires = neverExpiresList.some(a => activityName.toLowerCase().includes(a));
+let successCount = 0;
+let errorCount = 0;
+const promises = bulkSelectedEmployees.map(emp => {
+const activityRecord = {
+employeeId: emp.employeeId,
+employeeName: emp.name,
+employeeDept: emp.department,
+activityName: activityName,
+points: points,
+activityDate: activityDate,
+month: month,
+monthName: monthNames[month - 1],
+year: year,
+remarks: remarks,
+addedBy: 'admin-bulk-activity',
+createdAt: Date.now(),
+neverExpires: neverExpires
+};
+return db.ref('loyalty/employeeActivities').push(activityRecord).then(() => {
+return db.ref('loyalty/employees/' + emp.id).transaction(currentData => {
+if (currentData) {
+currentData.points = (currentData.points || 0) + points;
+currentData.totalEarned = (currentData.totalEarned || 0) + points;
+}
+return currentData;
+}).then(() => {
+return db.ref('loyalty/employees/' + emp.id).once('value');
+}).then(snap => {
+const empData = snap.val();
+const runningBalance = empData ? (empData.points || 0) : 0;
+return db.ref('loyalty/transactions').push({
+employeeId: emp.employeeId,
+employeeName: emp.name,
+type: 'earn',
+activityName: activityName,
+points: points,
+runningBalance: runningBalance,
+addedBy: 'admin-bulk-activity',
+timestamp: Date.now()
+});
+});
+}).then(() => {
+successCount++;
+}).catch(err => {
+console.error(err);
+errorCount++;
+});
+});
+Promise.all(promises).then(() => {
+if(successCount > 0) {
+showAlert(`Successfully awarded ${points} points to ${successCount} employees!`, 'success');
+}
+if(errorCount > 0) {
+showAlert(`${errorCount} entries failed. Check console for details.`, 'error');
+}
+document.getElementById('bulk-activity-date').value = '';
+document.getElementById('bulk-activity-name').value = '';
+document.getElementById('bulk-emp-search').value = '';
+document.getElementById('bulk-activity-remarks').value = '';
+bulkSelectedEmployees = [];
+renderBulkSelectedEmployees();
+});
+}
 document.addEventListener('click', function(e) {
 if(window.innerWidth <= 768 && !e.target.closest('.navbar') && !e.target.closest('.nav-btn')) {
 document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('show-mobile'));
