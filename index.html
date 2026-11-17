@@ -2934,10 +2934,17 @@ if(!confirm(`Permanently delete voucher ${voucher.serialNo}?
 Note: This will NOT refund points. Use 'Cancel' if you want to refund points to the employee.`)) return;
 db.ref('loyalty/vouchers/' + voucherId).remove().then(() => showAlert('Voucher deleted permanently', 'success'));
 }
+function getVoucherBalance(v) {
+// Balance right after THIS voucher's redemption, taken from the matching spend transaction
+const t0 = v.createdAt || v.issueDate || 0;
+const matches = transactions.filter(t => t.type === 'spend' && String(t.employeeId) === String(v.employeeId) && t.serviceName === v.serviceName && Number(t.points) === Number(v.points) && typeof t.runningBalance === 'number');
+if(matches.length) { matches.sort((a,b) => Math.abs((a.timestamp||0) - t0) - Math.abs((b.timestamp||0) - t0)); if(Math.abs((matches[0].timestamp||0) - t0) < 600000) return matches[0].runningBalance; }
+const emp = employees.find(e => e.employeeId === v.employeeId); return emp ? (emp.points || 0) : 0;
+}
 function viewVoucher(voucherId) { const voucher = vouchers.find(v => v.id === voucherId); if(!voucher) return showAlert('Voucher not found', 'error'); currentVoucher = {...voucher, hotelName: branding.hotelName || 'Host Loyalty Program', hotelLogo: branding.logo || ''}; showVoucher(currentVoucher); }
 function showVoucher(v) {
 const issueDate = new Date(v.issueDate).toLocaleDateString(); const expiryDate = new Date(v.expiryDate).toLocaleDateString();
-const emp = employees.find(e => e.employeeId === v.employeeId); const remainingPoints = emp ? (emp.points || 0) : 0;
+const remainingPoints = getVoucherBalance(v);
 document.getElementById('voucher-content').innerHTML = `<div class="voucher-preview"><div class="voucher-serial">Serial: ${v.serialNo}</div><div class="voucher-header"><div class="voucher-logo">${v.hotelLogo ? `<img src="${v.hotelLogo}">` : ''}</div><h2 style="color:#78350f;margin:10px 0 5px;">${v.hotelName || 'Host Loyalty Program'}</h2><p style="color:#92400e;font-size:0.9rem;">Service Redemption Voucher</p></div><div class="voucher-details"><div class="voucher-detail"><label>Employee Name</label><br><strong>${v.employeeName}</strong></div><div class="voucher-detail"><label>Department</label><br><strong>${v.employeeDept || '-'}</strong></div><div class="voucher-detail"><label>Service Availed</label><br><strong>${v.serviceName}</strong></div><div class="voucher-detail"><label>Category</label><br><strong>${v.serviceCategory || 'General'}</strong></div><div class="voucher-detail"><label>Issue Date</label><br><strong>${issueDate}</strong></div><div class="voucher-detail"><label>Expiry Date</label><br><strong style="color:#dc2626;">${expiryDate}</strong></div><div class="voucher-detail"><label>Points Redeemed</label><br><strong>${v.points} pts</strong></div><div class="voucher-detail"><label>Remaining Balance</label><br><strong style="color:var(--success);">${remainingPoints} pts</strong></div></div><div class="voucher-signature"><div class="line"></div><div style="color:#78350f;font-size:0.9rem;">Director HR Signature</div></div></div><p style="text-align:center;color:var(--text-muted);font-size:0.85rem;">This voucher is valid for 1 month from issue date.</p>`;
 document.getElementById('ticket-modal').classList.add('active');
 }
@@ -2945,7 +2952,7 @@ function downloadVoucherPDF() {
 if(!currentVoucher) return;
 const { jsPDF } = window.jspdf; const doc = new jsPDF(); const v = currentVoucher;
 const issueDate = new Date(v.issueDate).toLocaleDateString(); const expiryDate = new Date(v.expiryDate).toLocaleDateString();
-const emp = employees.find(e => e.employeeId === v.employeeId); const remainingPoints = emp ? (emp.points || 0) : 0;
+const remainingPoints = getVoucherBalance(v);
 doc.setFillColor(15, 118, 110); doc.rect(0, 0, 210, 40, 'F'); doc.setTextColor(255, 255, 255); doc.setFontSize(22); doc.setFont(undefined, 'bold'); doc.text(v.hotelName || 'Host Loyalty Program', 105, 20, {align: 'center'}); doc.setFontSize(12); doc.setFont(undefined, 'normal'); doc.text('Service Redemption Voucher', 105, 30, {align: 'center'});
 doc.setTextColor(0, 0, 0); doc.setFontSize(10); doc.text('Serial No: ' + v.serialNo, 15, 50); doc.setDrawColor(245, 158, 11); doc.setLineWidth(1); doc.rect(10, 45, 190, 180); doc.setFontSize(11); let y = 65;
 const details = [['Employee Name:', v.employeeName], ['Department:', v.employeeDept || '-'], ['Service Availed:', v.serviceName], ['Category:', v.serviceCategory || 'General'], ['Points Redeemed:', v.points + ' pts'], ['Remaining Balance:', remainingPoints + ' pts'], ['Issue Date:', issueDate], ['Expiry Date:', expiryDate]];
